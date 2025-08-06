@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashoka Universal School Mock-Stock Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Ashoka Universal School Theme Colors - Light Mode */
+        :root {
+            --primary-green: #006400; /* A deep, rich green from Ashoka branding */
+            --golden-yellow: #FFD700; /* Bright, golden yellow from Ashoka branding */
+            --light-background: #F8F8F0; /* Off-white, like paper */
+            --white-card-background: #ffffff; /* Pure white for main cards */
+            --dark-text: #333333; /* Dark gray for readability */
+            --light-border: #E0E0E0; /* Light gray border */
+            --positive-color: #28a745; /* Standard green for positive change */
+            --negative-color: #dc3545; /* Standard red for negative change */
+            --font-family: 'Poppins', sans-serif;
+            --flash-positive: rgba(40, 167, 69, 0.1); /* Subtle green flash */
+            --flash-negative: rgba(220, 53, 69, 0.1); /* Subtle red flash */
+            --tooltip-bg: var(--primary-green); /* Tooltip background matches primary green */
+            --tooltip-text-color: #ffffff; /* White text on tooltip */
+            --accent-glow: rgba(0, 100, 0, 0.2); /* Subtle green glow for focus/active states */
+            --input-bg: #f0f0f0;
+            --input-border: #cccccc;
+            --button-bg: var(--primary-green);
+            --button-text: #ffffff;
+            --link-color: var(--primary-green);
+            --portfolio-bg: #e6ffe6; /* Light green for portfolio in light mode */
+            --portfolio-border: #90ee90;
+        }
+
+        /* Dark Mode Colors */
+        body.dark-mode {
+            --primary-green: #4CAF50; /* Brighter green for dark mode */
+            --golden-yellow: #FFEB3B; /* Brighter yellow for dark mode */
+            --light-background: #1a1a36; /* Dark blue-purple background */
+            --white-card-background: #2b2b4d; /* Darker card background */
+            --dark-text: #e0e0f0; /* Light text for readability */
+            --light-border: #333355; /* Darker border */
+            --positive-color: #66BB6A; /* Lighter green for positive change */
+            --negative-color: #EF5350; /* Lighter red for negative change */
+            --flash-positive: rgba(102, 187, 106, 0.2);
+            --flash-negative: rgba(239, 83, 80, 0.2);
+            --tooltip-bg: #1a1a36;
+            --tooltip-text-color: #e0e0f0;
+            --accent-glow: rgba(76, 175, 80, 0.3);
+            --input-bg: #3b3b6b;
+            --input-border: #555588;
+            --button-bg: var(--primary-green);
+            --button-text: #ffffff;
+            --link-color: var(--golden-yellow);
+            --portfolio-bg: #1f3a4e; /* Darker blue-green for portfolio in dark mode */
+            --portfolio-border: #3a6b8c;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-background);
+            color: var(--dark-text);
+            margin: 0;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease; /* Smooth transition for dark mode */
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            background-color: var(--white-card-background);
+            border-radius: 12px;
+            border: 1px solid var(--light-border);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+            animation: fadeIn 1s ease-in-out;
+            transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease; /* Smooth transition for dark mode */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-green);
+            border-bottom: 2px solid var(--light-border);
+            padding-bottom: 1.2rem;
+            margin-bottom: 2.5rem;
+            font-weight: 700;
+            font-size: 2.8rem;
+            letter-spacing: 0.5px;
+            transition: color 0.5s ease, border-color 0.5s ease; /* Smooth transition for dark mode */
+        }
+
+        .intro-text {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--dark-text);
+            transition: color 0.5s ease; /* Smooth transition for dark mode */
+        }
+        
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 2.5rem;
+            animation: slideIn 0.8s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .category-button {
+            background-color: var(--white-card-background);
+            color: var(--dark-text);
+            border: 1px solid var(--light-border);
+            padding: 10px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, color 0.3s ease;
+        }
+        
+        .category-button:hover {
+            background-color: var(--light-background); /* Lighter hover state */
+            border-color: var(--primary-green);
+        }
+        
+        .category-button.active {
+            background-color: var(--primary-green);
+            color: #ffffff;
+            border-color: var(--primary-green);
+            transform: scale(1.03);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+        
+        .category-section {
+            margin-bottom: 3rem;
+        }
+        
+        .category-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            border-bottom: 1px solid var(--light-border);
+            padding-bottom: 0.7rem;
+            margin-bottom: 1.8rem;
+            transition: color 0.5s ease, border-color 0.5s ease; /* Smooth transition for dark mode */
+        }
+
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .stock-item {
+            background-color: var(--white-card-background);
+            border: 1px solid var(--light-border);
+            border-radius: 12px;
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Distribute content and push button to bottom */
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.5s ease, border-color 0.5s ease; /* Smoother animation */
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stock-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Smoother flash animations */
+        @keyframes priceUpFlash {
+            0% { background-color: var(--flash-positive); transform: scale(1.02); }
+            50% { background-color: var(--flash-positive); transform: scale(1.01); }
+            100% { background-color: var(--white-card-background); transform: scale(1); }
+        }
+        
+        @keyframes priceDownFlash {
+            0% { background-color: var(--flash-negative); transform: scale(1.02); }
+            50% { background-color: var(--flash-negative); transform: scale(1.01); }
+            100% { background-color: var(--white-card-background); transform: scale(1); }
+        }
+
+        .stock-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .stock-name {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: var(--dark-text);
+            transition: color 0.5s ease; /* Smooth transition for dark mode */
+        }
+
+        .stock-symbol {
+            font-size: 1rem;
+            color: #666666;
+            background-color: var(--light-border); /* Use border color for symbol background */
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: background-color 0.5s ease, color 0.5s ease; /* Smooth transition for dark mode */
+        }
+
+        .stock-price-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+            flex-grow: 1; /* Allow price container to take available space */
+            margin-bottom: 1rem; /* Space between price and button */
+        }
+
+        .stock-price-container:hover {
+            transform: scale(1.01);
+        }
+
+        .stock-price {
+            font-size: 2.3rem;
+            font-weight: 700;
+            line-height: 1;
+            transition: color 0.5s ease;
+        }
+
+        .price-change-icon {
+            margin-left: 1rem;
+            font-size: 1.6rem;
+            align-self: center;
+            transition: transform 0.5s ease, color 0.5s ease; /* Smooth transition for dark mode */
+        }
+
+        .positive {
+            color: var(--positive-color);
+        }
+        .negative {
+            color: var(--negative-color);
+        }
+
+        .percentage-change, .change-value { /* Renamed daily-change to change-value */
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.2;
+            transition: color 0.5s ease;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 15px; /* Positioned at bottom-left */
+            left: 15px;
+            background-color: var(--tooltip-bg);
+            color: var(--tooltip-text-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 10; /* Ensure tooltip is above other content */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; /* Smooth transition for dark mode */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--primary-green);
+            pointer-events: none; /* Allow clicks to pass through tooltip when hidden */
+            transform: translateY(10px); /* Initial slight offset for animation */
+        }
+        
+        .stock-item:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0); /* Animate into view */
+            pointer-events: auto; /* Enable clicks on tooltip when visible */
+        }
+
+        .tooltip p {
+            margin: 0;
+            padding: 2px 0;
+            line-height: 1.3;
+        }
+        
+        .tooltip .tooltip-price {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--golden-yellow);
+        }
+
+        .tooltip .tooltip-change {
+            font-weight: 600;
+            display: block;
+        }
+
+        .add-to-watchlist-btn, .buy-btn, .sell-btn {
+            background-color: var(--golden-yellow);
+            color: var(--dark-text);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.5s ease; /* Smooth transition for dark mode */
+            z-index: 11; /* Ensure button is above tooltip if there's any overlap */
+            margin-top: 0.5rem; /* Space between buttons */
+        }
+
+        .add-to-watchlist-btn:hover, .buy-btn:hover, .sell-btn:hover {
+            background-color: #e6c200;
+            transform: translateY(-2px);
+        }
+
+        .add-to-watchlist-btn.added {
+            background-color: var(--primary-green);
+            color: #ffffff;
+        }
+
+        .buy-btn {
+            background-color: var(--positive-color);
+            color: #ffffff;
+            margin-right: 0.5rem;
+        }
+        .buy-btn:hover {
+            background-color: #218838;
+        }
+
+        .sell-btn {
+            background-color: var(--negative-color);
+            color: #ffffff;
+        }
+        .sell-btn:hover {
+            background-color: #c82333;
+        }
+
+        .stock-actions {
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            margin-top: 1rem;
+        }
+
+
+        .top-bar {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            right: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 1rem;
+        }
+
+        .top-bar .left-group, .top-bar .right-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: var(--white-card-background);
+            color: var(--dark-text);
+            border: 1px solid var(--light-border);
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-button:hover {
+            background-color: var(--light-background);
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+        }
+
+        .nav-button.active {
+            background-color: var(--primary-green);
+            color: #ffffff;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .theme-toggle-button {
+            background-color: var(--white-card-background);
+            color: var(--dark-text);
+            border: 1px solid var(--light-border);
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .theme-toggle-button:hover {
+            background-color: var(--light-background);
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+        }
+
+        /* Login/Register Page Styles */
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+            background-color: var(--light-background); /* Match body background */
+            transition: background-color 0.5s ease;
+        }
+
+        .auth-card {
+            background-color: var(--white-card-background);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .auth-card h2 {
+            color: var(--primary-green);
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            font-weight: 700;
+            transition: color 0.5s ease;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+            font-weight: 600;
+            transition: color 0.5s ease;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--dark-text);
+            transition: border-color 0.3s ease, background-color 0.5s ease, color 0.5s ease;
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .auth-button:hover {
+            background-color: var(--primary-green);
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+        
+        .auth-button:active {
+            transform: translateY(0);
+        }
+
+        .auth-message {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--dark-text);
+            transition: color 0.5s ease;
+        }
+
+        .auth-message a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .auth-message a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: var(--negative-color);
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .user-id-display {
+            font-size: 0.85rem;
+            color: var(--dark-text);
+            background-color: var(--white-card-background);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--light-border);
+            z-index: 99;
+            max-width: 200px; /* Limit width */
+            word-wrap: break-word; /* Wrap long IDs */
+            transition: color 0.5s ease, background-color 0.5s ease, border-color 0.5s ease;
+        }
+        .user-id-display strong {
+            color: var(--primary-green);
+            transition: color 0.5s ease;
+        }
+
+        /* Portfolio Section */
+        .portfolio-summary {
+            background-color: var(--portfolio-bg);
+            border: 1px solid var(--portfolio-border);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+
+        .portfolio-item {
+            text-align: center;
+            padding: 0.8rem;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.5); /* Slightly transparent white */
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            transition: background-color 0.5s ease;
+        }
+        body.dark-mode .portfolio-item {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .portfolio-item h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: var(--dark-text);
+            transition: color 0.5s ease;
+        }
+
+        .portfolio-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            transition: color 0.5s ease;
+        }
+        .portfolio-value.positive { color: var(--positive-color); }
+        .portfolio-value.negative { color: var(--negative-color); }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--white-card-background);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transform: translateY(-50px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.5s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-content h3 {
+            color: var(--primary-green);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            transition: color 0.5s ease;
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-content input[type="number"] {
+            width: calc(100% - 30px); /* Adjust for padding */
+            padding: 10px 15px;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--dark-text);
+            transition: border-color 0.3s ease, background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .modal-buttons {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .modal-buttons .confirm-btn {
+            background-color: var(--positive-color);
+            color: #ffffff;
+            border: none;
+        }
+        .modal-buttons .confirm-btn:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .modal-buttons .cancel-btn {
+            background-color: #cccccc;
+            color: var(--dark-text);
+            border: 1px solid #999999;
+        }
+        .modal-buttons .cancel-btn:hover {
+            background-color: #bbbbbb;
+            transform: translateY(-2px);
+        }
+
+        .modal-message {
+            margin-top: 1rem;
+            color: var(--negative-color);
+            font-weight: 600;
+        }
+        
+        /* Role Selection Page Styles */
+        .role-selection-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+            background-color: var(--light-background);
+            transition: background-color 0.5s ease;
+        }
+
+        .role-selection-card {
+            background-color: var(--white-card-background);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .role-selection-card h2 {
+            color: var(--primary-green);
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            font-weight: 700;
+            transition: color 0.5s ease;
+        }
+
+        .role-buttons-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .role-button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .role-button.trader {
+            background-color: #007bff; /* Blue for Trader */
+        }
+        .role-button.trader:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.3);
+        }
+
+        .role-button.viewer {
+            background-color: #28a745; /* Green for Viewer */
+        }
+        .role-button.viewer:hover {
+            background-color: #1e7e34;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.3);
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.8rem;
+            }
+            .container {
+                padding: 1.2rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+            .intro-text {
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+            .category-button {
+                font-size: 0.8rem;
+                padding: 8px 14px;
+            }
+            .stock-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            .stock-grid {
+                grid-template-columns: 1fr;
+            }
+            .stock-item {
+                padding: 1.2rem;
+            }
+            .stock-name {
+                font-size: 1.1rem;
+            }
+            .stock-price {
+                font-size: 2rem;
+            }
+            .percentage-change, .change-value {
+                font-size: 1.3rem;
+            }
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                top: 1rem;
+                left: 1rem;
+                right: 1rem;
+                gap: 0.5rem;
+            }
+            .top-bar .left-group, .top-bar .right-group {
+                width: 100%;
+                justify-content: flex-start;
+                gap: 0.5rem;
+            }
+            .user-id-display {
+                margin-top: 0.5rem;
+            }
+            .portfolio-summary {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            .portfolio-item h3 {
+                font-size: 1rem;
+            }
+            .portfolio-value {
+                font-size: 1.5rem;
+            }
+            .auth-card {
+                padding: 2rem;
+            }
+            .modal-content {
+                padding: 1.5rem;
+            }
+            .role-selection-card {
+                padding: 2rem;
+            }
+            .role-selection-card h2 {
+                font-size: 1.8rem;
+            }
+            .role-button {
+                font-size: 1rem;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gray-100 p-8 flex flex-col items-center font-sans">
+        <!-- Top Bar for Navigation, Theme Toggle, and User Info -->
+        <div id="top-bar" class="top-bar hidden">
+            <div class="left-group">
+                <button id="nav-trader" class="nav-button">Trader</button>
+                <button id="nav-viewer" class="nav-button">Viewer</button>
+                <button id="nav-admin" class="nav-button">Admin</button>
+                <div class="user-id-display">
+                    <strong>User:</strong> <span id="user-id-display-text"></span>
+                </div>
+            </div>
+            <div class="right-group">
+                <button id="logout-button" class="nav-button bg-red-500 text-white hover:bg-red-600">Logout</button>
+                <button id="theme-toggle" class="theme-toggle-button">
+                    <span id="theme-icon">☀️</span>
+                    <span id="theme-text">Light Mode</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login-page" class="auth-container">
+            <div class="auth-card">
+                <h2>Login to Mock-Stock Challenge</h2>
+                <div class="form-group">
+                    <label for="login-username">Username:</label>
+                    <input type="text" id="login-username" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <button id="login-button" class="auth-button">Login</button>
+                <p id="login-error" class="error-message"></p>
+                <p class="auth-message">Don't have an account? <a href="#" id="go-to-register">Register here</a></p>
+                <p class="auth-message">Or <a href="#" id="anonymous-sign-in">Continue as Guest</a></p>
+            </div>
+        </div>
+
+        <!-- Registration Page -->
+        <div id="register-page" class="auth-container hidden">
+            <div class="auth-card">
+                <h2>Register for Mock-Stock Challenge</h2>
+                <div class="form-group">
+                    <label for="register-username">Username:</label>
+                    <input type="text" id="register-username" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" placeholder="Create a password">
+                </div>
+                <button id="register-button" class="auth-button">Register</button>
+                <p id="register-error" class="error-message"></p>
+                <p class="auth-message">Already have an account? <a href="#" id="go-to-login">Login here</a></p>
+            </div>
+        </div>
+
+        <!-- Role Selection Page -->
+        <div id="role-selection-page" class="role-selection-container hidden">
+            <div class="role-selection-card">
+                <h2>How would you like to enter?</h2>
+                <div class="role-buttons-group">
+                    <button id="enter-as-trader" class="role-button trader">
+                        Enter as Trader
+                    </button>
+                    <button id="enter-as-viewer" class="role-button viewer">
+                        Enter as Viewer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="admin-section" class="container hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Admin: Create New Item</h1>
+            <p class="text-gray-600 mb-4 text-center">
+                As an admin, you can create new items here. These items will be stored in the public Firestore database, accessible by the Viewer and Trading sections.
+            </p>
+            <div class="bg-blue-50 p-6 rounded-lg shadow-md">
+                <div class="mb-4">
+                    <label for="itemName" class="block text-gray-700 text-sm font-medium mb-2">Item Name:</label>
+                    <input type="text" id="itemName" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., Laptop Pro X">
+                </div>
+                <div class="mb-4">
+                    <label for="itemDescription" class="block text-gray-700 text-sm font-medium mb-2">Description:</label>
+                    <textarea id="itemDescription" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24 resize-y" placeholder="e.g., High-performance laptop with M2 chip"></textarea>
+                </div>
+                <div class="mb-6">
+                    <label for="itemPrice" class="block text-gray-700 text-sm font-medium mb-2">Price ($):</label>
+                    <input type="number" id="itemPrice" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., 1499.99" step="0.01">
+                </div>
+                <button id="create-item-button" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 ease-in-out shadow-md">
+                    Create Item
+                </button>
+                <p id="admin-message" class="mt-4 text-sm text-center text-gray-600 bg-blue-100 p-2 rounded-md"></p>
+                <p id="created-item-id" class="mt-4 text-sm text-center text-green-700 font-semibold bg-green-100 p-2 rounded-md break-all"></p>
+            </div>
+        </div>
+
+        <!-- Viewer Section (for general items, not stocks) -->
+        <div id="viewer-section" class="container hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Viewer: Fetch Item Details</h1>
+            <p class="text-gray-600 mb-4 text-center">
+                As a viewer, you can look up details of items by their unique ID. This simulates how a separate viewer application would access data created by the admin.
+            </p>
+            <div class="bg-green-50 p-6 rounded-lg shadow-md">
+                <div class="mb-4">
+                    <label for="searchItemId" class="block text-gray-700 text-sm font-medium mb-2">Enter Item ID:</label>
+                    <input type="text" id="searchItemId" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Paste an item ID here">
+                </div>
+                <button id="fetch-item-button" class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 ease-in-out shadow-md">
+                    Fetch Item Details
+                </button>
+                <p id="viewer-message" class="mt-4 text-sm text-center text-gray-600 bg-green-100 p-2 rounded-md"></p>
+                <div id="fetched-item-details" class="mt-4 p-4 bg-white rounded-md shadow-inner border border-gray-200 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Item Details:</h3>
+                    <p class="text-gray-700 mb-1"><span class="font-medium">ID:</span> <span id="item-detail-id" class="break-all"></span></p>
+                    <p class="text-gray-700 mb-1"><span class="font-medium">Name:</span> <span id="item-detail-name"></span></p>
+                    <p class="text-gray-700 mb-1"><span class="font-medium">Description:</span> <span id="item-detail-description"></span></p>
+                    <p class="text-gray-700 mb-1"><span class="font-medium">Price:</span> $<span id="item-detail-price"></span></p>
+                    <p class="text-gray-700 text-xs mt-2">
+                        <span class="font-medium">Created At:</span> <span id="item-detail-created-at"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading (Buying/Selling) Section -->
+        <div id="trading-section" class="container hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                Ashoka Universal School <br/> Mock-Stock Challenge (Trader)
+            </h1>
+            <p class="intro-text">
+                Welcome to the Live Mock-Stock Market Trader for the Ashoka Universal School Mock-Stock Challenge!
+                Here, you can monitor the real-time performance of various mock stocks across different sectors, buy, sell, and manage your portfolio.
+                Prices update every 3 seconds!
+            </p>
+
+            <section class="portfolio-summary">
+                <div class="portfolio-item">
+                    <h3>Cash Balance</h3>
+                    <p id="portfolio-cash" class="portfolio-value">₹0.00</p>
+                </div>
+                <div class="portfolio-item">
+                    <h3>Total Invested</h3>
+                    <p id="portfolio-invested" class="portfolio-value">₹0.00</p>
+                </div>
+                <div class="portfolio-item">
+                    <h3>Current Value</h3>
+                    <p id="portfolio-current-value" class="portfolio-value">₹0.00</p>
+                </div>
+                <div class="portfolio-item">
+                    <h3>Overall P/L</h3>
+                    <p id="portfolio-profit-loss" class="portfolio-value">₹0.00</p>
+                </div>
+            </section>
+
+            <div id="category-filter-trader" class="category-filter">
+                <!-- Category buttons will be rendered here by JS -->
+            </div>
+            <main id="stock-market-container-trader">
+                <ul id="stock-grid-trader" class="stock-grid">
+                    <!-- Stock cards will be rendered here by JS -->
+                </ul>
+            </main>
+        </div>
+
+        <!-- Stock Viewer (View Only) Section -->
+        <div id="stock-viewer-section" class="container hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                Ashoka Universal School <br/> Mock-Stock Challenge (Viewer)
+            </h1>
+            <p class="intro-text">
+                Welcome to the Live Mock-Stock Market Viewer for the Ashoka Universal School Mock-Stock Challenge!
+                Here, you can monitor the real-time performance of various mock stocks across different sectors.
+                Prices update every 3 seconds!
+            </p>
+
+            <div id="category-filter-viewer" class="category-filter">
+                <!-- Category buttons will be rendered here by JS -->
+            </div>
+            <main id="stock-market-container-viewer">
+                <ul id="stock-grid-viewer" class="stock-grid">
+                    <!-- Stock cards will be rendered here by JS -->
+                </ul>
+            </main>
+        </div>
+
+        <!-- Buy/Sell Modal -->
+        <div id="transaction-modal-overlay" class="modal-overlay">
+            <div class="modal-content">
+                <h3 id="modal-title" class="modal-title"></h3>
+                <p id="modal-stock-info" class="modal-stock-info"></p>
+                <div class="form-group">
+                    <label for="quantity-input">Quantity:</label>
+                    <input type="number" id="quantity-input" min="1" value="1">
+                </div>
+                <p id="modal-message" class="modal-message"></p>
+                <div class="modal-buttons">
+                    <button id="confirm-transaction-button" class="confirm-btn"></button>
+                    <button id="cancel-transaction-button" class="cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, collection, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Firebase instances
+        let app;
+        let db;
+        let auth;
+        let currentUserId = null;
+        let currentWatchlist = [];
+        let currentPortfolio = { cashBalance: 100000, holdings: [] };
+        let currentFilter = "All"; // For stock categories
+        let updatePricesIntervalId = null;
+
+        // Mock Stock Data
+        let stockData = [
+            {
+                category: "Finance",
+                stocks: [
+                    { id: "HDFCBANK", name: "HDFC Bank", symbol: "HDFCBANK", price: 1650.45, initialPrice: 1650.45, volatility: 0.015 },
+                    { id: "ICICIBANK", name: "ICICI Bank", symbol: "ICICIBANK", price: 980.10, initialPrice: 980.10, volatility: 0.018 },
+                    { id: "SBIN", name: "State Bank of India", symbol: "SBIN", price: 625.75, initialPrice: 625.75, volatility: 0.02 },
+                    { id: "BAJFINANCE", name: "Bajaj Finance", symbol: "BAJFINANCE", price: 7200.50, initialPrice: 7200.50, volatility: 0.025 },
+                    { id: "KOTAKBANK", name: "Kotak Mahindra Bank", symbol: "KOTAKBANK", price: 1910.80, initialPrice: 1910.80, volatility: 0.016 },
+                    { id: "AXISBANK", name: "Axis Bank", symbol: "AXISBANK", price: 1015.35, initialPrice: 1015.35, volatility: 0.019 },
+                    { id: "PAYTM", name: "Paytm", symbol: "PAYTM", price: 585.00, initialPrice: 585.00, volatility: 0.045 },
+                    { id: "PUNJAB", name: "Punjab National Bank", symbol: "PUNJAB", price: 115.90, initialPrice: 115.90, volatility: 0.025 },
+                    { id: "BANKBARODA", name: "Bank of Baroda", symbol: "BANKBARODA", price: 260.00, initialPrice: 260.00, volatility: 0.022 },
+                    { id: "RECLTD", name: "REC Ltd", symbol: "RECLTD", price: 530.70, initialPrice: 530.70, volatility: 0.023 },
+                    { id: "IIFL", name: "IIFL Finance", symbol: "IIFL", price: 590.25, initialPrice: 590.25, volatility: 0.035 },
+                    { id: "LICHSGFIN", name: "LIC Housing Finance", symbol: "LICHSGFIN", price: 715.00, initialPrice: 715.00, volatility: 0.021 },
+                    { id: "PFC", name: "Power Finance Corp", symbol: "PFC", price: 470.00, initialPrice: 470.00, volatility: 0.024 },
+                    { id: "HDFC", name: "HDFC Ltd", symbol: "HDFC", price: 2950.00, initialPrice: 2950.00, volatility: 0.014 },
+                    { id: "INDUSINDBK", name: "IndusInd Bank", symbol: "INDUSINDBK", price: 1320.60, initialPrice: 1320.60, volatility: 0.02 },
+                    { id: "PNBHOUSING", name: "PNB Housing", symbol: "PNBHOUSING", price: 690.45, initialPrice: 690.45, volatility: 0.03 },
+                    { id: "YESBANK", name: "Yes Bank", symbol: "YESBANK", price: 27.50, initialPrice: 27.50, volatility: 0.05 },
+                    { id: "FEDERALBNK", name: "Federal Bank", symbol: "FEDERALBNK", price: 155.80, initialPrice: 155.80, volatility: 0.02 },
+                    { id: "IDFCFIRSTB", name: "IDFC First Bank", symbol: "IDFCFIRSTB", price: 88.20, initialPrice: 88.20, volatility: 0.028 }
+                ]
+            },
+            {
+                category: "IT & Tech",
+                stocks: [
+                    { id: "TCS", name: "Tata Consultancy Services", symbol: "TCS", price: 3480.00, initialPrice: 3480.00, volatility: 0.017 },
+                    { id: "INFY", name: "Infosys", symbol: "INFY", price: 1425.00, initialPrice: 1425.00, volatility: 0.02 },
+                    { id: "WIPRO", name: "WIPRO", symbol: "WIPRO", price: 410.50, initialPrice: 410.50, volatility: 0.025 },
+                    { id: "TECHM", name: "Tech Mahindra", symbol: "TECHM", price: 1250.00, initialPrice: 1250.00, volatility: 0.023 },
+                    { id: "HCLTECH", name: "HCLTech", symbol: "HCLTECH", price: 1350.25, initialPrice: 1350.25, volatility: 0.021 },
+                    { id: "TATAELXSI", name: "Tata Elxsi", symbol: "TATAELXSI", price: 8150.00, initialPrice: 8150.00, volatility: 0.035 },
+                    { id: "PERSISTENT", name: "Persistent Systems", symbol: "PERSISTENT", price: 7600.00, initialPrice: 7600.00, volatility: 0.03 },
+                    { id: "LTIM", name: "LTIMindtree", symbol: "LTIM", price: 5350.00, initialPrice: 5350.00, volatility: 0.028 },
+                    { id: "COFORGE", name: "Coforge", symbol: "COFORGE", price: 6700.00, initialPrice: 6700.00, volatility: 0.032 },
+                    { id: "INFIBEAM", name: "Infibeam Avenues", symbol: "INFIBEAM", price: 32.50, initialPrice: 32.50, volatility: 0.06 },
+                    { id: "CYIENT", name: "Cyient", price: 2250.00, initialPrice: 2250.00, volatility: 0.031 },
+                    { id: "MPHASIS", name: "Mphasis", symbol: "MPHASIS", price: 2750.00, initialPrice: 2750.00, volatility: 0.029 },
+                    { id: "SONATSOFTW", name: "Sonata Software", symbol: "SONATSOFTW", price: 875.00, initialPrice: 875.00, volatility: 0.03 },
+                    { id: "MASTEK", name: "Mastek", symbol: "MASTEK", price: 2450.00, initialPrice: 2450.00, volatility: 0.027 },
+                    { id: "ZENSARTECH", name: "Zensar Technologies", symbol: "ZENSARTECH", price: 570.00, initialPrice: 570.00, volatility: 0.034 },
+                    { id: "L&TINFO", name: "L&T Technology Services", symbol: "L&TINFO", price: 4900.00, initialPrice: 4900.00, volatility: 0.025 },
+                    { id: "MINDTREE", name: "Mindtree", symbol: "MINDTREE", price: 4100.00, initialPrice: 4100.00, volatility: 0.026 }
+                ]
+            },
+            {
+                category: "Pharma",
+                stocks: [
+                    { id: "SUNPHARMA", name: "Sun Pharma", symbol: "SUNPHARMA", price: 1610.00, initialPrice: 1610.00, volatility: 0.016 },
+                    { id: "DRREDDY", name: "Dr. Reddy's Labs", symbol: "DRREDDY", price: 6350.00, initialPrice: 6350.00, volatility: 0.021 },
+                    { id: "CIPLA", name: "Cipla", symbol: "CIPLA", price: 1450.00, initialPrice: 1450.00, volatility: 0.018 },
+                    { id: "LUPIN", name: "Lupin", symbol: "LUPIN", price: 1750.00, initialPrice: 1750.00, volatility: 0.02 },
+                    { id: "TORNT", name: "Torrent Pharma", symbol: "TORNT", price: 3050.00, initialPrice: 3050.00, volatility: 0.022 },
+                    { id: "CADILA", name: "Zydus Lifesciences", symbol: "CADILA", price: 1050.00, initialPrice: 1050.00, volatility: 0.025 },
+                    { id: "AUROPHARMA", name: "Aurobindo Pharma", symbol: "AUROPHARMA", price: 1150.00, initialPrice: 1150.00, volatility: 0.028 },
+                    { id: "DIVISLAB", name: "Divi's Labs", symbol: "DIVISLAB", price: 4150.00, initialPrice: 4150.00, volatility: 0.019 },
+                    { id: "IPCALAB", name: "Ipca Laboratories", symbol: "IPCALAB", price: 990.00, initialPrice: 990.00, volatility: 0.023 },
+                    { id: "GLAXO", name: "GSK Pharma", symbol: "GLAXO", price: 1420.00, initialPrice: 1420.00, volatility: 0.017 },
+                    { id: "BIOCON", name: "Biocon", symbol: "BIOCON", price: 315.00, initialPrice: 315.00, volatility: 0.035 },
+                    { id: "ALKEM", name: "Alkem Laboratories", symbol: "ALKEM", price: 5100.00, initialPrice: 5100.00, volatility: 0.02 }
+                ]
+            },
+            {
+                category: "Automotive",
+                stocks: [
+                    { id: "MARUTI", name: "Maruti Suzuki India", symbol: "MARUTI", price: 10250.00, initialPrice: 10250.00, volatility: 0.022 },
+                    { id: "TATAMOTORS", name: "Tata Motors", symbol: "TATAMOTORS", price: 675.00, initialPrice: 675.00, volatility: 0.03 },
+                    { id: "BAJAJAUTO", name: "Bajaj Auto", symbol: "BAJAJAUTO", price: 8750.00, initialPrice: 8750.00, volatility: 0.024 },
+                    { id: "M&M", name: "Mahindra & Mahindra", symbol: "M&M", price: 1850.00, initialPrice: 1850.00, volatility: 0.025 },
+                    { id: "EICHERMOT", name: "Eicher Motors", symbol: "EICHERMOT", price: 4650.00, initialPrice: 4650.00, volatility: 0.028 },
+                    { id: "ASHOKLEY", name: "Ashok Leyland", symbol: "ASHOKLEY", price: 210.00, initialPrice: 210.00, volatility: 0.035 },
+                    { id: "TVSMOTOR", name: "TVS Motor Company", symbol: "TVSMOTORS", price: 2250.00, initialPrice: 2250.00, volatility: 0.03 },
+                    { id: "HEROMOTOCO", name: "Hero MotoCorp", symbol: "HEROMOTOCO", price: 3200.00, initialPrice: 3200.00, volatility: 0.027 },
+                    { id: "BOSCHLTD", name: "Bosch Ltd", symbol: "BOSCHLTD", price: 20500.00, initialPrice: 20500.00, volatility: 0.018 },
+                    { id: "MRF", name: "MRF", symbol: "MRF", price: 105000.00, initialPrice: 105000.00, volatility: 0.02 }
+                ]
+            },
+            {
+                category: "Manufacturing & Infra",
+                stocks: [
+                    { id: "RELIANCE", name: "Reliance Industries", symbol: "RELIANCE", price: 2580.00, initialPrice: 2580.00, volatility: 0.015 },
+                    { id: "LT", name: "Larsen & Toubro", symbol: "LT", price: 3150.00, initialPrice: 3150.00, volatility: 0.019 },
+                    { id: "ASIANPAINT", name: "Asian Paints", symbol: "ASIANPAINT", price: 3300.00, initialPrice: 3300.00, volatility: 0.022 },
+                    { id: "ULTRACEMCO", name: "Ultratech Cement", symbol: "ULTRACEMCO", price: 7700.00, initialPrice: 7700.00, volatility: 0.02 },
+                    { id: "PIDILITIND", name: "Pidilite Industries", symbol: "PIDILITIND", price: 3100.00, initialPrice: 3100.00, volatility: 0.025 },
+                    { id: "GRASIM", name: "Grasim Industries", symbol: "GRASIM", price: 2500.00, initialPrice: 2500.00, volatility: 0.021 },
+                    { id: "JSWINFRA", name: "JSW Infrastructure", symbol: "JSWINFRA", price: 320.00, initialPrice: 320.00, volatility: 0.035 },
+                    { id: "ADANIPORTS", name: "Adani Ports", symbol: "ADANIPORTS", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 },
+                    { id: "AMBUJACEM", name: "Ambuja Cements", symbol: "AMBUJACEM", price: 680.00, initialPrice: 680.00, volatility: 0.025 },
+                    { id: "ACC", name: "ACC Ltd", symbol: "ACC", price: 2500.00, initialPrice: 2500.00, volatility: 0.023 },
+                    { id: "SHREECEM", name: "Shree Cement", symbol: "SHREECEM", price: 27500.00, initialPrice: 27500.00, volatility: 0.018 },
+                    { id: "DIXON", name: "Dixon Technologies", symbol: "DIXON", price: 6000.00, initialPrice: 6000.00, volatility: 0.032 },
+                    { id: "BHARATFORG", name: "Bharat Forge", symbol: "BHARATFORG", price: 1300.00, initialPrice: 1300.00, volatility: 0.028 },
+                    { id: "ADANIENT", name: "Adani Enterprises", symbol: "ADANIENT", price: 3350.00, initialPrice: 3350.00, volatility: 0.035 },
+                    { id: "DALBHARAT", name: "Dalmia Bharat", symbol: "DALBHARAT", price: 2100.00, initialPrice: 2100.00, volatility: 0.024 }
+                ]
+            },
+            {
+                category: "Energy",
+                stocks: [
+                    { id: "NTPC", name: "NTPC", symbol: "NTPC", price: 180.00, initialPrice: 180.00, volatility: 0.018 },
+                    { id: "POWERGRID", name: "Power Grid Corporation", symbol: "POWERGRID", price: 235.00, initialPrice: 235.00, volatility: 0.017 },
+                    { id: "IOC", name: "Indian Oil Corp", symbol: "IOC", price: 160.00, initialPrice: 160.00, volatility: 0.025 },
+                    { id: "BPCL", name: "Bharat Petroleum", symbol: "BPCL", price: 470.00, initialPrice: 470.00, volatility: 0.028 },
+                    { id: "GAIL", name: "GAIL (India)", symbol: "GAIL", price: 190.00, initialPrice: 190.00, volatility: 0.023 },
+                    { id: "ADANITRANS", name: "Adani Transmission", symbol: "ADANITRANS", price: 950.00, initialPrice: 950.00, volatility: 0.032 },
+                    { id: "TATAPOWER", name: "Tata Power", symbol: "TATAPOWER", price: 420.00, initialPrice: 420.00, volatility: 0.027 },
+                    { id: "ONGC", name: "ONGC", price: 295.00, initialPrice: 295.00, volatility: 0.024 },
+                    { id: "RECL", name: "REC Limited", symbol: "RECL", price: 500.00, initialPrice: 500.00, volatility: 0.025 },
+                    { id: "NHPC", name: "NHPC", price: 115.00, initialPrice: 115.00, volatility: 0.026 },
+                    { id: "OIL", name: "Oil India", symbol: "OIL", price: 410.00, initialPrice: 410.00, volatility: 0.029 },
+                    { id: "POWERINDIA", name: "Power Grid InvIT", symbol: "POWERINDIA", price: 155.00, initialPrice: 155.00, volatility: 0.019 }
+                ]
+            },
+            {
+                category: "FMCG",
+                stocks: [
+                    { id: "HINDUNILVR", name: "Hindustan Unilever", symbol: "HINDUNILVR", price: 2750.00, initialPrice: 2750.00, volatility: 0.013 },
+                    { id: "NESTLEIND", name: "Nestle India", symbol: "NESTLEIND", price: 26000.00, initialPrice: 26000.00, volatility: 0.015 },
+                    { id: "ITC", name: "ITC", symbol: "ITC", price: 465.00, initialPrice: 465.00, volatility: 0.018 },
+                    { id: "DABUR", name: "Dabur India", symbol: "DABUR", price: 570.00, initialPrice: 570.00, volatility: 0.017 },
+                    { id: "MARICO", name: "Marico", symbol: "MARICO", price: 620.00, initialPrice: 620.00, volatility: 0.02 },
+                    { id: "BRITANNIA", name: "Britannia Industries", symbol: "BRITANNIA", price: 5650.00, initialPrice: 5650.00, volatility: 0.019 },
+                    { id: "GODREJCP", name: "Godrej Consumer Products", symbol: "GODREJCP", price: 1250.00, initialPrice: 1250.00, volatility: 0.021 },
+                    { id: "EMAMILTD", name: "Emami Ltd", symbol: "EMAMILTD", price: 520.00, initialPrice: 520.00, volatility: 0.025 },
+                    { id: "VBL", name: "Varun Beverages", symbol: "VBL", price: 1600.00, initialPrice: 1600.00, volatility: 0.022 },
+                    { id: "PGHL", name: "Procter & Gamble Health", symbol: "PGHL", price: 5200.00, initialPrice: 5200.00, volatility: 0.016 }
+                ]
+            },
+            {
+                category: "Metals",
+                stocks: [
+                    { id: "TATASTEEL", name: "Tata Steel", symbol: "TATASTEEL", price: 155.00, initialPrice: 155.00, volatility: 0.035 },
+                    { id: "JSWSTEEL", name: "JSW Steel", symbol: "JSWSTEEL", price: 820.00, initialPrice: 820.00, volatility: 0.032 },
+                    { id: "HINDALCO", name: "Hindalco Industries", symbol: "HINDALCO", price: 670.00, initialPrice: 670.00, volatility: 0.03 },
+                    { id: "VEDL", name: "Vedanta", symbol: "VEDL", price: 420.00, initialPrice: 420.00, volatility: 0.04 },
+                    { id: "SAIL", name: "Steel Authority of India", symbol: "SAIL", price: 125.00, initialPrice: 125.00, volatility: 0.038 },
+                    { id: "NMDC", name: "NMDC", price: 260.00, initialPrice: 260.00, volatility: 0.033 },
+                    { id: "HINDZINC", name: "Hindustan Zinc", symbol: "HINDZINC", price: 335.00, initialPrice: 335.00, volatility: 0.031 },
+                    { id: "NALCO", name: "National Aluminium Company", symbol: "NALCO", price: 125.00, initialPrice: 125.00, volatility: 0.036 },
+                    { id: "JINDALSTEL", name: "Jindal Steel & Power", symbol: "JINDALSTEL", price: 770.00, initialPrice: 770.00, volatility: 0.034 }
+                ]
+            },
+            {
+                category: "Telecom",
+                stocks: [
+                    { id: "BHARTIARTL", name: "Bharti Airtel", symbol: "BHARTIARTL", price: 825.00, initialPrice: 825.00, volatility: 0.02 },
+                    { id: "JIOFIN", name: "Jio Financial Services", symbol: "JIOFIN", price: 365.00, initialPrice: 365.00, volatility: 0.03 },
+                    { id: "VODAFONE", name: "Vodafone Idea", symbol: "VODAFONE", price: 16.50, initialPrice: 16.50, volatility: 0.07 },
+                    { id: "INDUSINDBK", name: "Indus Towers", symbol: "INDUSINDBK", price: 360.00, initialPrice: 360.00, volatility: 0.025 }
+                ]
+            },
+            {
+                category: "Chemicals",
+                stocks: [
+                    { id: "UPL", name: "UPL", symbol: "UPL", price: 570.00, initialPrice: 570.00, volatility: 0.028 },
+                    { id: "TATACHEM", name: "Tata Chemicals", symbol: "TATACHEM", price: 1150.00, initialPrice: 1150.00, volatility: 0.025 },
+                    { id: "PIIND", name: "PI Industries", symbol: "PIIND", price: 3750.00, initialPrice: 3750.00, volatility: 0.027 },
+                    { id: "DEEPAKFERT", name: "Deepak Fertilisers", symbol: "DEEPAKFERT", price: 775.00, initialPrice: 775.00, volatility: 0.03 },
+                    { id: "BALRAMCHIN", name: "Balrampur Chini", symbol: "BALRAMCHIN", price: 440.00, initialPrice: 440.00, volatility: 0.033 }
+                ]
+            },
+            {
+                category: "Real Estate",
+                stocks: [
+                    { id: "DLF", name: "DLF", symbol: "DLF", price: 950.00, initialPrice: 950.00, volatility: 0.03 },
+                    { id: "GODREJPROP", name: "Godrej Properties", symbol: "GODREJPROP", price: 2950.00, initialPrice: 2950.00, volatility: 0.028 },
+                    { id: "OBEROIRLTY", name: "Oberoi Realty", symbol: "OBEROIRLTY", price: 1500.00, initialPrice: 1500.00, volatility: 0.025 },
+                    { id: "PRESTIGE", name: "Prestige Estates", symbol: "PRESTIGE", price: 1700.00, initialPrice: 1700.00, volatility: 0.029 },
+                    { id: "BRIGADE", name: "Brigade Enterprises", symbol: "BRIGADE", price: 900.00, initialPrice: 900.00, volatility: 0.032 }
+                ]
+            },
+            {
+                category: "Aviation",
+                stocks: [
+                    { id: "INDIGO", name: "InterGlobe Aviation", symbol: "INDIGO", price: 3600.00, initialPrice: 3600.00, volatility: 0.035 },
+                    { id: "SPICEJET", name: "SpiceJet", price: 55.00, initialPrice: 55.00, volatility: 0.06 },
+                    { id: "JETAIR", name: "Jet Airways", price: 75.00, initialPrice: 75.00, volatility: 0.055 }
+                ]
+            },
+            {
+                category: "Hospitality",
+                stocks: [
+                    { id: "INDIANH", name: "Indian Hotels", symbol: "INDIANH", price: 620.00, initialPrice: 620.00, volatility: 0.025 },
+                    { id: "CHALET", name: "Chalet Hotels", symbol: "CHALET", price: 810.00, initialPrice: 810.00, volatility: 0.03 },
+                    { id: "EASEMYTRIP", price: 52.50, initialPrice: 52.50, volatility: 0.045 }
+                ]
+            },
+            {
+                category: "Logistics",
+                stocks: [
+                    { id: "MAHINDCIE", name: "Mahindra CIE", symbol: "MAHINDCIE", price: 575.00, initialPrice: 575.00, volatility: 0.028 },
+                    { id: "TCI", name: "Transport Corporation of India", symbol: "TCI", price: 1050.00, initialPrice: 1050.00, volatility: 0.024 }
+                ]
+            },
+            {
+                category: "Consumer Durables",
+                stocks: [
+                    { id: "TITAN", name: "Titan Company", symbol: "TITAN", price: 3600.00, initialPrice: 3600.00, volatility: 0.025 },
+                    { id: "VOLTAS", name: "Voltas", symbol: "VOLTAS", price: 930.00, initialPrice: 930.00, volatility: 0.028 },
+                    { id: "CROMPTON", name: "Crompton Greaves", symbol: "CROMPTON", price: 315.00, initialPrice: 315.00, volatility: 0.03 },
+                    { id: "HAVELLS", name: "Havells India", symbol: "HAVELLS", price: 1550.00, initialPrice: 1550.00, volatility: 0.027 }
+                ]
+            },
+            {
+                category: "Textiles",
+                stocks: [
+                    { id: "RAYMOND", name: "Raymond", symbol: "RAYMOND", price: 2100.00, initialPrice: 2100.00, volatility: 0.03 },
+                    { id: "WELSPUNIND", name: "Welspun India", symbol: "WELSPUNIND", price: 160.00, initialPrice: 160.00, volatility: 0.035 },
+                    { id: "VARDHMAN", name: "Vardhman Textiles", symbol: "VARDHMAN", price: 420.00, initialPrice: 420.00, volatility: 0.03 }
+                ]
+            },
+            {
+                category: "Media & Entertainment",
+                stocks: [
+                    { id: "ZEEL", name: "Zee Entertainment", symbol: "ZEEL", price: 260.00, initialPrice: 260.00, volatility: 0.04 },
+                    { id: "SUNTV", name: "Sun TV Network", symbol: "SUNTV", price: 680.00, initialPrice: 680.00, volatility: 0.035 },
+                    { id: "PVRINOX", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 }
+                ]
+            },
+            {
+                category: "Healthcare",
+                stocks: [
+                    { id: "APOLLOHOSP", name: "Apollo Hospitals", symbol: "APOLLOHOSP", price: 5700.00, initialPrice: 5700.00, volatility: 0.022 },
+                    { id: "FORTIS", name: "Fortis Healthcare", symbol: "FORTIS", price: 420.00, initialPrice: 420.00, volatility: 0.028 },
+                    { id: "MAXHEALTH", name: "Max Healthcare", symbol: "MAXHEALTH", price: 830.00, initialPrice: 830.00, volatility: 0.025 }
+                ]
+            }
+        ];
+
+        // Flattened list of all stocks for easier lookup and filtering
+        const allStocksFlattened = stockData.flatMap(cat => cat.stocks);
+        // Map for quick access to stock objects by ID
+        const stockMap = allStocksFlattened.reduce((map, stock) => {
+            map[stock.id] = stock;
+            return map;
+        }, {});
+
+        // Utility function to get DOM elements
+        const getEl = (id) => document.getElementById(id);
+
+        // Function to show/hide pages
+        function showPage(pageId) {
+            const pages = ['login-page', 'register-page', 'role-selection-page', 'admin-section', 'trading-section', 'stock-viewer-section'];
+            pages.forEach(id => {
+                const page = getEl(id);
+                if (page) {
+                    page.classList.add('hidden');
+                }
+            });
+            const targetPage = getEl(pageId);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+            }
+
+            // Manage top bar visibility
+            const topBar = getEl('top-bar');
+            if (pageId === 'login-page' || pageId === 'register-page' || pageId === 'role-selection-page') {
+                topBar.classList.add('hidden');
+            } else {
+                topBar.classList.remove('hidden');
+            }
+            updateNavButtonStates(pageId);
+        }
+
+        // Update navigation button active states
+        function updateNavButtonStates(activePageId) {
+            const navButtons = document.querySelectorAll('.nav-button');
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            if (activePageId === 'trading-section') {
+                getEl('nav-trader').classList.add('active');
+            } else if (activePageId === 'stock-viewer-section') {
+                getEl('nav-viewer').classList.add('active');
+            } else if (activePageId === 'admin-section') {
+                getEl('nav-admin').classList.add('active');
+            }
+        }
+
+        // --- Auth Functions ---
+        async function loadUserData(uid) {
+            if (!db) return;
+            try {
+                // Load Watchlist
+                const watchlistDocRef = doc(db, `artifacts/${appId}/users/${uid}/watchlists/myWatchlist`);
+                const watchlistSnap = await getDoc(watchlistDocRef);
+                if (watchlistSnap.exists()) {
+                    currentWatchlist = watchlistSnap.data().stocks || [];
+                } else {
+                    currentWatchlist = [];
+                }
+
+                // Load Portfolio
+                const portfolioDocRef = doc(db, `artifacts/${appId}/users/${uid}/portfolio/currentPortfolio`);
+                const portfolioSnap = await getDoc(portfolioDocRef);
+                if (portfolioSnap.exists()) {
+                    const data = portfolioSnap.data();
+                    currentPortfolio = {
+                        cashBalance: data.cashBalance || 0,
+                        holdings: Array.isArray(data.holdings) ? data.holdings : []
+                    };
+                } else {
+                    currentPortfolio = { cashBalance: 100000, holdings: [] }; // Default initial portfolio
+                }
+            } catch (err) {
+                console.error("Error loading user data:", err);
+                currentWatchlist = [];
+                currentPortfolio = { cashBalance: 100000, holdings: [] };
+            }
+        }
+
+        async function saveWatchlist() {
+            if (!db || !currentUserId) return;
+            try {
+                const watchlistDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/watchlists/myWatchlist`);
+                await setDoc(watchlistDocRef, { stocks: currentWatchlist }, { merge: true });
+            } catch (err) {
+                console.error("Error saving watchlist:", err);
+            }
+        }
+
+        async function savePortfolio() {
+            if (!db || !currentUserId) return;
+            try {
+                const portfolioDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/portfolio/currentPortfolio`);
+                await setDoc(portfolioDocRef, currentPortfolio, { merge: true });
+            } catch (err) {
+                console.error("Error saving portfolio:", err);
+            }
+        }
+
+        async function handleLogin() {
+            const loginUsername = getEl('login-username').value;
+            const loginPassword = getEl('login-password').value;
+            const loginErrorEl = getEl('login-error');
+            loginErrorEl.textContent = '';
+
+            if (!loginUsername || !loginPassword) {
+                loginErrorEl.textContent = 'Please enter both username and password.';
+                return;
+            }
+
+            try {
+                const usernamesRef = collection(db, `artifacts/${appId}/public/usernames`);
+                const q = query(usernamesRef, where("username", "==", loginUsername));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    loginErrorEl.textContent = 'Username not found.';
+                    return;
+                }
+                const userData = querySnapshot.docs[0].data();
+                const email = userData.email; // Retrieve the dummy email used for Firebase auth
+                await signInWithEmailAndPassword(auth, email, loginPassword);
+                // onAuthStateChanged will handle page navigation
+            } catch (err) {
+                console.error("Login error:", err);
+                let errorMessage = 'Login failed. Please check your credentials.';
+                if (err.code === 'auth/wrong-password') {
+                    errorMessage = 'Incorrect password.';
+                } else if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                    errorMessage = 'Invalid username or password.';
+                }
+                loginErrorEl.textContent = errorMessage;
+            }
+        }
+
+        async function handleRegister() {
+            const registerUsername = getEl('register-username').value;
+            const registerPassword = getEl('register-password').value;
+            const registerErrorEl = getEl('register-error');
+            registerErrorEl.textContent = '';
+
+            if (!registerUsername || !registerPassword) {
+                registerErrorEl.textContent = 'Please fill in all fields.';
+                return;
+            }
+            if (registerPassword.length < 6) {
+                registerErrorEl.textContent = 'Password should be at least 6 characters.';
+                return;
+            }
+
+            try {
+                const usernamesRef = collection(db, `artifacts/${appId}/public/usernames`);
+                const q = query(usernamesRef, where("username", "==", registerUsername));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    registerErrorEl.textContent = 'This username is already taken. Please choose another.';
+                    return;
+                }
+
+                // Generate a dummy email for Firebase Authentication
+                const dummyEmail = `${registerUsername}@mockstock.com`;
+                const userCredential = await createUserWithEmailAndPassword(auth, dummyEmail, registerPassword);
+                const user = userCredential.user;
+
+                // Store user profile with the actual username
+                const userProfileRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/userProfile`);
+                await setDoc(userProfileRef, { username: registerUsername, email: dummyEmail, createdAt: new Date().toISOString() });
+
+                // Store the username-to-UID mapping in a public collection for login lookup
+                const usernameMapRef = doc(db, `artifacts/${appId}/public/usernames/${registerUsername}`);
+                await setDoc(usernameMapRef, { uid: user.uid, email: dummyEmail });
+
+                // Initialize empty watchlist and default portfolio for the new user
+                await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/watchlists/myWatchlist`), { stocks: [] });
+                await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/portfolio/currentPortfolio`), { cashBalance: 100000, holdings: [] });
+                
+                // onAuthStateChanged will handle page navigation
+            } catch (err) {
+                console.error("Registration error:", err);
+                let errorMessage = 'Registration failed.';
+                if (err.code === 'auth/email-already-in-use') {
+                    errorMessage = 'An account with this email (or generated dummy email) already exists.';
+                } else if (err.code === 'auth/weak-password') {
+                    errorMessage = 'Password is too weak.';
+                }
+                registerErrorEl.textContent = errorMessage;
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+            } catch (err) {
+                console.error("Logout error:", err);
+            }
+        }
+
+        async function handleAnonymousSignIn() {
+            try {
+                await signInAnonymously(auth);
+            } catch (err) {
+                console.error("Anonymous sign-in error:", err);
+                getEl('login-error').textContent = 'Failed to sign in as guest. Please try again.';
+            }
+        }
+
+        // --- Admin Functions ---
+        async function createItem() {
+            const itemName = getEl('itemName').value;
+            const itemDescription = getEl('itemDescription').value;
+            const itemPrice = getEl('itemPrice').value;
+            const adminMessageEl = getEl('admin-message');
+            const createdItemIdEl = getEl('created-item-id');
+
+            adminMessageEl.textContent = '';
+            createdItemIdEl.textContent = '';
+
+            if (!db || !currentUserId) {
+                adminMessageEl.textContent = "Database not ready or user not authenticated.";
+                return;
+            }
+            if (!itemName || !itemDescription || !itemPrice) {
+                adminMessageEl.textContent = "Please fill all item fields.";
+                return;
+            }
+
+            adminMessageEl.textContent = "Creating item...";
+            try {
+                const docRef = await addDoc(collection(db, `artifacts/${appId}/public/data/items`), {
+                    name: itemName,
+                    description: itemDescription,
+                    price: parseFloat(itemPrice),
+                    createdAt: new Date().toISOString(),
+                    createdBy: currentUserId
+                });
+                createdItemIdEl.textContent = `New Item ID: ${docRef.id}`;
+                adminMessageEl.textContent = `Item created successfully!`;
+                getEl('itemName').value = '';
+                getEl('itemDescription').value = '';
+                getEl('itemPrice').value = '';
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                adminMessageEl.textContent = "Error creating item. See console for details.";
+            }
+        }
+
+        // --- Viewer Functions (for general items, not stocks) ---
+        async function fetchItemDetails() {
+            const searchItemId = getEl('searchItemId').value;
+            const viewerMessageEl = getEl('viewer-message');
+            const fetchedItemDetailsEl = getEl('fetched-item-details');
+
+            viewerMessageEl.textContent = '';
+            fetchedItemDetailsEl.classList.add('hidden'); // Hide previous details
+
+            if (!db || !currentUserId) {
+                viewerMessageEl.textContent = "Database not ready or user not authenticated.";
+                return;
+            }
+            if (!searchItemId) {
+                viewerMessageEl.textContent = "Please enter an Item ID to search.";
+                return;
+            }
+
+            viewerMessageEl.textContent = "Fetching item details...";
+            try {
+                const docRef = doc(db, `artifacts/${appId}/public/data/items`, searchItemId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    getEl('item-detail-id').textContent = docSnap.id;
+                    getEl('item-detail-name').textContent = data.name;
+                    getEl('item-detail-description').textContent = data.description;
+                    getEl('item-detail-price').textContent = data.price ? data.price.toFixed(2) : 'N/A';
+                    getEl('item-detail-created-at').textContent = new Date(data.createdAt).toLocaleString();
+                    fetchedItemDetailsEl.classList.remove('hidden');
+                    viewerMessageEl.textContent = "Item found!";
+                } else {
+                    viewerMessageEl.textContent = "No item found with that ID.";
+                }
+            } catch (e) {
+                console.error("Error fetching document: ", e);
+                viewerMessageEl.textContent = "Error fetching item. See console for details.";
+            }
+        }
+
+        // --- Stock Market Simulation Functions ---
+        const normalRandom = (() => {
+            let y2;
+            let useLast = false;
+            return function() {
+                if (useLast) {
+                    useLast = false;
+                    return y2;
+                }
+                let x1, x2, w;
+                do {
+                    x1 = 2.0 * Math.random() - 1.0;
+                    x2 = 2.0 * Math.random() - 1.0;
+                    w = x1 * x1 + x2 * x2;
+                } while (w >= 1.0);
+                w = Math.sqrt((-2.0 * Math.log(w)) / w);
+                y2 = x2 * w;
+                useLast = true;
+                return x1 * w;
+            }
+        })();
+
+        async function fetchRealTimeStockData() {
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 100)); // Reduced delay for faster updates
+
+            const globalMarketDrift = 0.0001;
+            const timeStep = 1;
+            const marketWideShockChance = 0.05;
+            let marketShockEffect = 0;
+            if (Math.random() < marketWideShockChance) {
+                marketShockEffect = (Math.random() - 0.5) * 0.08;
+            }
+
+            for (const stockId in stockMap) {
+                const stock = stockMap[stockId];
+                const oldPrice = stock.price;
+                const { volatility } = stock;
+                const driftTerm = globalMarketDrift - (volatility * volatility) / 2;
+                const randomShockTerm = volatility * normalRandom();
+                const newPrice = oldPrice * Math.exp(driftTerm * timeStep + randomShockTerm * Math.sqrt(timeStep) + marketShockEffect);
+                const noise = (Math.random() - 0.5) * 0.005;
+                stock.price = parseFloat((newPrice * (1 + noise)).toFixed(2));
+                if (stock.price < 1) {
+                    stock.price = 1; 
+                }
+            }
+            return Object.values(stockMap);
+        }
+
+        async function updatePrices() {
+            try {
+                await fetchRealTimeStockData();
+                renderStockCards(currentFilter, document.getElementById('trading-section').classList.contains('hidden') ? false : true); // Re-render for both
+                updatePortfolioDisplay(); // Update portfolio display as well
+            } catch (error) {
+                console.error("Failed to fetch real-time stock data:", error);
+            }
+        }
+
+        function startPriceUpdates() {
+            if (updatePricesIntervalId) {
+                clearInterval(updatePricesIntervalId);
+            }
+            updatePricesIntervalId = setInterval(updatePrices, 3000); // Update every 3 seconds
+        }
+
+        function stopPriceUpdates() {
+            if (updatePricesIntervalId) {
+                clearInterval(updatePricesIntervalId);
+                updatePricesIntervalId = null;
+            }
+        }
+
+        function toggleWatchlist(stockId) {
+            const index = currentWatchlist.indexOf(stockId);
+            if (index > -1) {
+                currentWatchlist = currentWatchlist.filter(id => id !== stockId);
+            } else {
+                currentWatchlist = [...currentWatchlist, stockId];
+            }
+            saveWatchlist();
+            renderStockCards(currentFilter, true); // Re-render trading view to update watchlist button
+        }
+
+        let modalCurrentStock = null;
+        let modalCurrentType = '';
+
+        function openTransactionModal(type, stockId) {
+            const stock = stockMap[stockId];
+            if (!stock) return;
+
+            modalCurrentStock = stock;
+            modalCurrentType = type;
+
+            getEl('modal-title').textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} ${stock.name}`;
+            getEl('modal-stock-info').textContent = `Current Price: ₹${stock.price.toFixed(2)}`;
+            getEl('quantity-input').value = 1;
+            getEl('modal-message').textContent = '';
+            
+            const confirmBtn = getEl('confirm-transaction-button');
+            confirmBtn.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            confirmBtn.classList.remove('buy-btn', 'sell-btn');
+            if (type === 'buy') {
+                confirmBtn.classList.add('buy-btn');
+            } else {
+                confirmBtn.classList.add('sell-btn');
+            }
+
+            getEl('transaction-modal-overlay').classList.add('active');
+        }
+
+        function closeTransactionModal() {
+            getEl('transaction-modal-overlay').classList.remove('active');
+            modalCurrentStock = null;
+            modalCurrentType = '';
+            getEl('modal-message').textContent = '';
+        }
+
+        async function confirmTransaction() {
+            const quantity = parseInt(getEl('quantity-input').value, 10);
+            const stock = modalCurrentStock;
+            const modalMessageEl = getEl('modal-message');
+
+            if (isNaN(quantity) || quantity <= 0) {
+                modalMessageEl.textContent = 'Please enter a valid quantity.';
+                return;
+            }
+
+            let transactionSuccess = false;
+
+            if (modalCurrentType === 'buy') {
+                const cost = quantity * stock.price;
+                if (currentPortfolio.cashBalance >= cost) {
+                    currentPortfolio.cashBalance -= cost;
+
+                    const existingHoldingIndex = currentPortfolio.holdings.findIndex(h => h.stockId === stock.id);
+                    if (existingHoldingIndex > -1) {
+                        const existingHolding = currentPortfolio.holdings[existingHoldingIndex];
+                        const newTotalQuantity = existingHolding.quantity + quantity;
+                        const newTotalCost = (existingHolding.quantity * existingHolding.averagePrice) + cost;
+                        existingHolding.quantity = newTotalQuantity;
+                        existingHolding.averagePrice = newTotalCost / newTotalQuantity;
+                    } else {
+                        currentPortfolio.holdings.push({
+                            stockId: stock.id,
+                            quantity: quantity,
+                            averagePrice: stock.price
+                        });
+                    }
+                    modalMessageEl.textContent = `Successfully bought ${quantity} shares of ${stock.symbol}.`;
+                    transactionSuccess = true;
+                } else {
+                    modalMessageEl.textContent = 'Insufficient cash balance.';
+                }
+            } else if (modalCurrentType === 'sell') {
+                const existingHoldingIndex = currentPortfolio.holdings.findIndex(h => h.stockId === stock.id);
+                if (existingHoldingIndex > -1) {
+                    const existingHolding = currentPortfolio.holdings[existingHoldingIndex];
+                    if (existingHolding.quantity >= quantity) {
+                        const revenue = quantity * stock.price;
+                        currentPortfolio.cashBalance += revenue; 
+                        existingHolding.quantity -= quantity;
+
+                        if (existingHolding.quantity === 0) {
+                            currentPortfolio.holdings.splice(existingHoldingIndex, 1);
+                        }
+                        modalMessageEl.textContent = `Successfully sold ${quantity} shares of ${stock.symbol}.`;
+                        transactionSuccess = true;
+                    } else {
+                        modalMessageEl.textContent = `You only own ${existingHolding.quantity} shares.`;
+                    }
+                } else {
+                    modalMessageEl.textContent = 'You do not own this stock.';
+                }
+            }
+
+            if (transactionSuccess) {
+                await savePortfolio(); // Save updated portfolio to Firestore
+                updatePortfolioDisplay();
+                renderStockCards(currentFilter, true); // Re-render trading view to update holdings
+                setTimeout(closeTransactionModal, 1000); // Close modal after a short delay
+            }
+        }
+
+        function updatePortfolioDisplay() {
+            getEl('portfolio-cash').textContent = `₹${currentPortfolio.cashBalance.toFixed(2)}`;
+
+            let totalInvested = 0;
+            let currentHoldingsValue = 0;
+
+            currentPortfolio.holdings.forEach(holding => {
+                const stock = stockMap[holding.stockId];
+                if (stock) {
+                    totalInvested += holding.quantity * holding.averagePrice;
+                    currentHoldingsValue += holding.quantity * stock.price;
+                }
+            });
+
+            getEl('portfolio-invested').textContent = `₹${totalInvested.toFixed(2)}`;
+            getEl('portfolio-current-value').textContent = `₹${currentHoldingsValue.toFixed(2)}`;
+
+            const overallProfitLoss = currentHoldingsValue - totalInvested;
+            const portfolioProfitLossEl = getEl('portfolio-profit-loss');
+            portfolioProfitLossEl.textContent = `₹${overallProfitLoss.toFixed(2)}`;
+            portfolioProfitLossEl.classList.remove('positive', 'negative');
+            if (overallProfitLoss > 0) {
+                portfolioProfitLossEl.classList.add('positive');
+            } else if (overallProfitLoss < 0) {
+                portfolioProfitLossEl.classList.add('negative');
+            }
+        }
+
+        function renderStockCard(stock, isTradingView) {
+            const priceChange = stock.price - stock.initialPrice;
+            const percentageChange = (priceChange / stock.initialPrice) * 100;
+            const isAddedToWatchlist = currentWatchlist.includes(stock.id);
+            const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
+            const hasHoldings = holding && holding.quantity > 0;
+
+            let cardHtml = `
+                <li class="stock-item" data-stock-id="${stock.id}">
+                    <div class="stock-info">
+                        <span class="stock-name">${stock.name}</span>
+                        <span class="stock-symbol">${stock.symbol}</span>
+                    </div>
+                    <div class="stock-price-container">
+                        <span class="stock-price">₹${stock.price.toFixed(2)}</span>
+                        <span class="change-value ${priceChange > 0 ? 'positive' : priceChange < 0 ? 'negative' : ''}">
+                            Change: ₹${priceChange.toFixed(2)}
+                        </span>
+                        <span class="percentage-change ${percentageChange > 0 ? 'positive' : percentageChange < 0 ? 'negative' : ''}">
+                            Percentage: ${percentageChange.toFixed(2)}%
+                        </span>
+                        <span class="price-change-icon ${priceChange > 0 ? 'positive' : priceChange < 0 ? 'negative' : ''}">
+                            ${priceChange > 0 ? '▲' : priceChange < 0 ? '▼' : ''}
+                        </span>
+                    </div>
+                    <div class="tooltip">
+                        <p class="tooltip-name">${stock.name}</p>
+                        <p class="tooltip-symbol">${stock.symbol}</p>
+                        <p>Current Price: <span class="tooltip-price">₹${stock.price.toFixed(2)}</span></p>
+                        <p>Change: <span class="tooltip-change">${priceChange.toFixed(2)}</span></p>
+                        <p>Percentage: <span class="tooltip-change">${percentageChange.toFixed(2)}%</span></p>
+                        ${hasHoldings ? `<p>Owned: ${holding.quantity} @ ₹${holding.averagePrice.toFixed(2)}</p>` : ''}
+                    </div>
+            `;
+
+            if (isTradingView) {
+                cardHtml += `
+                    <div class="stock-actions">
+                        <button class="buy-btn" data-stock-id="${stock.id}">Buy</button>
+                        ${hasHoldings ? `<button class="sell-btn" data-stock-id="${stock.id}">Sell</button>` : ''}
+                        <button class="add-to-watchlist-btn ${isAddedToWatchlist ? 'added' : ''}" data-stock-id="${stock.id}">
+                            ${isAddedToWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                        </button>
+                    </div>
+                `;
+            }
+            cardHtml += `</li>`;
+            return cardHtml;
+        }
+
+        function renderStockCards(filter, isTradingView) {
+            let stocksToRender = [];
+            if (filter === "All") {
+                stocksToRender = allStocksFlattened;
+            } else if (filter === "Watchlist" && isTradingView) {
+                stocksToRender = allStocksFlattened.filter(stock => currentWatchlist.includes(stock.id));
+            } else {
+                const selectedCategoryData = stockData.find(d => d.category === filter);
+                stocksToRender = selectedCategoryData ? selectedCategoryData.stocks : [];
+            }
+
+            const targetGridId = isTradingView ? 'stock-grid-trader' : 'stock-grid-viewer';
+            const stockGridEl = getEl(targetGridId);
+            stockGridEl.innerHTML = ''; // Clear existing cards
+
+            if (stocksToRender.length === 0) {
+                stockGridEl.innerHTML = `<p style="text-align: center; padding: 2rem; color: var(--dark-text);">No stocks found matching your criteria.</p>`;
+                return;
+            }
+
+            stocksToRender.forEach(stock => {
+                const stockCardHtml = renderStockCard(stock, isTradingView);
+                stockGridEl.insertAdjacentHTML('beforeend', stockCardHtml);
+            });
+
+            // Attach event listeners to newly rendered buttons
+            if (isTradingView) {
+                stockGridEl.querySelectorAll('.buy-btn').forEach(button => {
+                    button.onclick = () => openTransactionModal('buy', button.dataset.stockId);
+                });
+                stockGridEl.querySelectorAll('.sell-btn').forEach(button => {
+                    button.onclick = () => openTransactionModal('sell', button.dataset.stockId);
+                });
+                stockGridEl.querySelectorAll('.add-to-watchlist-btn').forEach(button => {
+                    button.onclick = () => toggleWatchlist(button.dataset.stockId);
+                });
+            }
+        }
+
+        function renderFilterButtons(isTradingView) {
+            const categories = isTradingView ? ["All", ...stockData.map(d => d.category), "Watchlist"] : ["All", ...stockData.map(d => d.category)];
+            const filterContainerId = isTradingView ? 'category-filter-trader' : 'category-filter-viewer';
+            const filterContainerEl = getEl(filterContainerId);
+            filterContainerEl.innerHTML = ''; // Clear existing buttons
+
+            categories.forEach(category => {
+                const button = document.createElement('button');
+                button.textContent = category;
+                button.classList.add('category-button');
+                if (currentFilter === category) {
+                    button.classList.add('active');
+                }
+                button.onclick = () => {
+                    currentFilter = category;
+                    renderFilterButtons(isTradingView); // Re-render to update active state
+                    renderStockCards(currentFilter, isTradingView);
+                };
+                filterContainerEl.appendChild(button);
+            });
+        }
+
+
+        // --- Event Listeners and Initial Setup ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize Firebase
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // Set initial theme based on local storage
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                getEl('theme-icon').textContent = '🌙';
+                getEl('theme-text').textContent = 'Dark Mode';
+            } else {
+                getEl('theme-icon').textContent = '☀️';
+                getEl('theme-text').textContent = 'Light Mode';
+            }
+
+            // Authentication state listener
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    getEl('user-id-display-text').textContent = currentUserId;
+                    await loadUserData(currentUserId);
+                    showPage('role-selection-page'); // Show role selection after login
+                    startPriceUpdates(); // Start price updates once logged in
+                } else {
+                    currentUserId = null;
+                    getEl('user-id-display-text').textContent = '';
+                    showPage('login-page'); // Go to login page if logged out
+                    stopPriceUpdates(); // Stop price updates if logged out
+                }
+            });
+
+            // Attempt to sign in with custom token if available (for Canvas environment)
+            if (initialAuthToken) {
+                try {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } catch (err) {
+                    console.error("Error signing in with custom token:", err);
+                    // Fallback to anonymous if custom token fails
+                    await signInAnonymously(auth);
+                }
+            } else {
+                // Sign in anonymously if no custom token (typical for external launch)
+                await signInAnonymously(auth);
+            }
+
+            // Auth Page Navigation
+            getEl('go-to-register').onclick = () => showPage('register-page');
+            getEl('go-to-login').onclick = () => showPage('login-page');
+            getEl('login-button').onclick = handleLogin;
+            getEl('register-button').onclick = handleRegister;
+            getEl('anonymous-sign-in').onclick = handleAnonymousSignIn;
+            getEl('logout-button').onclick = handleLogout;
+
+            // Role Selection Buttons
+            getEl('enter-as-trader').onclick = () => {
+                showPage('trading-section');
+                renderFilterButtons(true);
+                renderStockCards(currentFilter, true);
+                updatePortfolioDisplay();
+            };
+            getEl('enter-as-viewer').onclick = () => {
+                showPage('stock-viewer-section');
+                renderFilterButtons(false);
+                renderStockCards(currentFilter, false);
+            };
+
+            // Top Bar Navigation Buttons
+            getEl('nav-trader').onclick = () => {
+                showPage('trading-section');
+                renderFilterButtons(true);
+                renderStockCards(currentFilter, true);
+                updatePortfolioDisplay();
+            };
+            getEl('nav-viewer').onclick = () => {
+                showPage('stock-viewer-section');
+                renderFilterButtons(false);
+                renderStockCards(currentFilter, false);
+            };
+            getEl('nav-admin').onclick = () => showPage('admin-section');
+
+            // Admin Section Buttons
+            getEl('create-item-button').onclick = createItem;
+
+            // Viewer Section Buttons
+            getEl('fetch-item-button').onclick = fetchItemDetails;
+
+            // Modal Buttons
+            getEl('confirm-transaction-button').onclick = confirmTransaction;
+            getEl('cancel-transaction-button').onclick = closeTransactionModal;
+
+            // Theme Toggle
+            getEl('theme-toggle').onclick = () => {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+                getEl('theme-icon').textContent = isDarkMode ? '🌙' : '☀️';
+                getEl('theme-text').textContent = isDarkMode ? 'Dark Mode' : 'Light Mode';
+            };
+        });
+    </script>
+</body>
+</html>

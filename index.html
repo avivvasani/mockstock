@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Mock-Stock Market</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #0d1117;
+            --card-background: #161b22;
+            --text-color: #c9d1d9;
+            --header-color: #58a6ff;
+            --border-color: #30363d;
+            --positive-color: #2ea043;
+            --negative-color: #f85149;
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 2rem;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--header-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+        
+        .category-section {
+            margin-bottom: 2rem;
+        }
+        
+        .category-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--header-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .stock-item {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stock-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .stock-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stock-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        .stock-symbol {
+            font-size: 0.9rem;
+            color: #8b949e;
+            background-color: var(--border-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .stock-price-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stock-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            transition: color 0.5s ease;
+        }
+
+        .price-change-icon {
+            margin-left: 0.5rem;
+            font-size: 1.2rem;
+            transition: transform 0.5s ease;
+        }
+
+        .positive {
+            color: var(--positive-color);
+        }
+        .negative {
+            color: var(--negative-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .stock-item {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Live Mock-Stock Market</h1>
+        <main id="stock-market-container">
+            </main>
+    </div>
+
+    <script>
+        const stockData = [
+            {
+                category: "Finance",
+                stocks: [
+                    { id: "HDFCBANK", name: "HDFC Bank", symbol: "HDFCBANK", price: 1500.00 },
+                    { id: "ICICIBANK", name: "ICICI Bank", symbol: "ICICIBANK", price: 900.50 },
+                    { id: "SBIN", name: "State Bank of India", symbol: "SBIN", price: 600.90 },
+                    { id: "BAJFINANCE", name: "Bajaj Finance", symbol: "BAJFINANCE", price: 7000.40 },
+                    { id: "KOTAKBANK", name: "Kotak Mahindra Bank", symbol: "KOTAKBANK", price: 1800.20 },
+                    { id: "AXISBANK", name: "Axis Bank", symbol: "AXISBANK", price: 950.80 },
+                    { id: "PAYTM", name: "Paytm", symbol: "PAYTM", price: 650.00 },
+                    { id: "PUNJAB", name: "Punjab National Bank", symbol: "PUNJAB", price: 120.00 },
+                    { id: "BANKBARODA", name: "Bank of Baroda", symbol: "BANKBARODA", price: 250.00 },
+                    { id: "RECLTD", name: "REC Ltd", symbol: "RECLTD", price: 500.00 }
+                ]
+            },
+            {
+                category: "IT",
+                stocks: [
+                    { id: "TCS", name: "Tata Consultancy Services", symbol: "TCS", price: 3500.00 },
+                    { id: "INFY", name: "Infosys", symbol: "INFY", price: 1400.00 },
+                    { id: "WIPRO", name: "WIPRO", symbol: "WIPRO", price: 400.30 },
+                    { id: "TECHM", name: "Tech Mahindra", symbol: "TECHM", price: 1200.70 },
+                    { id: "HCLTECH", name: "HCLTech", symbol: "HCLTECH", price: 1300.00 },
+                    { id: "TATAELXSI", name: "Tata Elxsi", symbol: "TATAELXSI", price: 8000.00 },
+                    { id: "PERSISTENT", name: "Persistent Systems", symbol: "PERSISTENT", price: 7500.00 }
+                ]
+            },
+            {
+                category: "Pharma",
+                stocks: [
+                    { id: "SUNPHARMA", name: "Sun Pharma", symbol: "SUNPHARMA", price: 1550.00 },
+                    { id: "DRREDDY", name: "Dr. Reddy's Labs", symbol: "DRREDDY", price: 6200.00 },
+                    { id: "CIPLA", name: "Cipla", symbol: "CIPLA", price: 1400.00 },
+                    { id: "LUPIN", name: "Lupin", symbol: "LUPIN", price: 1700.00 },
+                    { id: "TORNT", name: "Torrent Pharma", symbol: "TORNT", price: 2900.00 },
+                    { id: "CADILA", name: "Zydus Lifesciences", symbol: "CADILA", price: 1000.00 }
+                ]
+            },
+            {
+                category: "Automotive",
+                stocks: [
+                    { id: "MARUTI", name: "Maruti Suzuki India", symbol: "MARUTI", price: 10000.00 },
+                    { id: "TATAMOTORS", name: "Tata Motors", symbol: "TATAMOTORS", price: 650.00 },
+                    { id: "BAJAJAUTO", name: "Bajaj Auto", symbol: "BAJAJAUTO", price: 8500.00 },
+                    { id: "M&M", name: "Mahindra & Mahindra", symbol: "M&M", price: 1800.00 },
+                    { id: "EICHERMOT", name: "Eicher Motors", symbol: "EICHERMOT", price: 4500.00 }
+                ]
+            },
+            {
+                category: "Manufacturing",
+                stocks: [
+                    { id: "RELIANCE", name: "Reliance Industries", symbol: "RELIANCE", price: 2500.00 },
+                    { id: "HINDUNILVR", name: "Hindustan Unilever", symbol: "HINDUNILVR", price: 2700.75 },
+                    { id: "LT", name: "Larsen & Toubro", symbol: "LT", price: 3000.60 },
+                    { id: "ASIANPAINT", name: "Asian Paints", symbol: "ASIANPAINT", price: 3200.00 },
+                    { id: "ULTRACEMCO", name: "Ultratech Cement", symbol: "ULTRACEMCO", price: 7500.00 },
+                    { id: "POWERGRID", name: "Power Grid Corporation", symbol: "POWERGRID", price: 220.00 },
+                    { id: "BHARTIARTL", name: "Bharti Airtel", symbol: "BHARTIARTL", price: 800.10 }
+                ]
+            }
+        ];
+
+        const stockMarketContainer = document.getElementById('stock-market-container');
+
+        const renderInitialStocks = () => {
+            stockData.forEach(category => {
+                const categorySection = document.createElement('section');
+                categorySection.className = 'category-section';
+                
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.className = 'category-title';
+                categoryTitle.textContent = category.category;
+                
+                const stockGrid = document.createElement('ul');
+                stockGrid.className = 'stock-grid';
+                
+                category.stocks.forEach(stock => {
+                    const li = document.createElement('li');
+                    li.className = 'stock-item';
+                    li.id = stock.id;
+                    li.innerHTML = `
+                        <div class="stock-info">
+                            <span class="stock-name">${stock.name}</span>
+                            <span class="stock-symbol">${stock.symbol}</span>
+                        </div>
+                        <div class="stock-price-container">
+                            <span class="stock-price">₹${stock.price.toFixed(2)}</span>
+                            </div>
+                    `;
+                    stockGrid.appendChild(li);
+                });
+                
+                categorySection.appendChild(categoryTitle);
+                categorySection.appendChild(stockGrid);
+                stockMarketContainer.appendChild(categorySection);
+            });
+        };
+
+        const updatePrices = () => {
+            stockData.forEach(category => {
+                category.stocks.forEach(stock => {
+                    const oldPrice = stock.price;
+                    const change = (Math.random() - 0.5) * stock.price * 0.01;
+                    let newPrice = oldPrice + change;
+
+                    if (newPrice < 1) newPrice = 1;
+                    
+                    stock.price = parseFloat(newPrice.toFixed(2));
+
+                    const priceElement = document.querySelector(`#${stock.id} .stock-price`);
+                    if (priceElement) {
+                        const priceChangeContainer = priceElement.parentElement;
+                        let iconElement = priceChangeContainer.querySelector('.price-change-icon');
+
+                        if (!iconElement) {
+                            iconElement = document.createElement('span');
+                            iconElement.className = 'price-change-icon';
+                            priceChangeContainer.appendChild(iconElement);
+                        }
+
+                        priceElement.textContent = `₹${stock.price.toFixed(2)}`;
+                        
+                        priceElement.classList.remove('positive', 'negative');
+                        iconElement.classList.remove('positive', 'negative');
+                        iconElement.textContent = '';
+
+                        if (newPrice > oldPrice) {
+                            priceElement.classList.add('positive');
+                            iconElement.classList.add('positive');
+                            iconElement.innerHTML = '&#x25B2;'; // Up arrow
+                        } else if (newPrice < oldPrice) {
+                            priceElement.classList.add('negative');
+                            iconElement.classList.add('negative');
+                            iconElement.innerHTML = '&#x25BC;'; // Down arrow
+                        }
+                    }
+                });
+            });
+        };
+
+        // Render the stocks on page load
+        renderInitialStocks();
+
+        // Update prices every 3 seconds
+        setInterval(updatePrices, 3000);
+    </script>
+
+</body>
+</html>

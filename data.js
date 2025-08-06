@@ -255,14 +255,13 @@ function App() {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState('login'); // 'login', 'register', 'admin', 'stockViewer', 'trading'
+  const [currentPage, setCurrentPage] = useState('login'); // 'login', 'register', 'roleSelection', 'admin', 'stockViewer', 'trading'
 
   // Auth states
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [registerUsername, setRegisterUsername] = useState('');
-  const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerError, setRegisterError] = useState('');
 
@@ -308,7 +307,7 @@ function App() {
           if (user) {
             setUserId(user.uid);
             await loadUserData(user.uid, firestoreInstance); // Load user data after auth
-            setCurrentPage('trading'); // Default to trading view after login
+            setCurrentPage('roleSelection'); // Go to role selection after login
           } else {
             setUserId(null);
             setWatchlist([]);
@@ -328,7 +327,8 @@ function App() {
             await signInWithCustomToken(firebaseAuthInstance, initialAuthToken);
           } catch (err) {
             console.error("Error signing in with custom token:", err);
-            await signInAnonymously(firebaseAuthInstance);
+            // If custom token fails, proceed to anonymous or regular login flow
+            await signInAnonymously(firebaseAuthInstance); // Fallback to anonymous
           }
         } else {
           await signInAnonymously(firebaseAuthInstance);
@@ -414,16 +414,15 @@ function App() {
         return;
       }
       const userData = querySnapshot.docs[0].data();
-      const email = userData.email;
+      const email = userData.email; // Retrieve the dummy email used for Firebase auth
       await signInWithEmailAndPassword(auth, email, loginPassword);
+      // Auth state listener will handle showing roleSelection
     } catch (err) {
       console.error("Login error:", err);
       let errorMessage = 'Login failed. Please check your credentials.';
       if (err.code === 'auth/wrong-password') {
         errorMessage = 'Incorrect password.';
-      } else if (err.code === 'auth/user-not-found') {
-        errorMessage = 'User not found. Please check your username.';
-      } else if (err.code === 'auth/invalid-credential') {
+      } else if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
         errorMessage = 'Invalid username or password.';
       }
       setLoginError(errorMessage);
@@ -432,7 +431,7 @@ function App() {
 
   const handleRegister = async () => {
     setRegisterError('');
-    if (!registerUsername || !registerEmail || !registerPassword) {
+    if (!registerUsername || !registerPassword) {
       setRegisterError('Please fill in all fields.');
       return;
     }
@@ -449,27 +448,29 @@ function App() {
         return;
       }
 
-      const userCredential = await createUserWithEmailAndPassword(auth, registerEmail, registerPassword);
+      // Generate a dummy email for Firebase Authentication
+      const dummyEmail = `${registerUsername}@mockstock.com`;
+      const userCredential = await createUserWithEmailAndPassword(auth, dummyEmail, registerPassword);
       const user = userCredential.user;
 
+      // Store user profile with the actual username
       const userProfileRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/userProfile`);
-      await setDoc(userProfileRef, { username: registerUsername, email: registerEmail, createdAt: new Date().toISOString() });
+      await setDoc(userProfileRef, { username: registerUsername, email: dummyEmail, createdAt: new Date().toISOString() });
 
+      // Store the username-to-UID mapping in a public collection for login lookup
       const usernameMapRef = doc(db, `artifacts/${appId}/public/usernames/${registerUsername}`);
-      await setDoc(usernameMapRef, { uid: user.uid, email: registerEmail });
+      await setDoc(usernameMapRef, { uid: user.uid, email: dummyEmail });
 
-      // Initialize empty watchlist and default portfolio
+      // Initialize empty watchlist and default portfolio for the new user
       await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/watchlists/myWatchlist`), { stocks: [] });
       await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/portfolio/currentPortfolio`), { cashBalance: 100000, holdings: [] });
       
-      // Auth state listener will handle showing the main viewer
+      // Auth state listener will handle showing roleSelection
     } catch (err) {
       console.error("Registration error:", err);
       let errorMessage = 'Registration failed.';
       if (err.code === 'auth/email-already-in-use') {
-        errorMessage = 'This email is already registered.';
-      } else if (err.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email format.';
+        errorMessage = 'An account with this email (or generated dummy email) already exists.';
       } else if (err.code === 'auth/weak-password') {
         errorMessage = 'Password is too weak.';
       }
@@ -606,11 +607,14 @@ function App() {
       await fetchRealTimeStockData();
       // Trigger re-render of stock display and portfolio
       setCurrentFilter(prev => prev); // This is a common pattern to force re-render when underlying data (stockMap) changes
-      updatePortfolioDisplay();
+      // Only update portfolio display if on the trading page
+      if (currentPage === 'trading') {
+          updatePortfolioDisplay();
+      }
     } catch (error) {
       console.error("Failed to fetch real-time stock data:", error);
     }
-  }, [fetchRealTimeStockData, updatePortfolioDisplay]);
+  }, [fetchRealTimeStockData, updatePortfolioDisplay, currentPage]);
 
   const startPriceUpdates = useCallback(() => {
     if (updateIntervalId) {
@@ -709,7 +713,7 @@ function App() {
         const existingHolding = newPortfolio.holdings[existingHoldingIndex];
         if (existingHolding.quantity >= quantity) {
           const revenue = quantity * stock.price;
-          currentPortfolio.cashBalance += revenue; // Update cash directly on currentPortfolio
+          newPortfolio.cashBalance += revenue; 
           existingHolding.quantity -= quantity;
 
           if (existingHolding.quantity === 0) {
@@ -1616,6 +1620,76 @@ function App() {
             color: var(--negative-color);
             font-weight: 600;
         }
+        
+        /* Role Selection Page Styles */
+        .role-selection-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+            background-color: var(--light-background);
+            transition: background-color 0.5s ease;
+        }
+
+        .role-selection-card {
+            background-color: var(--white-card-background);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .role-selection-card h2 {
+            color: var(--primary-green);
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            font-weight: 700;
+            transition: color 0.5s ease;
+        }
+
+        .role-buttons-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .role-button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .role-button.trader {
+            background-color: #007bff; /* Blue for Trader */
+        }
+        .role-button.trader:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.3);
+        }
+
+        .role-button.viewer {
+            background-color: #28a745; /* Green for Viewer */
+        }
+        .role-button.viewer:hover {
+            background-color: #1e7e34;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.3);
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -1689,11 +1763,21 @@ function App() {
             .modal-content {
                 padding: 1.5rem;
             }
+            .role-selection-card {
+                padding: 2rem;
+            }
+            .role-selection-card h2 {
+                font-size: 1.8rem;
+            }
+            .role-button {
+                font-size: 1rem;
+                padding: 12px 20px;
+            }
         }
       `}</style>
 
       {/* Top Bar for Navigation, Theme Toggle, and User Info */}
-      {userId && (
+      {userId && currentPage !== 'login' && currentPage !== 'register' && currentPage !== 'roleSelection' && (
         <div className="top-bar">
           <div className="left-group">
             <button onClick={() => setCurrentPage('trading')} className={`nav-button ${currentPage === 'trading' ? 'active' : ''}`}>Trader</button>
@@ -1764,16 +1848,7 @@ function App() {
                 onChange={(e) => setRegisterUsername(e.target.value)}
               />
             </div>
-            <div className="form-group">
-              <label htmlFor="register-email">Email (for account recovery):</label>
-              <input
-                type="email"
-                id="register-email"
-                placeholder="Enter your email"
-                value={registerEmail}
-                onChange={(e) => setRegisterEmail(e.target.value)}
-              />
-            </div>
+            {/* Email field removed from user interaction */}
             <div className="form-group">
               <label htmlFor="register-password">Password:</label>
               <input
@@ -1787,6 +1862,23 @@ function App() {
             <button onClick={handleRegister} className="auth-button">Register</button>
             {registerError && <p className="error-message">{registerError}</p>}
             <p className="auth-message">Already have an account? <a href="#" onClick={() => setCurrentPage('login')}>Login here</a></p>
+          </div>
+        </div>
+      )}
+
+      {/* Role Selection Page */}
+      {currentPage === 'roleSelection' && (
+        <div className="role-selection-container">
+          <div className="role-selection-card">
+            <h2>How would you like to enter?</h2>
+            <div className="role-buttons-group">
+              <button onClick={() => setCurrentPage('trading')} className="role-button trader">
+                Enter as Trader
+              </button>
+              <button onClick={() => setCurrentPage('stockViewer')} className="role-button viewer">
+                Enter as Viewer
+              </button>
+            </div>
           </div>
         </div>
       )}

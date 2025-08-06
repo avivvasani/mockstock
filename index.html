@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ashoka Universal School Mock-Stock Competition</title>
+    <title>Ashoka Universal School Mock-Stock Challenge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Ashoka Universal School Theme Colors */
+        /* Ashoka Universal School Theme Colors - Light Mode */
         :root {
             --primary-green: #006400; /* A deep, rich green from Ashoka branding */
             --golden-yellow: #FFD700; /* Bright, golden yellow from Ashoka branding */
@@ -26,28 +26,46 @@
             --accent-glow: rgba(0, 100, 0, 0.2); /* Subtle green glow for focus/active states */
         }
 
+        /* Dark Mode Colors */
+        body.dark-mode {
+            --primary-green: #4CAF50; /* Brighter green for dark mode */
+            --golden-yellow: #FFEB3B; /* Brighter yellow for dark mode */
+            --light-background: #1a1a36; /* Dark blue-purple background */
+            --white-card-background: #2b2b4d; /* Darker card background */
+            --dark-text: #e0e0f0; /* Light text for readability */
+            --light-border: #333355; /* Darker border */
+            --positive-color: #66BB6A; /* Lighter green for positive change */
+            --negative-color: #EF5350; /* Lighter red for negative change */
+            --flash-positive: rgba(102, 187, 106, 0.2);
+            --flash-negative: rgba(239, 83, 80, 0.2);
+            --tooltip-bg: #1a1a36;
+            --tooltip-text-color: #e0e0f0;
+            --accent-glow: rgba(76, 175, 80, 0.3);
+        }
+
         body {
             font-family: var(--font-family);
             background-color: var(--light-background);
             color: var(--dark-text);
             margin: 0;
-            padding: 1.5rem; /* Slightly reduced padding */
+            padding: 1.5rem;
             display: flex;
             justify-content: center;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: background-color 0.5s ease;
+            transition: background-color 0.5s ease, color 0.5s ease; /* Smooth transition for dark mode */
         }
 
         .container {
             width: 95%;
             max-width: 1400px;
-            background-color: var(--white-card-background); /* White card background */
-            border-radius: 12px; /* Slightly less rounded */
+            background-color: var(--white-card-background);
+            border-radius: 12px;
             border: 1px solid var(--light-border);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); /* Softer shadow */
-            padding: 2.5rem; /* Adjusted padding */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
             animation: fadeIn 1s ease-in-out;
+            transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease; /* Smooth transition for dark mode */
         }
 
         @keyframes fadeIn {
@@ -57,14 +75,14 @@
 
         h1 {
             text-align: center;
-            color: var(--primary-green); /* Primary green for header */
+            color: var(--primary-green);
             border-bottom: 2px solid var(--light-border);
             padding-bottom: 1.2rem;
             margin-bottom: 2.5rem;
             font-weight: 700;
-            font-size: 2.8rem; /* Slightly smaller for professionalism */
+            font-size: 2.8rem;
             letter-spacing: 0.5px;
-            /* text-shadow: removed for cleaner look */
+            transition: color 0.5s ease, border-color 0.5s ease; /* Smooth transition for dark mode */
         }
 
         .intro-text {
@@ -73,37 +91,14 @@
             font-size: 1.1rem;
             line-height: 1.6;
             color: var(--dark-text);
+            transition: color 0.5s ease; /* Smooth transition for dark mode */
         }
         
-        #search-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 2.5rem;
-        }
-        
-        #stock-search {
-            width: 100%;
-            max-width: 600px;
-            padding: 12px 20px; /* Adjusted padding */
-            font-size: 1rem;
-            background-color: var(--light-background); /* Light background for search */
-            border: 1px solid var(--light-border);
-            border-radius: 25px; /* Slightly less rounded */
-            color: var(--dark-text);
-            transition: all 0.3s ease;
-        }
-        
-        #stock-search:focus {
-            outline: none;
-            border-color: var(--primary-green); /* Green border on focus */
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-
         .category-filter {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px; /* Slightly reduced gap */
+            gap: 10px;
             margin-bottom: 2.5rem;
             animation: slideIn 0.8s ease-out;
         }
@@ -114,11 +109,11 @@
         }
 
         .category-button {
-            background-color: var(--white-card-background); /* White background for buttons */
+            background-color: var(--white-card-background);
             color: var(--dark-text);
             border: 1px solid var(--light-border);
-            padding: 10px 24px; /* Adjusted padding */
-            border-radius: 25px; /* Slightly less rounded */
+            padding: 10px 24px;
+            border-radius: 25px;
             cursor: pointer;
             font-size: 0.95rem;
             font-weight: 600;
@@ -126,15 +121,15 @@
         }
         
         .category-button:hover {
-            background-color: #f0f0f0; /* Lighter hover state */
+            background-color: var(--light-background); /* Lighter hover state */
             border-color: var(--primary-green);
         }
         
         .category-button.active {
-            background-color: var(--primary-green); /* Primary green for active */
-            color: #ffffff; /* White text on active button */
+            background-color: var(--primary-green);
+            color: #ffffff;
             border-color: var(--primary-green);
-            transform: scale(1.03); /* Subtle scale */
+            transform: scale(1.03);
             box-shadow: 0 0 8px var(--accent-glow);
         }
         
@@ -143,56 +138,53 @@
         }
         
         .category-title {
-            font-size: 2rem; /* Adjusted font size */
+            font-size: 2rem;
             font-weight: 700;
-            color: var(--primary-green); /* Primary green for category titles */
+            color: var(--primary-green);
             border-bottom: 1px solid var(--light-border);
             padding-bottom: 0.7rem;
             margin-bottom: 1.8rem;
+            transition: color 0.5s ease, border-color 0.5s ease; /* Smooth transition for dark mode */
         }
 
         .stock-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Slightly smaller min-width */
-            gap: 1.5rem; /* Reduced gap */
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
             list-style: none;
             padding: 0;
             margin: 0;
         }
         
         .stock-item {
-            background-color: var(--white-card-background); /* White background for stock items */
+            background-color: var(--white-card-background);
             border: 1px solid var(--light-border);
-            border-radius: 12px; /* Less rounded */
-            padding: 1.8rem; /* Adjusted padding */
+            border-radius: 12px;
+            padding: 1.8rem;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.5s ease;
+            justify-content: space-between; /* Distribute content and push button to bottom */
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.5s ease, border-color 0.5s ease; /* Smoother animation */
             position: relative;
-            overflow: hidden; /* Ensure tooltip doesn't overflow rounded corners */
+            overflow: hidden;
         }
         
         .stock-item:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06); /* Softer shadow on hover */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
         }
 
-        .stock-item.price-up {
-            animation: priceUpFlash 0.5s ease-out;
-        }
-
-        .stock-item.price-down {
-            animation: priceDownFlash 0.5s ease-out;
-        }
-
+        /* Smoother flash animations */
         @keyframes priceUpFlash {
-            0% { background-color: var(--flash-positive); }
-            100% { background-color: var(--white-card-background); }
+            0% { background-color: var(--flash-positive); transform: scale(1.02); }
+            50% { background-color: var(--flash-positive); transform: scale(1.01); }
+            100% { background-color: var(--white-card-background); transform: scale(1); }
         }
         
         @keyframes priceDownFlash {
-            0% { background-color: var(--flash-negative); }
-            100% { background-color: var(--white-card-background); }
+            0% { background-color: var(--flash-negative); transform: scale(1.02); }
+            50% { background-color: var(--flash-negative); transform: scale(1.01); }
+            100% { background-color: var(--white-card-background); transform: scale(1); }
         }
 
         .stock-info {
@@ -204,16 +196,18 @@
 
         .stock-name {
             font-weight: 600;
-            font-size: 1.3rem; /* Adjusted font size */
+            font-size: 1.3rem;
             color: var(--dark-text);
+            transition: color 0.5s ease; /* Smooth transition for dark mode */
         }
 
         .stock-symbol {
             font-size: 1rem;
-            color: #666666; /* Slightly darker symbol text */
-            background-color: #f0f0f0; /* Lighter background for symbol */
+            color: #666666;
+            background-color: var(--light-border); /* Use border color for symbol background */
             padding: 6px 12px;
             border-radius: 20px;
+            transition: background-color 0.5s ease, color 0.5s ease; /* Smooth transition for dark mode */
         }
 
         .stock-price-container {
@@ -222,6 +216,8 @@
             justify-content: space-between;
             cursor: pointer;
             transition: transform 0.2s ease-in-out;
+            flex-grow: 1; /* Allow price container to take available space */
+            margin-bottom: 1rem; /* Space between price and button */
         }
 
         .stock-price-container:hover {
@@ -229,7 +225,7 @@
         }
 
         .stock-price {
-            font-size: 2.3rem; /* Adjusted font size */
+            font-size: 2.3rem;
             font-weight: 700;
             line-height: 1;
             transition: color 0.5s ease;
@@ -237,9 +233,9 @@
 
         .price-change-icon {
             margin-left: 1rem;
-            font-size: 1.6rem; /* Adjusted font size */
+            font-size: 1.6rem;
             align-self: center;
-            transition: transform 0.5s ease;
+            transition: transform 0.5s ease, color 0.5s ease; /* Smooth transition for dark mode */
         }
 
         .positive {
@@ -249,8 +245,8 @@
             color: var(--negative-color);
         }
 
-        .percentage-change, .daily-change {
-            font-size: 1.5rem; /* Adjusted font size */
+        .percentage-change, .change-value { /* Renamed daily-change to change-value */
+            font-size: 1.5rem;
             font-weight: 600;
             line-height: 1.2;
             transition: color 0.5s ease;
@@ -262,25 +258,28 @@
 
         .tooltip {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background-color: var(--tooltip-bg); /* Primary green for tooltip */
-            color: var(--tooltip-text-color); /* White text for tooltip */
+            bottom: 15px; /* Positioned at bottom-left */
+            left: 15px;
+            background-color: var(--tooltip-bg);
+            color: var(--tooltip-text-color);
             padding: 12px;
-            border-radius: 8px; /* Less rounded */
+            border-radius: 8px;
             font-size: 0.9rem;
-            z-index: 10;
+            z-index: 10; /* Ensure tooltip is above other content */
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            transition: opacity 0.3s ease, visibility 0.3s ease, background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; /* Smooth transition for dark mode */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--primary-green); /* Border matches background */
-            min-width: 160px;
+            border: 1px solid var(--primary-green);
+            pointer-events: none; /* Allow clicks to pass through tooltip when hidden */
+            transform: translateY(10px); /* Initial slight offset for animation */
         }
         
         .stock-item:hover .tooltip {
             opacity: 1;
             visibility: visible;
+            transform: translateY(0); /* Animate into view */
+            pointer-events: auto; /* Enable clicks on tooltip when visible */
         }
 
         .tooltip p {
@@ -292,12 +291,66 @@
         .tooltip .tooltip-price {
             font-weight: 700;
             font-size: 1.2rem;
-            color: var(--golden-yellow); /* Golden yellow for tooltip price */
+            color: var(--golden-yellow);
         }
 
         .tooltip .tooltip-change {
             font-weight: 600;
             display: block;
+        }
+
+        .add-to-watchlist-btn {
+            background-color: var(--golden-yellow);
+            color: var(--dark-text);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            /* margin-top: 1rem; Removed as flex-grow takes care of spacing */
+            align-self: flex-end; /* Align button to the right within the card */
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.5s ease; /* Smooth transition for dark mode */
+            z-index: 11; /* Ensure button is above tooltip if there's any overlap */
+        }
+
+        .add-to-watchlist-btn:hover {
+            background-color: #e6c200;
+            transform: translateY(-2px);
+        }
+
+        .add-to-watchlist-btn.added {
+            background-color: var(--primary-green);
+            color: #ffffff;
+        }
+
+        .theme-toggle-container {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            z-index: 100;
+        }
+
+        .theme-toggle-button {
+            background-color: var(--white-card-background);
+            color: var(--dark-text);
+            border: 1px solid var(--light-border);
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .theme-toggle-button:hover {
+            background-color: var(--light-background);
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
         }
 
         /* Responsive adjustments */
@@ -337,13 +390,23 @@
             .stock-price {
                 font-size: 2rem;
             }
-            .percentage-change, .daily-change {
+            .percentage-change, .change-value {
                 font-size: 1.3rem;
+            }
+            .theme-toggle-container {
+                top: 1rem;
+                right: 1rem;
             }
         }
     </style>
 </head>
 <body>
+
+    <div class="theme-toggle-container">
+        <button id="theme-toggle" class="theme-toggle-button">
+            <span id="theme-icon">☀️</span> <span id="theme-text">Light Mode</span>
+        </button>
+    </div>
 
     <div class="container">
         <h1>Ashoka Universal School <br> Mock-Stock Challenge</h1>
@@ -352,9 +415,6 @@
             Here, you can monitor the real-time performance of various mock stocks across different sectors. 
             Keep an eye on the market trends and see how your chosen portfolios are performing. Prices update every 3 seconds!
         </p>
-        <div id="search-container">
-            <input type="text" id="stock-search" placeholder="Search by name or symbol...">
-        </div>
         <div class="category-filter" id="category-filter">
             <!-- Category buttons will be rendered here by JavaScript -->
         </div>
@@ -474,7 +534,7 @@
                     { id: "GAIL", name: "GAIL (India)", symbol: "GAIL", price: 190.00, initialPrice: 190.00, volatility: 0.023 },
                     { id: "ADANITRANS", name: "Adani Transmission", symbol: "ADANITRANS", price: 950.00, initialPrice: 950.00, volatility: 0.032 },
                     { id: "TATAPOWER", name: "Tata Power", symbol: "TATAPOWER", price: 420.00, initialPrice: 420.00, volatility: 0.027 },
-                    { id: "ONGC", name: "ONGC", symbol: "ONGC", price: 295.00, initialPrice: 295.00, volatility: 0.024 },
+                    { id: "ONGC", name: "ONGC", price: 295.00, initialPrice: 295.00, volatility: 0.024 },
                     { id: "RECL", name: "REC Limited", symbol: "RECL", price: 500.00, initialPrice: 500.00, volatility: 0.025 },
                     { id: "NHPC", name: "NHPC", price: 115.00, initialPrice: 115.00, volatility: 0.026 },
                     { id: "OIL", name: "Oil India", symbol: "OIL", price: 410.00, initialPrice: 410.00, volatility: 0.029 },
@@ -552,7 +612,7 @@
                 stocks: [
                     { id: "INDIANH", name: "Indian Hotels", symbol: "INDIANH", price: 620.00, initialPrice: 620.00, volatility: 0.025 },
                     { id: "CHALET", name: "Chalet Hotels", symbol: "CHALET", price: 810.00, initialPrice: 810.00, volatility: 0.03 },
-                    { id: "EASEMYTRIP", name: "EaseMyTrip", price: 52.50, initialPrice: 52.50, volatility: 0.045 }
+                    { id: "EASEMYTRIP", price: 52.50, initialPrice: 52.50, volatility: 0.045 }
                 ]
             },
             {
@@ -584,7 +644,7 @@
                 stocks: [
                     { id: "ZEEL", name: "Zee Entertainment", symbol: "ZEEL", price: 260.00, initialPrice: 260.00, volatility: 0.04 },
                     { id: "SUNTV", name: "Sun TV Network", symbol: "SUNTV", price: 680.00, initialPrice: 680.00, volatility: 0.035 },
-                    { id: "PVRINOX", name: "PVR INOX", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 }
+                    { id: "PVRINOX", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 }
                 ]
             },
             {
@@ -604,18 +664,19 @@
             map[stock.id] = stock;
             return map;
         }, {});
-        // Map for quick access to category of a stock by ID (though not strictly needed with current render logic)
-        const categoryMap = stockData.reduce((map, cat) => {
-            cat.stocks.forEach(stock => map[stock.id] = cat.category);
-            return map;
-        }, {});
         
+        // Watchlist array to store IDs of stocks added to the watchlist
+        // Load watchlist from localStorage if available
+        let watchlist = JSON.parse(localStorage.getItem('mockStockWatchlist')) || [];
+
         // DOM elements
         const stockMarketContainer = document.getElementById('stock-market-container');
         const filterContainer = document.getElementById('category-filter');
-        const searchInput = document.getElementById('stock-search');
+        const themeToggleButton = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
         
-        let currentFilter = "All";
+        let currentFilter = "All"; // Default filter
 
         /**
          * Generates a random number from a standard normal distribution using the Box-Muller transform.
@@ -651,13 +712,12 @@
          */
         const fetchRealTimeStockData = async () => {
             // Simulate network delay
+            // In a real application, this would be a fetch() call to a real stock API.
+            // For this mock, we keep the simulation.
             await new Promise(resolve => setTimeout(resolve, 3000)); 
-
-            const updatedStocks = [];
 
             // Define market-wide factors
             const globalMarketDrift = 0.0001; // A small positive drift for a generally bullish market
-            const marketVolatility = 0.005; // Base market volatility
             const timeStep = 1; // Represents 1 minute in this simulation
             const marketWideShockChance = 0.05; // 5% chance of a major market shock
             
@@ -668,7 +728,7 @@
             
             // Loop through all stocks and apply the new price calculation logic
             for (const stockId in stockMap) {
-                const stock = { ...stockMap[stockId] }; // Create a copy
+                const stock = stockMap[stockId]; // Reference the actual stock object in stockMap
                 const oldPrice = stock.price;
                 const { volatility } = stock;
 
@@ -689,11 +749,10 @@
                 if (stock.price < 1) {
                     stock.price = 1; 
                 }
-
-                updatedStocks.push(stock);
             }
 
-            return updatedStocks;
+            // Return all stocks from the updated stockMap for consistency, though not strictly used by updatePrices anymore
+            return Object.values(stockMap);
         };
 
         /**
@@ -739,7 +798,7 @@
                     stockMarketContainer.appendChild(categorySection);
                 }
             } else {
-                // Render stocks in a flat grid (e.g., for search results)
+                // Render stocks in a flat grid (e.g., for watchlist)
                 if (stocksToRender.length > 0) {
                     const stockGrid = document.createElement('ul');
                     stockGrid.className = 'stock-grid';
@@ -768,6 +827,8 @@
             const priceChange = stock.price - stock.initialPrice;
             const percentageChange = (priceChange / stock.initialPrice) * 100;
 
+            const isAddedToWatchlist = watchlist.includes(stock.id);
+
             li.innerHTML = `
                 <div class="stock-info">
                     <span class="stock-name">${stock.name}</span>
@@ -775,63 +836,115 @@
                 </div>
                 <div class="stock-price-container" data-display="price">
                     <span class="stock-price">₹${stock.price.toFixed(2)}</span>
-                    <span class="daily-change hidden">₹${priceChange.toFixed(2)}</span>
-                    <span class="percentage-change hidden">${percentageChange.toFixed(2)}%</span>
+                    <span class="change-value ${priceChange === 0 ? '' : 'hidden'}">₹${priceChange.toFixed(2)}</span>
+                    <span class="percentage-change ${percentageChange === 0 ? '' : 'hidden'}">${percentageChange.toFixed(2)}%</span>
                     <span class="price-change-icon"></span>
                 </div>
                 <div class="tooltip">
                     <p class="tooltip-name">${stock.name}</p>
                     <p class="tooltip-symbol">${stock.symbol}</p>
                     <p>Current Price: <span class="tooltip-price">₹${stock.price.toFixed(2)}</span></p>
-                    <p>Daily Change: <span class="tooltip-change">₹${priceChange.toFixed(2)}</span></p>
+                    <p>Change: <span class="tooltip-change">₹${priceChange.toFixed(2)}</span></p>
                     <p>Percentage: <span class="tooltip-change">${percentageChange.toFixed(2)}%</span></p>
                 </div>
+                <button class="add-to-watchlist-btn ${isAddedToWatchlist ? 'added' : ''}" data-stock-id="${stock.id}">
+                    ${isAddedToWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                </button>
             `;
             
-            // Add event listener to toggle display between price, daily change, and percentage change
+            // Add event listener to toggle display between price, change, and percentage change
             const priceContainer = li.querySelector('.stock-price-container');
             priceContainer.addEventListener('click', (e) => {
                 e.stopPropagation(); // Prevent event bubbling
                 toggleDisplay(priceContainer);
             });
 
+            // Add event listener for watchlist button
+            const watchlistButton = li.querySelector('.add-to-watchlist-btn');
+            watchlistButton.addEventListener('click', () => toggleWatchlist(stock.id));
+
+            // Set initial color and icon for price change
+            const priceElement = li.querySelector('.stock-price');
+            const changeValueElement = li.querySelector('.change-value');
+            const percentageElement = li.querySelector('.percentage-change');
+            const iconElement = li.querySelector('.price-change-icon');
+            const tooltipPriceElement = li.querySelector('.tooltip-price');
+            const tooltipChangeElements = li.querySelectorAll('.tooltip-change');
+
+            if (priceChange > 0) {
+                priceElement.classList.add('positive');
+                changeValueElement.classList.add('positive');
+                percentageElement.classList.add('positive');
+                iconElement.classList.add('positive');
+                iconElement.innerHTML = '&#x25B2;'; // Up arrow
+                tooltipPriceElement.classList.add('positive');
+                tooltipChangeElements.forEach(el => el.classList.add('positive'));
+            } else if (priceChange < 0) {
+                priceElement.classList.add('negative');
+                changeValueElement.classList.add('negative');
+                percentageElement.classList.add('negative');
+                iconElement.classList.add('negative');
+                iconElement.innerHTML = '&#x25BC;'; // Down arrow
+                tooltipPriceElement.classList.add('negative');
+                tooltipChangeElements.forEach(el => el.classList.add('negative'));
+            } else {
+                iconElement.innerHTML = ''; // No arrow if no change
+            }
+
             return li;
         };
 
         /**
-         * Toggles the display mode of a stock's price container (price, daily change, percentage change).
+         * Toggles the display mode of a stock's price container (price, change, percentage change).
          * @param {HTMLElement} priceContainer - The stock price container element.
          */
         const toggleDisplay = (priceContainer) => {
             const currentDisplay = priceContainer.dataset.display;
             const priceElement = priceContainer.querySelector('.stock-price');
-            const dailyChangeElement = priceContainer.querySelector('.daily-change');
+            const changeValueElement = priceContainer.querySelector('.change-value');
             const percentageElement = priceContainer.querySelector('.percentage-change');
 
             // Cycle through display modes
             if (currentDisplay === 'price') {
                 priceElement.classList.add('hidden');
-                dailyChangeElement.classList.remove('hidden');
+                changeValueElement.classList.remove('hidden');
                 percentageElement.classList.add('hidden');
-                priceContainer.dataset.display = 'daily';
-            } else if (currentDisplay === 'daily') {
+                priceContainer.dataset.display = 'change';
+            } else if (currentDisplay === 'change') {
                 priceElement.classList.add('hidden');
-                dailyChangeElement.classList.add('hidden');
+                changeValueElement.classList.add('hidden');
                 percentageElement.classList.remove('hidden');
                 priceContainer.dataset.display = 'percentage';
             } else {
                 priceElement.classList.remove('hidden');
-                dailyChangeElement.classList.add('hidden');
+                changeValueElement.classList.add('hidden');
                 percentageElement.classList.add('hidden');
                 priceContainer.dataset.display = 'price';
             }
         };
 
         /**
+         * Adds or removes a stock from the watchlist.
+         * @param {string} stockId - The ID of the stock to toggle.
+         */
+        const toggleWatchlist = (stockId) => {
+            const index = watchlist.indexOf(stockId);
+            if (index > -1) {
+                // Remove from watchlist
+                watchlist.splice(index, 1);
+            } else {
+                // Add to watchlist
+                watchlist.push(stockId);
+            }
+            localStorage.setItem('mockStockWatchlist', JSON.stringify(watchlist)); // Persist watchlist
+            filterByCategory(currentFilter); // Re-render the current view to update button states and list if on watchlist
+        };
+
+        /**
          * Renders the category filter buttons.
          */
         const renderFilterButtons = () => {
-            const categories = ["All", ...stockData.map(d => d.category)];
+            const categories = ["All", ...stockData.map(d => d.category), "Watchlist"];
             filterContainer.innerHTML = ''; // Clear existing buttons
             categories.forEach(category => {
                 const button = document.createElement('button');
@@ -844,147 +957,83 @@
         };
 
         /**
-         * Filters the displayed stocks by the selected category.
-         * @param {string} selectedCategory - The category to filter by.
+         * Filters the displayed stocks by the selected category or shows the watchlist.
+         * @param {string} selectedCategory - The category to filter by or "Watchlist".
          */
         const filterByCategory = (selectedCategory) => {
-            searchInput.value = ''; // Clear search input when filtering by category
             const buttons = document.querySelectorAll('.category-button');
-            buttons.forEach(button => button.classList.remove('active')); // Deactivate all buttons
+            buttons.forEach(button => button.classList.remove('active'));
             const activeButton = document.querySelector(`[data-category="${selectedCategory}"]`);
-            if (activeButton) activeButton.classList.add('active'); // Activate selected button
+            if (activeButton) activeButton.classList.add('active');
             
-            let stocksToRender = allStocksFlattened;
-            if (selectedCategory !== "All") {
+            let stocksToRender = [];
+            if (selectedCategory === "All") {
+                stocksToRender = allStocksFlattened;
+            } else if (selectedCategory === "Watchlist") {
+                stocksToRender = allStocksFlattened.filter(stock => watchlist.includes(stock.id));
+            }
+            else {
                 const selectedCategoryData = stockData.find(d => d.category === selectedCategory);
                 stocksToRender = selectedCategoryData ? selectedCategoryData.stocks : [];
             }
-            renderStocks(stocksToRender, selectedCategory === "All");
-            currentFilter = selectedCategory;
+            renderStocks(stocksToRender, selectedCategory !== "Watchlist");
+            currentFilter = selectedCategory; // Update current filter state
         };
 
         /**
-         * Searches for stocks based on the search term.
-         * @param {string} searchTerm - The search query.
-         */
-        const searchStocks = (searchTerm) => {
-            const normalizedSearchTerm = searchTerm.toLowerCase();
-            const filteredStocks = allStocksFlattened.filter(stock => 
-                stock.name.toLowerCase().includes(normalizedSearchTerm) || 
-                stock.symbol.toLowerCase().includes(normalizedSearchTerm)
-            );
-            
-            document.querySelectorAll('.category-button').forEach(button => button.classList.remove('active')); // Deactivate category buttons
-            renderStocks(filteredStocks, false); // Render search results in a flat list
-            currentFilter = "Search";
-        };
-
-        // Event listener for search input
-        searchInput.addEventListener('keyup', (e) => {
-            if (e.target.value.length > 0) {
-                searchStocks(e.target.value);
-            } else {
-                filterByCategory("All"); // If search is cleared, show all stocks
-            }
-        });
-
-        /**
-         * Updates the prices of all visible stocks based on fetched data.
-         * This function is called periodically to simulate real-time updates.
+         * Updates the prices of all stocks in the stockMap and then re-renders the current view.
+         * This ensures prices update even for stocks not currently visible.
          */
         const updatePrices = async () => {
             try {
-                const fetchedData = await fetchRealTimeStockData();
-
-                // Update the main stockData and stockMap with new prices
-                fetchedData.forEach(newStock => {
-                    const existingStock = stockMap[newStock.id];
-                    if (existingStock) {
-                        existingStock.price = newStock.price;
-                        // initialPrice remains constant for daily change calculation
-                    }
-                });
+                // Fetch and update all stock prices in stockMap
+                await fetchRealTimeStockData(); 
                 
-                // Get all currently visible stock item elements
-                const visibleStockElements = document.querySelectorAll('.stock-item');
+                // Re-render the currently active filter view to reflect updated prices
+                filterByCategory(currentFilter);
 
-                visibleStockElements.forEach(stockItemElement => {
-                    const stockId = stockItemElement.id;
-                    const stock = stockMap[stockId]; // Get the updated stock data
-                    if (!stock) return; // Skip if stock data not found
-
-                    // Get current displayed price to compare for flash animation
-                    const priceElement = stockItemElement.querySelector('.stock-price');
-                    const oldDisplayedPrice = parseFloat(priceElement.textContent.substring(1)); // Remove '₹' and parse
-
-                    const dailyChangeElement = stockItemElement.querySelector('.daily-change');
-                    const percentageElement = stockItemElement.querySelector('.percentage-change');
-                    let iconElement = stockItemElement.querySelector('.price-change-icon');
-
-                    // Calculate new price change and percentage change
-                    const priceChange = stock.price - stock.initialPrice;
-                    const percentageChange = (priceChange / stock.initialPrice) * 100;
-                    
-                    // Update text content
-                    priceElement.textContent = `₹${stock.price.toFixed(2)}`;
-                    dailyChangeElement.textContent = `₹${priceChange.toFixed(2)}`;
-                    percentageElement.textContent = `${percentageChange.toFixed(2)}%`;
-                    
-                    // Reset classes for price change indication and animation
-                    priceElement.classList.remove('positive', 'negative');
-                    dailyChangeElement.classList.remove('positive', 'negative');
-                    percentageElement.classList.remove('positive', 'negative');
-                    iconElement.classList.remove('positive', 'negative');
-                    stockItemElement.classList.remove('price-up', 'price-down');
-                    
-                    // Update tooltip values
-                    const tooltipPriceElement = stockItemElement.querySelector('.tooltip-price');
-                    const tooltipChangeElements = stockItemElement.querySelectorAll('.tooltip-change');
-                    
-                    tooltipPriceElement.classList.remove('positive', 'negative');
-                    tooltipChangeElements.forEach(el => el.classList.remove('positive', 'negative'));
-                    
-                    // Apply new classes based on price movement compared to the *previous displayed price*
-                    if (stock.price > oldDisplayedPrice) {
-                        priceElement.classList.add('positive');
-                        dailyChangeElement.classList.add('positive');
-                        percentageElement.classList.add('positive');
-                        iconElement.classList.add('positive');
-                        stockItemElement.classList.add('price-up'); // Trigger flash animation
-                        iconElement.innerHTML = '&#x25B2;'; // Up arrow
-                        tooltipPriceElement.classList.add('positive');
-                        tooltipChangeElements.forEach(el => el.classList.add('positive'));
-                    } else if (stock.price < oldDisplayedPrice) {
-                        priceElement.classList.add('negative');
-                        dailyChangeElement.classList.add('negative');
-                        percentageElement.classList.add('negative');
-                        iconElement.classList.add('negative');
-                        stockItemElement.classList.add('price-down'); // Trigger flash animation
-                        iconElement.innerHTML = '&#x25BC;'; // Down arrow
-                        tooltipPriceElement.classList.add('negative');
-                        tooltipChangeElements.forEach(el => el.classList.add('negative'));
-                    } else {
-                        // If price hasn't changed, ensure no arrow is displayed
-                        iconElement.innerHTML = '';
-                    }
-
-                    // Update tooltip content with new values
-                    tooltipPriceElement.textContent = `₹${stock.price.toFixed(2)}`;
-                    tooltipChangeElements[0].textContent = `₹${priceChange.toFixed(2)}`;
-                    tooltipChangeElements[1].textContent = `${percentageChange.toFixed(2)}%`;
-                });
             } catch (error) {
                 console.error("Failed to fetch real-time stock data:", error);
-                // In a real app, you might show an error message to the user
+            }
+        };
+
+        /**
+         * Toggles between light and dark mode.
+         */
+        const toggleTheme = () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light'); // Persist theme preference
+            updateThemeToggleButton(isDarkMode);
+        };
+
+        /**
+         * Updates the text and icon of the theme toggle button.
+         * @param {boolean} isDarkMode - True if dark mode is active, false otherwise.
+         */
+        const updateThemeToggleButton = (isDarkMode) => {
+            if (isDarkMode) {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+            } else {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
             }
         };
 
         // Initial setup on page load
         document.addEventListener('DOMContentLoaded', () => {
+            // Apply saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+            updateThemeToggleButton(savedTheme === 'dark');
+
             renderFilterButtons();
             filterByCategory("All"); // Display all stocks initially
-            // Start the periodic updates
-            setInterval(updatePrices, 3000);
+            setInterval(updatePrices, 3000); // Start periodic updates
+            themeToggleButton.addEventListener('click', toggleTheme); // Add theme toggle listener
         });
     </script>
 

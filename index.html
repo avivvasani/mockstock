@@ -271,50 +271,9 @@
             display: none;
         }
 
-        .tooltip {
-            position: absolute;
-            bottom: 15px; /* Positioned at bottom-left */
-            left: 15px;
-            background-color: var(--tooltip-bg);
-            color: var(--tooltip-text-color);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            z-index: 10; /* Ensure tooltip is above other content */
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease, background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; /* Smooth transition for dark mode */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--primary-green);
-            pointer-events: none; /* Allow clicks to pass through tooltip when hidden */
-            transform: translateY(10px); /* Initial slight offset for animation */
-        }
-        
-        .stock-item:hover .tooltip {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0); /* Animate into view */
-            pointer-events: auto; /* Enable clicks on tooltip when visible */
-        }
+        /* Tooltip styles removed as per request */
 
-        .tooltip p {
-            margin: 0;
-            padding: 2px 0;
-            line-height: 1.3;
-        }
-        
-        .tooltip .tooltip-price {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--golden-yellow);
-        }
-
-        .tooltip .tooltip-change {
-            font-weight: 600;
-            display: block;
-        }
-
-        .add-to-watchlist-btn, .buy-btn, .sell-btn {
+        .add-to-watchlist-btn, .buy-btn, .sell-btn, .max-btn {
             background-color: var(--golden-yellow);
             color: var(--dark-text);
             border: none;
@@ -325,10 +284,10 @@
             font-weight: 600;
             transition: background-color 0.3s ease, transform 0.2s ease, color 0.5s ease; /* Smooth transition for dark mode */
             z-index: 11; /* Ensure button is above tooltip if there's any overlap */
-            margin-top: 0.5rem; /* Space between buttons */
+            /* margin-top: 0.5rem; Removed, using gap on parent */
         }
 
-        .add-to-watchlist-btn:hover, .buy-btn:hover, .sell-btn:hover {
+        .add-to-watchlist-btn:hover, .buy-btn:hover, .sell-btn:hover, .max-btn:hover {
             background-color: #e6c200;
             transform: translateY(-2px);
         }
@@ -341,7 +300,7 @@
         .buy-btn {
             background-color: var(--positive-color);
             color: #ffffff;
-            margin-right: 0.5rem;
+            /* margin-right: 0.5rem; Removed, using gap on parent */
         }
         .buy-btn:hover {
             background-color: #218838;
@@ -355,10 +314,22 @@
             background-color: #c82333;
         }
 
+        .max-btn {
+            background-color: #6c757d; /* Grey for Max button */
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+        .max-btn:hover {
+            background-color: #5a6268;
+        }
+
         .stock-actions {
             display: flex;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
             justify-content: flex-end; /* Align buttons to the right */
             margin-top: 1rem;
+            gap: 0.5rem; /* Added gap for spacing between buttons */
         }
 
 
@@ -651,10 +622,16 @@
 
         .modal-content .form-group {
             margin-bottom: 1rem;
+            display: flex; /* Use flex for quantity input and max button */
+            align-items: center;
+            gap: 10px; /* Space between input and button */
+        }
+        .modal-content .form-group input[type="number"] {
+            flex-grow: 1; /* Allow input to take available space */
+            width: auto; /* Override fixed width */
         }
 
         .modal-content input[type="number"] {
-            width: calc(100% - 30px); /* Adjust for padding */
             padding: 10px 15px;
             border: 1px solid var(--input-border);
             border-radius: 8px;
@@ -662,6 +639,7 @@
             background-color: var(--input-bg);
             color: var(--dark-text);
             transition: border-color 0.3s ease, background-color 0.5s ease, color 0.5s ease;
+            box-sizing: border-box; /* Include padding in width */
         }
 
         .modal-buttons {
@@ -866,7 +844,6 @@
         <!-- Top Bar for Navigation, Theme Toggle, and User Info -->
         <div id="top-bar" class="top-bar hidden">
             <div class="left-group">
-                <!-- Trader and Viewer buttons removed -->
                 <div class="user-id-display">
                     <strong>User:</strong> <span id="user-id-display-text"></span>
                 </div>
@@ -874,7 +851,7 @@
             <div class="right-group">
                 <button id="logout-button" class="nav-button bg-red-500 text-white hover:bg-red-600">Logout</button>
                 <button id="theme-toggle" class="theme-toggle-button">
-                    <span id="theme-icon">☀️</span>
+                    <span id="theme-icon">☀</span>
                     <span id="theme-text">Light Mode</span>
                 </button>
             </div>
@@ -955,7 +932,12 @@
                 </div>
                 <div class="portfolio-item">
                     <h3>Overall P/L</h3>
-                    <p id="portfolio-profit-loss" class="portfolio-value">₹0.00</p>
+                    <p id="portfolio-overall-profit-loss" class="portfolio-value">₹0.00</p>
+                </div>
+                <!-- New: Total P/L -->
+                <div class="portfolio-item">
+                    <h3>Total P/L</h3>
+                    <p id="portfolio-total-profit-loss" class="portfolio-value">₹0.00</p>
                 </div>
             </section>
 
@@ -995,14 +977,28 @@
             <div class="modal-content">
                 <h3 id="modal-title" class="modal-title"></h3>
                 <p id="modal-stock-info" class="modal-stock-info"></p>
+                <p id="modal-shares-owned" class="text-sm text-gray-600 mb-2"></p> <!-- Added for shares owned -->
                 <div class="form-group">
                     <label for="quantity-input">Quantity:</label>
                     <input type="number" id="quantity-input" min="1" value="1">
+                    <button id="max-quantity-button" class="max-btn">Max</button>
                 </div>
                 <p id="modal-message" class="modal-message"></p>
                 <div class="modal-buttons">
                     <button id="confirm-transaction-button" class="confirm-btn"></button>
                     <button id="cancel-transaction-button" class="cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Confirmation Modal -->
+        <div id="custom-confirm-modal-overlay" class="modal-overlay">
+            <div class="modal-content">
+                <h3 id="custom-confirm-title" class="modal-title">Confirm Action</h3>
+                <p id="custom-confirm-message" class="text-lg font-semibold text-gray-800 mb-6"></p>
+                <div class="modal-buttons">
+                    <button id="custom-confirm-yes" class="confirm-btn">Yes</button>
+                    <button id="custom-confirm-no" class="cancel-btn">No</button>
                 </div>
             </div>
         </div>
@@ -1026,7 +1022,7 @@
         let currentFilter = "All"; // For stock categories
         let updatePricesIntervalId = null;
 
-        // Mock Stock Data (remains the same)
+        // Mock Stock Data (Updated with missing names/symbols)
         let stockData = [
             {
                 category: "Finance",
@@ -1065,7 +1061,7 @@
                     { id: "LTIM", name: "LTIMindtree", symbol: "LTIM", price: 5350.00, initialPrice: 5350.00, volatility: 0.028 },
                     { id: "COFORGE", name: "Coforge", symbol: "COFORGE", price: 6700.00, initialPrice: 6700.00, volatility: 0.032 },
                     { id: "INFIBEAM", name: "Infibeam Avenues", symbol: "INFIBEAM", price: 32.50, initialPrice: 32.50, volatility: 0.06 },
-                    { id: "CYIENT", name: "Cyient", price: 2250.00, initialPrice: 2250.00, volatility: 0.031 },
+                    { id: "CYIENT", name: "Cyient", symbol: "CYIENT", price: 2250.00, initialPrice: 2250.00, volatility: 0.031 },
                     { id: "MPHASIS", name: "Mphasis", symbol: "MPHASIS", price: 2750.00, initialPrice: 2750.00, volatility: 0.029 },
                     { id: "SONATSOFTW", name: "Sonata Software", symbol: "SONATSOFTW", price: 875.00, initialPrice: 875.00, volatility: 0.03 },
                     { id: "MASTEK", name: "Mastek", symbol: "MASTEK", price: 2450.00, initialPrice: 2450.00, volatility: 0.027 },
@@ -1205,8 +1201,8 @@
                 category: "Aviation",
                 stocks: [
                     { id: "INDIGO", name: "InterGlobe Aviation", symbol: "INDIGO", price: 3600.00, initialPrice: 3600.00, volatility: 0.035 },
-                    { id: "SPICEJET", name: "SpiceJet", price: 55.00, initialPrice: 55.00, volatility: 0.06 },
-                    { id: "JETAIR", name: "Jet Airways", price: 75.00, initialPrice: 75.00, volatility: 0.055 }
+                    { id: "SPICEJET", name: "SpiceJet", symbol: "SPICEJET", price: 55.00, initialPrice: 55.00, volatility: 0.06 },
+                    { id: "JETAIR", name: "Jet Airways", symbol: "JETAIR", price: 75.00, initialPrice: 75.00, volatility: 0.055 }
                 ]
             },
             {
@@ -1214,7 +1210,7 @@
                 stocks: [
                     { id: "INDIANH", name: "Indian Hotels", symbol: "INDIANH", price: 620.00, initialPrice: 620.00, volatility: 0.025 },
                     { id: "CHALET", name: "Chalet Hotels", symbol: "CHALET", price: 810.00, initialPrice: 810.00, volatility: 0.03 },
-                    { id: "EASEMYTRIP", price: 52.50, initialPrice: 52.50, volatility: 0.045 }
+                    { id: "EASEMYTRIP", name: "Easy Trip Planners", symbol: "EASEMYTRIP", price: 52.50, initialPrice: 52.50, volatility: 0.045 }
                 ]
             },
             {
@@ -1246,7 +1242,7 @@
                 stocks: [
                     { id: "ZEEL", name: "Zee Entertainment", symbol: "ZEEL", price: 260.00, initialPrice: 260.00, volatility: 0.04 },
                     { id: "SUNTV", name: "Sun TV Network", symbol: "SUNTV", price: 680.00, initialPrice: 680.00, volatility: 0.035 },
-                    { id: "PVRINOX", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 }
+                    { id: "PVRINOX", name: "PVR INOX", symbol: "PVRINOX", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 }
                 ]
             },
             {
@@ -1480,16 +1476,12 @@
                         const priceElement = stockItemElement.querySelector('.stock-price');
                         const changeValueElement = stockItemElement.querySelector('.change-value');
                         const iconElement = stockItemElement.querySelector('.price-change-icon');
-                        const tooltipPriceElement = stockItemElement.querySelector('.tooltip-price');
-                        const tooltipChangeElement = stockItemElement.querySelector('.tooltip-change'); // Only one change element now
 
                         const priceChange = stock.price - currentDisplayedPrice;
 
                         // Update text content
                         priceElement.textContent = `₹${stock.price.toFixed(2)}`;
-                        changeValueElement.textContent = `₹${priceChange.toFixed(2)}`; // Removed "Change: "
-                        tooltipPriceElement.textContent = `₹${stock.price.toFixed(2)}`;
-                        tooltipChangeElement.textContent = priceChange.toFixed(2); // Removed percentage from tooltip
+                        changeValueElement.textContent = `₹${priceChange.toFixed(2)}`;
 
                         // Update classes for styling (positive/negative) and animation
                         // Remove previous state classes
@@ -1497,8 +1489,6 @@
                         changeValueElement.classList.remove('positive', 'negative');
                         iconElement.classList.remove('positive', 'negative');
                         stockItemElement.classList.remove('price-up', 'price-down'); // Remove old animation class
-                        tooltipPriceElement.classList.remove('positive', 'negative');
-                        tooltipChangeElement.classList.remove('positive', 'negative');
 
 
                         if (priceChange > 0) {
@@ -1507,16 +1497,12 @@
                             iconElement.classList.add('positive');
                             stockItemElement.classList.add('price-up'); // Trigger flash animation
                             iconElement.innerHTML = '&#x25B2;'; // Up arrow
-                            tooltipPriceElement.classList.add('positive');
-                            tooltipChangeElement.classList.add('positive');
                         } else if (priceChange < 0) {
                             priceElement.classList.add('negative');
                             changeValueElement.classList.add('negative');
                             iconElement.classList.add('negative');
                             stockItemElement.classList.add('price-down'); // Trigger flash animation
                             iconElement.innerHTML = '&#x25BC;'; // Down arrow
-                            tooltipPriceElement.classList.add('negative');
-                            tooltipChangeElement.classList.add('negative');
                         } else {
                             // If price hasn't changed, ensure no arrow is displayed
                             iconElement.innerHTML = '';
@@ -1557,6 +1543,7 @@
 
         let modalCurrentStock = null;
         let modalCurrentType = '';
+        let confirmActionCallback = null; // For custom confirmation modal
 
         function openTransactionModal(type, stockId) {
             const stock = stockMap[stockId];
@@ -1570,6 +1557,15 @@
             getEl('quantity-input').value = 1;
             getEl('modal-message').textContent = '';
             
+            const sharesOwnedEl = getEl('modal-shares-owned');
+            if (type === 'sell') {
+                const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
+                sharesOwnedEl.textContent = holding ? `You own: ${holding.quantity} shares` : 'You own: 0 shares';
+                sharesOwnedEl.classList.remove('hidden');
+            } else {
+                sharesOwnedEl.classList.add('hidden');
+            }
+
             const confirmBtn = getEl('confirm-transaction-button');
             confirmBtn.textContent = type.charAt(0).toUpperCase() + type.slice(1);
             confirmBtn.classList.remove('buy-btn', 'sell-btn');
@@ -1587,6 +1583,22 @@
             modalCurrentStock = null;
             modalCurrentType = '';
             getEl('modal-message').textContent = '';
+            getEl('modal-shares-owned').textContent = ''; // Clear shares owned info
+        }
+
+        function setMaxQuantity() {
+            const quantityInput = getEl('quantity-input');
+            const stock = modalCurrentStock;
+
+            if (!stock) return;
+
+            if (modalCurrentType === 'buy') {
+                const maxQuantity = Math.floor(currentPortfolio.cashBalance / stock.price);
+                quantityInput.value = Math.max(1, maxQuantity); // Ensure at least 1, if affordable
+            } else if (modalCurrentType === 'sell') {
+                const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
+                quantityInput.value = holding ? holding.quantity : 0;
+            }
         }
 
         function confirmTransaction() {
@@ -1657,17 +1669,48 @@
             }
         }
 
+        // Custom Confirmation Modal Logic
+        function openCustomConfirmModal(message, callback) {
+            getEl('custom-confirm-message').textContent = message;
+            getEl('custom-confirm-modal-overlay').classList.add('active');
+            confirmActionCallback = callback; // Store the callback function
+        }
+
+        function closeCustomConfirmModal() {
+            getEl('custom-confirm-modal-overlay').classList.remove('active');
+            confirmActionCallback = null;
+        }
+
+        function handleCustomConfirmYes() {
+            if (confirmActionCallback) {
+                confirmActionCallback(true);
+            }
+            closeCustomConfirmModal();
+        }
+
+        function handleCustomConfirmNo() {
+            if (confirmActionCallback) {
+                confirmActionCallback(false);
+            }
+            closeCustomConfirmModal();
+        }
+
+
         function updatePortfolioDisplay() {
             getEl('portfolio-cash').textContent = `₹${currentPortfolio.cashBalance.toFixed(2)}`;
 
             let totalInvested = 0;
             let currentHoldingsValue = 0;
+            let totalPNL = 0; // Initialize total P/L
 
             currentPortfolio.holdings.forEach(holding => {
                 const stock = stockMap[holding.stockId];
                 if (stock) {
-                    totalInvested += holding.quantity * holding.averagePrice;
-                    currentHoldingsValue += holding.quantity * stock.price;
+                    const holdingInvested = holding.quantity * holding.averagePrice;
+                    const holdingCurrentValue = holding.quantity * stock.price;
+                    totalInvested += holdingInvested;
+                    currentHoldingsValue += holdingCurrentValue;
+                    totalPNL += (holdingCurrentValue - holdingInvested); // Accumulate P/L
                 }
             });
 
@@ -1675,19 +1718,27 @@
             getEl('portfolio-current-value').textContent = `₹${currentHoldingsValue.toFixed(2)}`;
 
             const overallProfitLoss = currentHoldingsValue - totalInvested;
-            const portfolioProfitLossEl = getEl('portfolio-profit-loss');
-            portfolioProfitLossEl.textContent = `₹${overallProfitLoss.toFixed(2)}`;
-            portfolioProfitLossEl.classList.remove('positive', 'negative');
+            const portfolioOverallProfitLossEl = getEl('portfolio-overall-profit-loss');
+            portfolioOverallProfitLossEl.textContent = `₹${overallProfitLoss.toFixed(2)}`;
+            portfolioOverallProfitLossEl.classList.remove('positive', 'negative');
             if (overallProfitLoss > 0) {
-                portfolioProfitLossEl.classList.add('positive');
+                portfolioOverallProfitLossEl.classList.add('positive');
             } else if (overallProfitLoss < 0) {
-                portfolioProfitLossEl.classList.add('negative');
+                portfolioOverallProfitLossEl.classList.add('negative');
+            }
+
+            // Update Total P/L display
+            const portfolioTotalProfitLossEl = getEl('portfolio-total-profit-loss');
+            portfolioTotalProfitLossEl.textContent = `₹${totalPNL.toFixed(2)}`;
+            portfolioTotalProfitLossEl.classList.remove('positive', 'negative');
+            if (totalPNL > 0) {
+                portfolioTotalProfitLossEl.classList.add('positive');
+            } else if (totalPNL < 0) {
+                portfolioTotalProfitLossEl.classList.add('negative');
             }
         }
 
         function renderStockCard(stock, isTradingView) {
-            // This function now primarily builds the initial card structure.
-            // Live price updates are handled by updatePrices() directly manipulating the DOM.
             const priceChange = stock.price - stock.initialPrice;
             const isAddedToWatchlist = currentWatchlist.includes(stock.id);
             const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
@@ -1708,13 +1759,6 @@
                             ${priceChange > 0 ? '▲' : priceChange < 0 ? '▼' : ''}
                         </span>
                     </div>
-                    <div class="tooltip">
-                        <p class="tooltip-name">${stock.name}</p>
-                        <p class="tooltip-symbol">${stock.symbol}</p>
-                        <p>Current Price: <span class="tooltip-price">₹${stock.price.toFixed(2)}</span></p>
-                        <p>Change: <span class="tooltip-change">${priceChange.toFixed(2)}</span></p>
-                        ${hasHoldings ? `<p>Owned: ${holding.quantity} @ ₹${holding.averagePrice.toFixed(2)}</p>` : ''}
-                    </div>
             `;
 
             if (isTradingView) {
@@ -1722,6 +1766,7 @@
                     <div class="stock-actions">
                         <button class="buy-btn" data-stock-id="${stock.id}">Buy</button>
                         ${hasHoldings ? `<button class="sell-btn" data-stock-id="${stock.id}">Sell</button>` : ''}
+                        ${hasHoldings ? `<button class="sell-all-btn" data-stock-id="${stock.id}">Sell All</button>` : ''}
                         <button class="add-to-watchlist-btn ${isAddedToWatchlist ? 'added' : ''}" data-stock-id="${stock.id}">
                             ${isAddedToWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
                         </button>
@@ -1764,31 +1809,36 @@
                 stockGridEl.querySelectorAll('.sell-btn').forEach(button => {
                     button.onclick = () => openTransactionModal('sell', button.dataset.stockId);
                 });
+                // Event listener for "Sell All" button
+                stockGridEl.querySelectorAll('.sell-all-btn').forEach(button => {
+                    button.onclick = () => {
+                        const stockId = button.dataset.stockId;
+                        const stock = stockMap[stockId];
+                        if (!stock) return;
+
+                        const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
+                        if (holding && holding.quantity > 0) {
+                            openCustomConfirmModal(`Are you sure you want to sell all ${holding.quantity} shares of ${stock.name}?`, (confirmed) => {
+                                if (confirmed) {
+                                    const revenue = holding.quantity * stock.price;
+                                    currentPortfolio.cashBalance += revenue;
+                                    currentPortfolio.holdings = currentPortfolio.holdings.filter(h => h.stockId !== stock.id);
+                                    saveUserData(currentUserId);
+                                    updatePortfolioDisplay();
+                                    renderStockCards(currentFilter, true); // Re-render to update UI
+                                    // Optional: Show a success message
+                                    // alert(`Successfully sold all ${holding.quantity} shares of ${stock.name}.`);
+                                }
+                            });
+                        } else {
+                            // alert("You don't own any shares of this stock to sell.");
+                        }
+                    };
+                });
                 stockGridEl.querySelectorAll('.add-to-watchlist-btn').forEach(button => {
                     button.onclick = () => toggleWatchlist(button.dataset.stockId);
                 });
             }
-        }
-
-        function renderFilterButtons(isTradingView) {
-            const categories = ["All", ...stockData.map(d => d.category), "Watchlist"];
-            const filterContainerEl = isTradingView ? getEl('category-filter-trader') : getEl('category-filter-viewer');
-            filterContainerEl.innerHTML = ''; // Clear existing buttons
-
-            categories.forEach(category => {
-                const button = document.createElement('button');
-                button.textContent = category;
-                button.classList.add('category-button');
-                if (currentFilter === category) {
-                    button.classList.add('active');
-                }
-                button.onclick = () => {
-                    currentFilter = category;
-                    renderFilterButtons(isTradingView); // Re-render to update active state
-                    renderStockCards(currentFilter, isTradingView);
-                };
-                filterContainerEl.appendChild(button);
-            });
         }
 
 
@@ -1800,7 +1850,7 @@
                 getEl('theme-icon').textContent = '🌙';
                 getEl('theme-text').textContent = 'Dark Mode';
             } else {
-                getEl('theme-icon').textContent = '☀️';
+                getEl('theme-icon').textContent = '☀';
                 getEl('theme-text').textContent = 'Light Mode';
             }
 
@@ -1843,13 +1893,19 @@
             // Modal Buttons
             getEl('confirm-transaction-button').onclick = confirmTransaction;
             getEl('cancel-transaction-button').onclick = closeTransactionModal;
+            getEl('max-quantity-button').onclick = setMaxQuantity; // New: Max button handler
+
+            // Custom Confirmation Modal Buttons
+            getEl('custom-confirm-yes').onclick = handleCustomConfirmYes;
+            getEl('custom-confirm-no').onclick = handleCustomConfirmNo;
+
 
             // Theme Toggle
             getEl('theme-toggle').onclick = () => {
                 document.body.classList.toggle('dark-mode');
                 const isDarkMode = document.body.classList.contains('dark-mode');
                 localStorage.setItem(LOCAL_STORAGE_THEME_KEY, isDarkMode ? 'dark' : 'light');
-                getEl('theme-icon').textContent = isDarkMode ? '🌙' : '☀️';
+                getEl('theme-icon').textContent = isDarkMode ? '🌙' : '☀';
                 getEl('theme-text').textContent = isDarkMode ? 'Dark Mode' : 'Light Mode';
             };
         });

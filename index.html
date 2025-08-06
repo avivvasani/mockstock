@@ -867,4 +867,974 @@
         <div id="top-bar" class="top-bar hidden">
             <div class="left-group">
                 <button id="nav-trader" class="nav-button">Trader</button>
-                <button id="nav-viewer" class="
+                <button id="nav-viewer" class="nav-button">Viewer</button>
+                <!-- Admin button removed as general item storage is no longer supported with localStorage -->
+            </div>
+            <div class="right-group">
+                <button id="logout-button" class="nav-button bg-red-500 text-white hover:bg-red-600">Logout</button>
+                <button id="theme-toggle" class="theme-toggle-button">
+                    <span id="theme-icon">☀️</span>
+                    <span id="theme-text">Light Mode</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login-page" class="auth-container">
+            <div class="auth-card">
+                <h2>Login to Mock-Stock Challenge</h2>
+                <div class="form-group">
+                    <label for="login-username">Username:</label>
+                    <input type="text" id="login-username" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <button id="login-button" class="auth-button">Login</button>
+                <p id="login-error" class="error-message"></p>
+                <p class="auth-message">Don't have an account? <a href="#" id="go-to-register">Register here</a></p>
+                <p class="auth-message">Or <a href="#" id="anonymous-sign-in">Continue as Guest</a></p>
+            </div>
+        </div>
+
+        <!-- Registration Page -->
+        <div id="register-page" class="auth-container hidden">
+            <div class="auth-card">
+                <h2>Register for Mock-Stock Challenge</h2>
+                <div class="form-group">
+                    <label for="register-username">Username:</label>
+                    <input type="text" id="register-username" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" placeholder="Create a password">
+                </div>
+                <button id="register-button" class="auth-button">Register</button>
+                <p id="register-error" class="error-message"></p>
+                <p class="auth-message">Already have an account? <a href="#" id="go-to-login">Login here</a></p>
+            </div>
+        </div>
+
+        <!-- Role Selection Page -->
+        <div id="role-selection-page" class="role-selection-container hidden">
+            <div class="role-selection-card">
+                <h2>How would you like to enter?</h2>
+                <div class="role-buttons-group">
+                    <button id="enter-as-trader" class="role-button trader">
+                        Enter as Trader
+                    </button>
+                    <button id="enter-as-viewer" class="role-button viewer">
+                        Enter as Viewer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Section (Removed - no longer supported with localStorage) -->
+        <!-- <div id="admin-section" class="container hidden">...</div> -->
+
+        <!-- Viewer Section (Removed - no longer supported with localStorage) -->
+        <!-- <div id="viewer-section" class="container hidden">...</div> -->
+
+        <!-- Trading (Buying/Selling) Section -->
+        <div id="trading-section" class="container hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                Ashoka Universal School <br/> Mock-Stock Challenge (Trader)
+            </h1>
+            <p class="intro-text">
+                Welcome to the Live Mock-Stock Market Trader for the Ashoka Universal School Mock-Stock Challenge!
+                Here, you can monitor the real-time performance of various mock stocks across different sectors, buy, sell, and manage your portfolio.
+                Prices update every 3 seconds!
+            </p>
+
+            <section class="portfolio-summary">
+                <div class="portfolio-item">
+                    <h3>Cash Balance</h3>
+                    <p id="portfolio-cash" class="portfolio-value">₹0.00</p>
+                </div>
+                <div class="portfolio-item">
+                    <h3>Total Invested</h3>
+                    <p id="portfolio-invested" class="portfolio-value">₹0.00</p>
+                </div>
+                <div class="portfolio-item">
+                    <h3>Current Value</h3>
+                    <p id="portfolio-current-value" class="portfolio-value">₹0.00</p>
+                </div>
+                <div class="portfolio-item">
+                    <h3>Overall P/L</h3>
+                    <p id="portfolio-profit-loss" class="portfolio-value">₹0.00</p>
+                </div>
+            </section>
+
+            <div id="category-filter-trader" class="category-filter">
+                <!-- Category buttons will be rendered here by JS -->
+            </div>
+            <main id="stock-market-container-trader">
+                <ul id="stock-grid-trader" class="stock-grid">
+                    <!-- Stock cards will be rendered here by JS -->
+                </ul>
+            </main>
+        </div>
+
+        <!-- Stock Viewer (View Only) Section -->
+        <div id="stock-viewer-section" class="container hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                Ashoka Universal School <br/> Mock-Stock Challenge (Viewer)
+            </h1>
+            <p class="intro-text">
+                Welcome to the Live Mock-Stock Market Viewer for the Ashoka Universal School Mock-Stock Challenge!
+                Here, you can monitor the real-time performance of various mock stocks across different sectors.
+                Prices update every 3 seconds!
+            </p>
+
+            <div id="category-filter-viewer" class="category-filter">
+                <!-- Category buttons will be rendered here by JS -->
+            </div>
+            <main id="stock-market-container-viewer">
+                <ul id="stock-grid-viewer" class="stock-grid">
+                    <!-- Stock cards will be rendered here by JS -->
+                </ul>
+            </main>
+        </div>
+
+        <!-- Buy/Sell Modal -->
+        <div id="transaction-modal-overlay" class="modal-overlay">
+            <div class="modal-content">
+                <h3 id="modal-title" class="modal-title"></h3>
+                <p id="modal-stock-info" class="modal-stock-info"></p>
+                <div class="form-group">
+                    <label for="quantity-input">Quantity:</label>
+                    <input type="number" id="quantity-input" min="1" value="1">
+                </div>
+                <p id="modal-message" class="modal-message"></p>
+                <div class="modal-buttons">
+                    <button id="confirm-transaction-button" class="confirm-btn"></button>
+                    <button id="cancel-transaction-button" class="cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IMPORTANT: For a real application, storing user credentials directly in localStorage is INSECURE.
+        // This simplified approach is ONLY suitable for a low-stakes, mock, one-day event where security
+        // and persistent multi-user data across different browsers/devices are not a concern.
+
+        // Global variables for local storage keys
+        const LOCAL_STORAGE_USERS_KEY = 'mockStockUsers';
+        const LOCAL_STORAGE_CURRENT_USER_ID_KEY = 'mockStockCurrentUserId';
+        const LOCAL_STORAGE_WATCHLIST_PREFIX = 'mockStockWatchlist_';
+        const LOCAL_STORAGE_PORTFOLIO_PREFIX = 'mockStockPortfolio_';
+        const LOCAL_STORAGE_THEME_KEY = 'mockStockTheme';
+
+        let currentUserId = null;
+        let currentWatchlist = [];
+        let currentPortfolio = { cashBalance: 100000, holdings: [] };
+        let currentFilter = "All"; // For stock categories
+        let updatePricesIntervalId = null;
+
+        // Mock Stock Data (remains the same)
+        let stockData = [
+            {
+                category: "Finance",
+                stocks: [
+                    { id: "HDFCBANK", name: "HDFC Bank", symbol: "HDFCBANK", price: 1650.45, initialPrice: 1650.45, volatility: 0.015 },
+                    { id: "ICICIBANK", name: "ICICI Bank", symbol: "ICICIBANK", price: 980.10, initialPrice: 980.10, volatility: 0.018 },
+                    { id: "SBIN", name: "State Bank of India", symbol: "SBIN", price: 625.75, initialPrice: 625.75, volatility: 0.02 },
+                    { id: "BAJFINANCE", name: "Bajaj Finance", symbol: "BAJFINANCE", price: 7200.50, initialPrice: 7200.50, volatility: 0.025 },
+                    { id: "KOTAKBANK", name: "Kotak Mahindra Bank", symbol: "KOTAKBANK", price: 1910.80, initialPrice: 1910.80, volatility: 0.016 },
+                    { id: "AXISBANK", name: "Axis Bank", symbol: "AXISBANK", price: 1015.35, initialPrice: 1015.35, volatility: 0.019 },
+                    { id: "PAYTM", name: "Paytm", symbol: "PAYTM", price: 585.00, initialPrice: 585.00, volatility: 0.045 },
+                    { id: "PUNJAB", name: "Punjab National Bank", symbol: "PUNJAB", price: 115.90, initialPrice: 115.90, volatility: 0.025 },
+                    { id: "BANKBARODA", name: "Bank of Baroda", symbol: "BANKBARODA", price: 260.00, initialPrice: 260.00, volatility: 0.022 },
+                    { id: "RECLTD", name: "REC Ltd", symbol: "RECLTD", price: 530.70, initialPrice: 530.70, volatility: 0.023 },
+                    { id: "IIFL", name: "IIFL Finance", symbol: "IIFL", price: 590.25, initialPrice: 590.25, volatility: 0.035 },
+                    { id: "LICHSGFIN", name: "LIC Housing Finance", symbol: "LICHSGFIN", price: 715.00, initialPrice: 715.00, volatility: 0.021 },
+                    { id: "PFC", name: "Power Finance Corp", symbol: "PFC", price: 470.00, initialPrice: 470.00, volatility: 0.024 },
+                    { id: "HDFC", name: "HDFC Ltd", symbol: "HDFC", price: 2950.00, initialPrice: 2950.00, volatility: 0.014 },
+                    { id: "INDUSINDBK", name: "IndusInd Bank", symbol: "INDUSINDBK", price: 1320.60, initialPrice: 1320.60, volatility: 0.02 },
+                    { id: "PNBHOUSING", name: "PNB Housing", symbol: "PNBHOUSING", price: 690.45, initialPrice: 690.45, volatility: 0.03 },
+                    { id: "YESBANK", name: "Yes Bank", symbol: "YESBANK", price: 27.50, initialPrice: 27.50, volatility: 0.05 },
+                    { id: "FEDERALBNK", name: "Federal Bank", symbol: "FEDERALBNK", price: 155.80, initialPrice: 155.80, volatility: 0.02 },
+                    { id: "IDFCFIRSTB", name: "IDFC First Bank", symbol: "IDFCFIRSTB", price: 88.20, initialPrice: 88.20, volatility: 0.028 }
+                ]
+            },
+            {
+                category: "IT & Tech",
+                stocks: [
+                    { id: "TCS", name: "Tata Consultancy Services", symbol: "TCS", price: 3480.00, initialPrice: 3480.00, volatility: 0.017 },
+                    { id: "INFY", name: "Infosys", symbol: "INFY", price: 1425.00, initialPrice: 1425.00, volatility: 0.02 },
+                    { id: "WIPRO", name: "WIPRO", symbol: "WIPRO", price: 410.50, initialPrice: 410.50, volatility: 0.025 },
+                    { id: "TECHM", name: "Tech Mahindra", symbol: "TECHM", price: 1250.00, initialPrice: 1250.00, volatility: 0.023 },
+                    { id: "HCLTECH", name: "HCLTech", symbol: "HCLTECH", price: 1350.25, initialPrice: 1350.25, volatility: 0.021 },
+                    { id: "TATAELXSI", name: "Tata Elxsi", symbol: "TATAELXSI", price: 8150.00, initialPrice: 8150.00, volatility: 0.035 },
+                    { id: "PERSISTENT", name: "Persistent Systems", symbol: "PERSISTENT", price: 7600.00, initialPrice: 7600.00, volatility: 0.03 },
+                    { id: "LTIM", name: "LTIMindtree", symbol: "LTIM", price: 5350.00, initialPrice: 5350.00, volatility: 0.028 },
+                    { id: "COFORGE", name: "Coforge", symbol: "COFORGE", price: 6700.00, initialPrice: 6700.00, volatility: 0.032 },
+                    { id: "INFIBEAM", name: "Infibeam Avenues", symbol: "INFIBEAM", price: 32.50, initialPrice: 32.50, volatility: 0.06 },
+                    { id: "CYIENT", name: "Cyient", price: 2250.00, initialPrice: 2250.00, volatility: 0.031 },
+                    { id: "MPHASIS", name: "Mphasis", symbol: "MPHASIS", price: 2750.00, initialPrice: 2750.00, volatility: 0.029 },
+                    { id: "SONATSOFTW", name: "Sonata Software", symbol: "SONATSOFTW", price: 875.00, initialPrice: 875.00, volatility: 0.03 },
+                    { id: "MASTEK", name: "Mastek", symbol: "MASTEK", price: 2450.00, initialPrice: 2450.00, volatility: 0.027 },
+                    { id: "ZENSARTECH", name: "Zensar Technologies", symbol: "ZENSARTECH", price: 570.00, initialPrice: 570.00, volatility: 0.034 },
+                    { id: "L&TINFO", name: "L&T Technology Services", symbol: "L&TINFO", price: 4900.00, initialPrice: 4900.00, volatility: 0.025 },
+                    { id: "MINDTREE", name: "Mindtree", symbol: "MINDTREE", price: 4100.00, initialPrice: 4100.00, volatility: 0.026 }
+                ]
+            },
+            {
+                category: "Pharma",
+                stocks: [
+                    { id: "SUNPHARMA", name: "Sun Pharma", symbol: "SUNPHARMA", price: 1610.00, initialPrice: 1610.00, volatility: 0.016 },
+                    { id: "DRREDDY", name: "Dr. Reddy's Labs", symbol: "DRREDDY", price: 6350.00, initialPrice: 6350.00, volatility: 0.021 },
+                    { id: "CIPLA", name: "Cipla", symbol: "CIPLA", price: 1450.00, initialPrice: 1450.00, volatility: 0.018 },
+                    { id: "LUPIN", name: "Lupin", symbol: "LUPIN", price: 1750.00, initialPrice: 1750.00, volatility: 0.02 },
+                    { id: "TORNT", name: "Torrent Pharma", symbol: "TORNT", price: 3050.00, initialPrice: 3050.00, volatility: 0.022 },
+                    { id: "CADILA", name: "Zydus Lifesciences", symbol: "CADILA", price: 1050.00, initialPrice: 1050.00, volatility: 0.025 },
+                    { id: "AUROPHARMA", name: "Aurobindo Pharma", symbol: "AUROPHARMA", price: 1150.00, initialPrice: 1150.00, volatility: 0.028 },
+                    { id: "DIVISLAB", name: "Divi's Labs", symbol: "DIVISLAB", price: 4150.00, initialPrice: 4150.00, volatility: 0.019 },
+                    { id: "IPCALAB", name: "Ipca Laboratories", symbol: "IPCALAB", price: 990.00, initialPrice: 990.00, volatility: 0.023 },
+                    { id: "GLAXO", name: "GSK Pharma", symbol: "GLAXO", price: 1420.00, initialPrice: 1420.00, volatility: 0.017 },
+                    { id: "BIOCON", name: "Biocon", symbol: "BIOCON", price: 315.00, initialPrice: 315.00, volatility: 0.035 },
+                    { id: "ALKEM", name: "Alkem Laboratories", symbol: "ALKEM", price: 5100.00, initialPrice: 5100.00, volatility: 0.02 }
+                ]
+            },
+            {
+                category: "Automotive",
+                stocks: [
+                    { id: "MARUTI", name: "Maruti Suzuki India", symbol: "MARUTI", price: 10250.00, initialPrice: 10250.00, volatility: 0.022 },
+                    { id: "TATAMOTORS", name: "Tata Motors", symbol: "TATAMOTORS", price: 675.00, initialPrice: 675.00, volatility: 0.03 },
+                    { id: "BAJAJAUTO", name: "Bajaj Auto", symbol: "BAJAJAUTO", price: 8750.00, initialPrice: 8750.00, volatility: 0.024 },
+                    { id: "M&M", name: "Mahindra & Mahindra", symbol: "M&M", price: 1850.00, initialPrice: 1850.00, volatility: 0.025 },
+                    { id: "EICHERMOT", name: "Eicher Motors", symbol: "EICHERMOT", price: 4650.00, initialPrice: 4650.00, volatility: 0.028 },
+                    { id: "ASHOKLEY", name: "Ashok Leyland", symbol: "ASHOKLEY", price: 210.00, initialPrice: 210.00, volatility: 0.035 },
+                    { id: "TVSMOTOR", name: "TVS Motor Company", symbol: "TVSMOTORS", price: 2250.00, initialPrice: 2250.00, volatility: 0.03 },
+                    { id: "HEROMOTOCO", name: "Hero MotoCorp", symbol: "HEROMOTOCO", price: 3200.00, initialPrice: 3200.00, volatility: 0.027 },
+                    { id: "BOSCHLTD", name: "Bosch Ltd", symbol: "BOSCHLTD", price: 20500.00, initialPrice: 20500.00, volatility: 0.018 },
+                    { id: "MRF", name: "MRF", symbol: "MRF", price: 105000.00, initialPrice: 105000.00, volatility: 0.02 }
+                ]
+            },
+            {
+                category: "Manufacturing & Infra",
+                stocks: [
+                    { id: "RELIANCE", name: "Reliance Industries", symbol: "RELIANCE", price: 2580.00, initialPrice: 2580.00, volatility: 0.015 },
+                    { id: "LT", name: "Larsen & Toubro", symbol: "LT", price: 3150.00, initialPrice: 3150.00, volatility: 0.019 },
+                    { id: "ASIANPAINT", name: "Asian Paints", symbol: "ASIANPAINT", price: 3300.00, initialPrice: 3300.00, volatility: 0.022 },
+                    { id: "ULTRACEMCO", name: "Ultratech Cement", symbol: "ULTRACEMCO", price: 7700.00, initialPrice: 7700.00, volatility: 0.02 },
+                    { id: "PIDILITIND", name: "Pidilite Industries", symbol: "PIDILITIND", price: 3100.00, initialPrice: 3100.00, volatility: 0.025 },
+                    { id: "GRASIM", name: "Grasim Industries", symbol: "GRASIM", price: 2500.00, initialPrice: 2500.00, volatility: 0.021 },
+                    { id: "JSWINFRA", name: "JSW Infrastructure", symbol: "JSWINFRA", price: 320.00, initialPrice: 320.00, volatility: 0.035 },
+                    { id: "ADANIPORTS", name: "Adani Ports", symbol: "ADANIPORTS", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 },
+                    { id: "AMBUJACEM", name: "Ambuja Cements", symbol: "AMBUJACEM", price: 680.00, initialPrice: 680.00, volatility: 0.025 },
+                    { id: "ACC", name: "ACC Ltd", symbol: "ACC", price: 2500.00, initialPrice: 2500.00, volatility: 0.023 },
+                    { id: "SHREECEM", name: "Shree Cement", symbol: "SHREECEM", price: 27500.00, initialPrice: 27500.00, volatility: 0.018 },
+                    { id: "DIXON", name: "Dixon Technologies", symbol: "DIXON", price: 6000.00, initialPrice: 6000.00, volatility: 0.032 },
+                    { id: "BHARATFORG", name: "Bharat Forge", symbol: "BHARATFORG", price: 1300.00, initialPrice: 1300.00, volatility: 0.028 },
+                    { id: "ADANIENT", name: "Adani Enterprises", symbol: "ADANIENT", price: 3350.00, initialPrice: 3350.00, volatility: 0.035 },
+                    { id: "DALBHARAT", name: "Dalmia Bharat", symbol: "DALBHARAT", price: 2100.00, initialPrice: 2100.00, volatility: 0.024 }
+                ]
+            },
+            {
+                category: "Energy",
+                stocks: [
+                    { id: "NTPC", name: "NTPC", symbol: "NTPC", price: 180.00, initialPrice: 180.00, volatility: 0.018 },
+                    { id: "POWERGRID", name: "Power Grid Corporation", symbol: "POWERGRID", price: 235.00, initialPrice: 235.00, volatility: 0.017 },
+                    { id: "IOC", name: "Indian Oil Corp", symbol: "IOC", price: 160.00, initialPrice: 160.00, volatility: 0.025 },
+                    { id: "BPCL", name: "Bharat Petroleum", symbol: "BPCL", price: 470.00, initialPrice: 470.00, volatility: 0.028 },
+                    { id: "GAIL", name: "GAIL (India)", symbol: "GAIL", price: 190.00, initialPrice: 190.00, volatility: 0.023 },
+                    { id: "ADANITRANS", name: "Adani Transmission", symbol: "ADANITRANS", price: 950.00, initialPrice: 950.00, volatility: 0.032 },
+                    { id: "TATAPOWER", name: "Tata Power", symbol: "TATAPOWER", price: 420.00, initialPrice: 420.00, volatility: 0.027 },
+                    { id: "ONGC", name: "ONGC", price: 295.00, initialPrice: 295.00, volatility: 0.024 },
+                    { id: "RECL", name: "REC Limited", symbol: "RECL", price: 500.00, initialPrice: 500.00, volatility: 0.025 },
+                    { id: "NHPC", name: "NHPC", price: 115.00, initialPrice: 115.00, volatility: 0.026 },
+                    { id: "OIL", name: "Oil India", symbol: "OIL", price: 410.00, initialPrice: 410.00, volatility: 0.029 },
+                    { id: "POWERINDIA", name: "Power Grid InvIT", symbol: "POWERINDIA", price: 155.00, initialPrice: 155.00, volatility: 0.019 }
+                ]
+            },
+            {
+                category: "FMCG",
+                stocks: [
+                    { id: "HINDUNILVR", name: "Hindustan Unilever", symbol: "HINDUNILVR", price: 2750.00, initialPrice: 2750.00, volatility: 0.013 },
+                    { id: "NESTLEIND", name: "Nestle India", symbol: "NESTLEIND", price: 26000.00, initialPrice: 26000.00, volatility: 0.015 },
+                    { id: "ITC", name: "ITC", symbol: "ITC", price: 465.00, initialPrice: 465.00, volatility: 0.018 },
+                    { id: "DABUR", name: "Dabur India", symbol: "DABUR", price: 570.00, initialPrice: 570.00, volatility: 0.017 },
+                    { id: "MARICO", name: "Marico", symbol: "MARICO", price: 620.00, initialPrice: 620.00, volatility: 0.02 },
+                    { id: "BRITANNIA", name: "Britannia Industries", symbol: "BRITANNIA", price: 5650.00, initialPrice: 5650.00, volatility: 0.019 },
+                    { id: "GODREJCP", name: "Godrej Consumer Products", symbol: "GODREJCP", price: 1250.00, initialPrice: 1250.00, volatility: 0.021 },
+                    { id: "EMAMILTD", name: "Emami Ltd", symbol: "EMAMILTD", price: 520.00, initialPrice: 520.00, volatility: 0.025 },
+                    { id: "VBL", name: "Varun Beverages", symbol: "VBL", price: 1600.00, initialPrice: 1600.00, volatility: 0.022 },
+                    { id: "PGHL", name: "Procter & Gamble Health", symbol: "PGHL", price: 5200.00, initialPrice: 5200.00, volatility: 0.016 }
+                ]
+            },
+            {
+                category: "Metals",
+                stocks: [
+                    { id: "TATASTEEL", name: "Tata Steel", symbol: "TATASTEEL", price: 155.00, initialPrice: 155.00, volatility: 0.035 },
+                    { id: "JSWSTEEL", name: "JSW Steel", symbol: "JSWSTEEL", price: 820.00, initialPrice: 820.00, volatility: 0.032 },
+                    { id: "HINDALCO", name: "Hindalco Industries", symbol: "HINDALCO", price: 670.00, initialPrice: 670.00, volatility: 0.03 },
+                    { id: "VEDL", name: "Vedanta", symbol: "VEDL", price: 420.00, initialPrice: 420.00, volatility: 0.04 },
+                    { id: "SAIL", name: "Steel Authority of India", symbol: "SAIL", price: 125.00, initialPrice: 125.00, volatility: 0.038 },
+                    { id: "NMDC", name: "NMDC", price: 260.00, initialPrice: 260.00, volatility: 0.033 },
+                    { id: "HINDZINC", name: "Hindustan Zinc", symbol: "HINDZINC", price: 335.00, initialPrice: 335.00, volatility: 0.031 },
+                    { id: "NALCO", name: "National Aluminium Company", symbol: "NALCO", price: 125.00, initialPrice: 125.00, volatility: 0.036 },
+                    { id: "JINDALSTEL", name: "Jindal Steel & Power", symbol: "JINDALSTEL", price: 770.00, initialPrice: 770.00, volatility: 0.034 }
+                ]
+            },
+            {
+                category: "Telecom",
+                stocks: [
+                    { id: "BHARTIARTL", name: "Bharti Airtel", symbol: "BHARTIARTL", price: 825.00, initialPrice: 825.00, volatility: 0.02 },
+                    { id: "JIOFIN", name: "Jio Financial Services", symbol: "JIOFIN", price: 365.00, initialPrice: 365.00, volatility: 0.03 },
+                    { id: "VODAFONE", name: "Vodafone Idea", symbol: "VODAFONE", price: 16.50, initialPrice: 16.50, volatility: 0.07 },
+                    { id: "INDUSINDBK", name: "Indus Towers", symbol: "INDUSINDBK", price: 360.00, initialPrice: 360.00, volatility: 0.025 }
+                ]
+            },
+            {
+                category: "Chemicals",
+                stocks: [
+                    { id: "UPL", name: "UPL", symbol: "UPL", price: 570.00, initialPrice: 570.00, volatility: 0.028 },
+                    { id: "TATACHEM", name: "Tata Chemicals", symbol: "TATACHEM", price: 1150.00, initialPrice: 1150.00, volatility: 0.025 },
+                    { id: "PIIND", name: "PI Industries", symbol: "PIIND", price: 3750.00, initialPrice: 3750.00, volatility: 0.027 },
+                    { id: "DEEPAKFERT", name: "Deepak Fertilisers", symbol: "DEEPAKFERT", price: 775.00, initialPrice: 775.00, volatility: 0.03 },
+                    { id: "BALRAMCHIN", name: "Balrampur Chini", symbol: "BALRAMCHIN", price: 440.00, initialPrice: 440.00, volatility: 0.033 }
+                ]
+            },
+            {
+                category: "Real Estate",
+                stocks: [
+                    { id: "DLF", name: "DLF", symbol: "DLF", price: 950.00, initialPrice: 950.00, volatility: 0.03 },
+                    { id: "GODREJPROP", name: "Godrej Properties", symbol: "GODREJPROP", price: 2950.00, initialPrice: 2950.00, volatility: 0.028 },
+                    { id: "OBEROIRLTY", name: "Oberoi Realty", symbol: "OBEROIRLTY", price: 1500.00, initialPrice: 1500.00, volatility: 0.025 },
+                    { id: "PRESTIGE", name: "Prestige Estates", symbol: "PRESTIGE", price: 1700.00, initialPrice: 1700.00, volatility: 0.029 },
+                    { id: "BRIGADE", name: "Brigade Enterprises", symbol: "BRIGADE", price: 900.00, initialPrice: 900.00, volatility: 0.032 }
+                ]
+            },
+            {
+                category: "Aviation",
+                stocks: [
+                    { id: "INDIGO", name: "InterGlobe Aviation", symbol: "INDIGO", price: 3600.00, initialPrice: 3600.00, volatility: 0.035 },
+                    { id: "SPICEJET", name: "SpiceJet", price: 55.00, initialPrice: 55.00, volatility: 0.06 },
+                    { id: "JETAIR", name: "Jet Airways", price: 75.00, initialPrice: 75.00, volatility: 0.055 }
+                ]
+            },
+            {
+                category: "Hospitality",
+                stocks: [
+                    { id: "INDIANH", name: "Indian Hotels", symbol: "INDIANH", price: 620.00, initialPrice: 620.00, volatility: 0.025 },
+                    { id: "CHALET", name: "Chalet Hotels", symbol: "CHALET", price: 810.00, initialPrice: 810.00, volatility: 0.03 },
+                    { id: "EASEMYTRIP", price: 52.50, initialPrice: 52.50, volatility: 0.045 }
+                ]
+            },
+            {
+                category: "Logistics",
+                stocks: [
+                    { id: "MAHINDCIE", name: "Mahindra CIE", symbol: "MAHINDCIE", price: 575.00, initialPrice: 575.00, volatility: 0.028 },
+                    { id: "TCI", name: "Transport Corporation of India", symbol: "TCI", price: 1050.00, initialPrice: 1050.00, volatility: 0.024 }
+                ]
+            },
+            {
+                category: "Consumer Durables",
+                stocks: [
+                    { id: "TITAN", name: "Titan Company", symbol: "TITAN", price: 3600.00, initialPrice: 3600.00, volatility: 0.025 },
+                    { id: "VOLTAS", name: "Voltas", symbol: "VOLTAS", price: 930.00, initialPrice: 930.00, volatility: 0.028 },
+                    { id: "CROMPTON", name: "Crompton Greaves", symbol: "CROMPTON", price: 315.00, initialPrice: 315.00, volatility: 0.03 },
+                    { id: "HAVELLS", name: "Havells India", symbol: "HAVELLS", price: 1550.00, initialPrice: 1550.00, volatility: 0.027 }
+                ]
+            },
+            {
+                category: "Textiles",
+                stocks: [
+                    { id: "RAYMOND", name: "Raymond", symbol: "RAYMOND", price: 2100.00, initialPrice: 2100.00, volatility: 0.03 },
+                    { id: "WELSPUNIND", name: "Welspun India", symbol: "WELSPUNIND", price: 160.00, initialPrice: 160.00, volatility: 0.035 },
+                    { id: "VARDHMAN", name: "Vardhman Textiles", symbol: "VARDHMAN", price: 420.00, initialPrice: 420.00, volatility: 0.03 }
+                ]
+            },
+            {
+                category: "Media & Entertainment",
+                stocks: [
+                    { id: "ZEEL", name: "Zee Entertainment", symbol: "ZEEL", price: 260.00, initialPrice: 260.00, volatility: 0.04 },
+                    { id: "SUNTV", name: "Sun TV Network", symbol: "SUNTV", price: 680.00, initialPrice: 680.00, volatility: 0.035 },
+                    { id: "PVRINOX", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 }
+                ]
+            },
+            {
+                category: "Healthcare",
+                stocks: [
+                    { id: "APOLLOHOSP", name: "Apollo Hospitals", symbol: "APOLLOHOSP", price: 5700.00, initialPrice: 5700.00, volatility: 0.022 },
+                    { id: "FORTIS", name: "Fortis Healthcare", symbol: "FORTIS", price: 420.00, initialPrice: 420.00, volatility: 0.028 },
+                    { id: "MAXHEALTH", name: "Max Healthcare", symbol: "MAXHEALTH", price: 830.00, initialPrice: 830.00, volatility: 0.025 }
+                ]
+            }
+        ];
+
+        // Flattened list of all stocks for easier lookup and filtering
+        const allStocksFlattened = stockData.flatMap(cat => cat.stocks);
+        // Map for quick access to stock objects by ID
+        const stockMap = allStocksFlattened.reduce((map, stock) => {
+            map[stock.id] = stock;
+            return map;
+        }, {});
+
+        // Utility function to get DOM elements
+        const getEl = (id) => document.getElementById(id);
+
+        // Function to show/hide pages
+        function showPage(pageId) {
+            const pages = ['login-page', 'register-page', 'role-selection-page', 'trading-section', 'stock-viewer-section']; // Removed admin/viewer sections
+            pages.forEach(id => {
+                const page = getEl(id);
+                if (page) {
+                    page.classList.add('hidden');
+                }
+            });
+            const targetPage = getEl(pageId);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+            }
+
+            // Manage top bar visibility
+            const topBar = getEl('top-bar');
+            if (pageId === 'login-page' || pageId === 'register-page' || pageId === 'role-selection-page') {
+                topBar.classList.add('hidden');
+            } else {
+                topBar.classList.remove('hidden');
+            }
+            updateNavButtonStates(pageId);
+        }
+
+        // Update navigation button active states
+        function updateNavButtonStates(activePageId) {
+            const navButtons = document.querySelectorAll('.nav-button');
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            if (activePageId === 'trading-section') {
+                getEl('nav-trader').classList.add('active');
+            } else if (activePageId === 'stock-viewer-section') {
+                getEl('nav-viewer').classList.add('active');
+            }
+            // Admin button is removed, so no need to manage its state
+        }
+
+        // --- Local Storage Data Management ---
+        function loadUsers() {
+            try {
+                const users = JSON.parse(localStorage.getItem(LOCAL_STORAGE_USERS_KEY)) || {};
+                return users;
+            } catch (e) {
+                console.error("Error loading users from localStorage:", e);
+                return {};
+            }
+        }
+
+        function saveUsers(users) {
+            try {
+                localStorage.setItem(LOCAL_STORAGE_USERS_KEY, JSON.stringify(users));
+            } catch (e) {
+                console.error("Error saving users to localStorage:", e);
+            }
+        }
+
+        function loadUserData(userId) {
+            try {
+                currentWatchlist = JSON.parse(localStorage.getItem(LOCAL_STORAGE_WATCHLIST_PREFIX + userId)) || [];
+                currentPortfolio = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + userId)) || { cashBalance: 100000, holdings: [] };
+            } catch (e) {
+                console.error(`Error loading data for user ${userId} from localStorage:`, e);
+                currentWatchlist = [];
+                currentPortfolio = { cashBalance: 100000, holdings: [] };
+            }
+        }
+
+        function saveUserData(userId) {
+            try {
+                localStorage.setItem(LOCAL_STORAGE_WATCHLIST_PREFIX + userId, JSON.stringify(currentWatchlist));
+                localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + userId, JSON.stringify(currentPortfolio));
+            } catch (e) {
+                console.error(`Error saving data for user ${userId} to localStorage:`, e);
+            }
+        }
+
+        // --- Auth Functions (using localStorage) ---
+        function handleLogin() {
+            const loginUsername = getEl('login-username').value;
+            const loginPassword = getEl('login-password').value;
+            const loginErrorEl = getEl('login-error');
+            loginErrorEl.textContent = '';
+
+            if (!loginUsername || !loginPassword) {
+                loginErrorEl.textContent = 'Please enter both username and password.';
+                return;
+            }
+
+            const users = loadUsers();
+            if (users[loginUsername] && users[loginUsername].password === loginPassword) {
+                currentUserId = loginUsername; // Use username as ID for simplicity
+                localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
+                loadUserData(currentUserId);
+                showPage('role-selection-page');
+            } else {
+                loginErrorEl.textContent = 'Invalid username or password.';
+            }
+        }
+
+        function handleRegister() {
+            const registerUsername = getEl('register-username').value;
+            const registerPassword = getEl('register-password').value;
+            const registerErrorEl = getEl('register-error');
+            registerErrorEl.textContent = '';
+
+            if (!registerUsername || !registerPassword) {
+                registerErrorEl.textContent = 'Please fill in all fields.';
+                return;
+            }
+            if (registerPassword.length < 6) {
+                registerErrorEl.textContent = 'Password should be at least 6 characters.';
+                return;
+            }
+
+            const users = loadUsers();
+            if (users[registerUsername]) {
+                registerErrorEl.textContent = 'This username is already taken. Please choose another.';
+                return;
+            }
+
+            users[registerUsername] = { password: registerPassword }; // Store password directly (insecure for real apps)
+            saveUsers(users);
+
+            // Automatically log in the newly registered user
+            currentUserId = registerUsername;
+            localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
+            // Initialize empty watchlist and default portfolio for the new user
+            localStorage.setItem(LOCAL_STORAGE_WATCHLIST_PREFIX + currentUserId, JSON.stringify([]));
+            localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + currentUserId, JSON.stringify({ cashBalance: 100000, holdings: [] }));
+            
+            loadUserData(currentUserId);
+            showPage('role-selection-page');
+        }
+
+        function handleLogout() {
+            currentUserId = null;
+            localStorage.removeItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
+            showPage('login-page');
+            stopPriceUpdates();
+        }
+
+        function handleAnonymousSignIn() {
+            // Generate a unique ID for guest session
+            currentUserId = 'guest_' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
+            // Initialize empty watchlist and default portfolio for the guest
+            localStorage.setItem(LOCAL_STORAGE_WATCHLIST_PREFIX + currentUserId, JSON.stringify([]));
+            localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + currentUserId, JSON.stringify({ cashBalance: 100000, holdings: [] }));
+            
+            loadUserData(currentUserId);
+            showPage('role-selection-page');
+        }
+
+        // --- Admin/Viewer sections removed as they relied on shared backend data ---
+
+        // --- Stock Market Simulation Functions ---
+        const normalRandom = (() => {
+            let y2;
+            let useLast = false;
+            return function() {
+                if (useLast) {
+                    useLast = false;
+                    return y2;
+                }
+                let x1, x2, w;
+                do {
+                    x1 = 2.0 * Math.random() - 1.0;
+                    x2 = 2.0 * Math.random() - 1.0;
+                    w = x1 * x1 + x2 * x2;
+                } while (w >= 1.0);
+                w = Math.sqrt((-2.0 * Math.log(w)) / w);
+                y2 = x2 * w;
+                useLast = true;
+                return x1 * w;
+            }
+        })();
+
+        async function fetchRealTimeStockData() {
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 100)); // Reduced delay for faster updates
+
+            const globalMarketDrift = 0.0001;
+            const timeStep = 1;
+            const marketWideShockChance = 0.05;
+            let marketShockEffect = 0;
+            if (Math.random() < marketWideShockChance) {
+                marketShockEffect = (Math.random() - 0.5) * 0.08;
+            }
+
+            for (const stockId in stockMap) {
+                const stock = stockMap[stockId];
+                const oldPrice = stock.price;
+                const { volatility } = stock;
+                const driftTerm = globalMarketDrift - (volatility * volatility) / 2;
+                const randomShockTerm = volatility * normalRandom();
+                const newPrice = oldPrice * Math.exp(driftTerm * timeStep + randomShockTerm * Math.sqrt(timeStep) + marketShockEffect);
+                const noise = (Math.random() - 0.5) * 0.005;
+                stock.price = parseFloat((newPrice * (1 + noise)).toFixed(2));
+                if (stock.price < 1) {
+                    stock.price = 1; 
+                }
+            }
+            return Object.values(stockMap);
+        }
+
+        async function updatePrices() {
+            try {
+                await fetchRealTimeStockData();
+                // Check which stock view is active and re-render only that one
+                const isTradingViewActive = !document.getElementById('trading-section').classList.contains('hidden');
+                renderStockCards(currentFilter, isTradingViewActive);
+                updatePortfolioDisplay(); // Update portfolio display as well
+            } catch (error) {
+                console.error("Failed to fetch real-time stock data:", error);
+            }
+        }
+
+        function startPriceUpdates() {
+            if (updatePricesIntervalId) {
+                clearInterval(updatePricesIntervalId);
+            }
+            updatePricesIntervalId = setInterval(updatePrices, 3000); // Update every 3 seconds
+        }
+
+        function stopPriceUpdates() {
+            if (updatePricesIntervalId) {
+                clearInterval(updatePricesIntervalId);
+                updatePricesIntervalId = null;
+            }
+        }
+
+        function toggleWatchlist(stockId) {
+            const index = currentWatchlist.indexOf(stockId);
+            if (index > -1) {
+                currentWatchlist = currentWatchlist.filter(id => id !== stockId);
+            } else {
+                currentWatchlist = [...currentWatchlist, stockId];
+            }
+            saveUserData(currentUserId); // Save updated watchlist to localStorage
+            renderStockCards(currentFilter, true); // Re-render trading view to update watchlist button
+        }
+
+        let modalCurrentStock = null;
+        let modalCurrentType = '';
+
+        function openTransactionModal(type, stockId) {
+            const stock = stockMap[stockId];
+            if (!stock) return;
+
+            modalCurrentStock = stock;
+            modalCurrentType = type;
+
+            getEl('modal-title').textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} ${stock.name}`;
+            getEl('modal-stock-info').textContent = `Current Price: ₹${stock.price.toFixed(2)}`;
+            getEl('quantity-input').value = 1;
+            getEl('modal-message').textContent = '';
+            
+            const confirmBtn = getEl('confirm-transaction-button');
+            confirmBtn.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            confirmBtn.classList.remove('buy-btn', 'sell-btn');
+            if (type === 'buy') {
+                confirmBtn.classList.add('buy-btn');
+            } else {
+                confirmBtn.classList.add('sell-btn');
+            }
+
+            getEl('transaction-modal-overlay').classList.add('active');
+        }
+
+        function closeTransactionModal() {
+            getEl('transaction-modal-overlay').classList.remove('active');
+            modalCurrentStock = null;
+            modalCurrentType = '';
+            getEl('modal-message').textContent = '';
+        }
+
+        function confirmTransaction() {
+            const quantity = parseInt(getEl('quantity-input').value, 10);
+            const stock = modalCurrentStock;
+            const modalMessageEl = getEl('modal-message');
+
+            if (isNaN(quantity) || quantity <= 0) {
+                modalMessageEl.textContent = 'Please enter a valid quantity.';
+                return;
+            }
+
+            let transactionSuccess = false;
+
+            if (modalCurrentType === 'buy') {
+                const cost = quantity * stock.price;
+                if (currentPortfolio.cashBalance >= cost) {
+                    currentPortfolio.cashBalance -= cost;
+
+                    const existingHoldingIndex = currentPortfolio.holdings.findIndex(h => h.stockId === stock.id);
+                    if (existingHoldingIndex > -1) {
+                        const existingHolding = currentPortfolio.holdings[existingHoldingIndex];
+                        const newTotalQuantity = existingHolding.quantity + quantity;
+                        const newTotalCost = (existingHolding.quantity * existingHolding.averagePrice) + cost;
+                        existingHolding.quantity = newTotalQuantity;
+                        existingHolding.averagePrice = newTotalCost / newTotalQuantity;
+                    } else {
+                        currentPortfolio.holdings.push({
+                            stockId: stock.id,
+                            quantity: quantity,
+                            averagePrice: stock.price
+                        });
+                    }
+                    modalMessageEl.textContent = `Successfully bought ${quantity} shares of ${stock.symbol}.`;
+                    transactionSuccess = true;
+                } else {
+                    modalMessageEl.textContent = 'Insufficient cash balance.';
+                }
+            } else if (modalCurrentType === 'sell') {
+                const existingHoldingIndex = currentPortfolio.holdings.findIndex(h => h.stockId === stock.id);
+                if (existingHoldingIndex > -1) {
+                    const existingHolding = currentPortfolio.holdings[existingHoldingIndex];
+                    if (existingHolding.quantity >= quantity) {
+                        const revenue = quantity * stock.price;
+                        currentPortfolio.cashBalance += revenue; 
+                        existingHolding.quantity -= quantity;
+
+                        if (existingHolding.quantity === 0) {
+                            currentPortfolio.holdings.splice(existingHoldingIndex, 1);
+                        }
+                        modalMessageEl.textContent = `Successfully sold ${quantity} shares of ${stock.symbol}.`;
+                        transactionSuccess = true;
+                    } else {
+                        modalMessageEl.textContent = `You only own ${existingHolding.quantity} shares.`;
+                    }
+                } else {
+                    modalMessageEl.textContent = 'You do not own this stock.';
+                }
+            }
+
+            if (transactionSuccess) {
+                saveUserData(currentUserId); // Save updated portfolio to localStorage
+                updatePortfolioDisplay();
+                renderStockCards(currentFilter, true); // Re-render trading view to update holdings
+                setTimeout(closeTransactionModal, 1000); // Close modal after a short delay
+            }
+        }
+
+        function updatePortfolioDisplay() {
+            getEl('portfolio-cash').textContent = `₹${currentPortfolio.cashBalance.toFixed(2)}`;
+
+            let totalInvested = 0;
+            let currentHoldingsValue = 0;
+
+            currentPortfolio.holdings.forEach(holding => {
+                const stock = stockMap[holding.stockId];
+                if (stock) {
+                    totalInvested += holding.quantity * holding.averagePrice;
+                    currentHoldingsValue += holding.quantity * stock.price;
+                }
+            });
+
+            getEl('portfolio-invested').textContent = `₹${totalInvested.toFixed(2)}`;
+            getEl('portfolio-current-value').textContent = `₹${currentHoldingsValue.toFixed(2)}`;
+
+            const overallProfitLoss = currentHoldingsValue - totalInvested;
+            const portfolioProfitLossEl = getEl('portfolio-profit-loss');
+            portfolioProfitLossEl.textContent = `₹${overallProfitLoss.toFixed(2)}`;
+            portfolioProfitLossEl.classList.remove('positive', 'negative');
+            if (overallProfitLoss > 0) {
+                portfolioProfitLossEl.classList.add('positive');
+            } else if (overallProfitLoss < 0) {
+                portfolioProfitLossEl.classList.add('negative');
+            }
+        }
+
+        function renderStockCard(stock, isTradingView) {
+            const priceChange = stock.price - stock.initialPrice;
+            const percentageChange = (priceChange / stock.initialPrice) * 100;
+            const isAddedToWatchlist = currentWatchlist.includes(stock.id);
+            const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
+            const hasHoldings = holding && holding.quantity > 0;
+
+            let cardHtml = `
+                <li class="stock-item" data-stock-id="${stock.id}">
+                    <div class="stock-info">
+                        <span class="stock-name">${stock.name}</span>
+                        <span class="stock-symbol">${stock.symbol}</span>
+                    </div>
+                    <div class="stock-price-container">
+                        <span class="stock-price">₹${stock.price.toFixed(2)}</span>
+                        <span class="change-value ${priceChange > 0 ? 'positive' : priceChange < 0 ? 'negative' : ''}">
+                            Change: ₹${priceChange.toFixed(2)}
+                        </span>
+                        <span class="percentage-change ${percentageChange > 0 ? 'positive' : percentageChange < 0 ? 'negative' : ''}">
+                            Percentage: ${percentageChange.toFixed(2)}%
+                        </span>
+                        <span class="price-change-icon ${priceChange > 0 ? '▲' : priceChange < 0 ? '▼' : ''}">
+                            ${priceChange > 0 ? '▲' : priceChange < 0 ? '▼' : ''}
+                        </span>
+                    </div>
+                    <div class="tooltip">
+                        <p class="tooltip-name">${stock.name}</p>
+                        <p class="tooltip-symbol">${stock.symbol}</p>
+                        <p>Current Price: <span class="tooltip-price">₹${stock.price.toFixed(2)}</span></p>
+                        <p>Change: <span class="tooltip-change">${priceChange.toFixed(2)}</span></p>
+                        <p>Percentage: <span class="tooltip-change">${percentageChange.toFixed(2)}%</span></p>
+                        ${hasHoldings ? `<p>Owned: ${holding.quantity} @ ₹${holding.averagePrice.toFixed(2)}</p>` : ''}
+                    </div>
+            `;
+
+            if (isTradingView) {
+                cardHtml += `
+                    <div class="stock-actions">
+                        <button class="buy-btn" data-stock-id="${stock.id}">Buy</button>
+                        ${hasHoldings ? `<button class="sell-btn" data-stock-id="${stock.id}">Sell</button>` : ''}
+                        <button class="add-to-watchlist-btn ${isAddedToWatchlist ? 'added' : ''}" data-stock-id="${stock.id}">
+                            ${isAddedToWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                        </button>
+                    </div>
+                `;
+            }
+            cardHtml += `</li>`;
+            return cardHtml;
+        }
+
+        function renderStockCards(filter, isTradingView) {
+            let stocksToRender = [];
+            if (filter === "All") {
+                stocksToRender = allStocksFlattened;
+            } else if (filter === "Watchlist" && isTradingView) {
+                stocksToRender = allStocksFlattened.filter(stock => currentWatchlist.includes(stock.id));
+            } else {
+                const selectedCategoryData = stockData.find(d => d.category === filter);
+                stocksToRender = selectedCategoryData ? selectedCategoryData.stocks : [];
+            }
+
+            const targetGridId = isTradingView ? 'stock-grid-trader' : 'stock-grid-viewer';
+            const stockGridEl = getEl(targetGridId);
+            stockGridEl.innerHTML = ''; // Clear existing cards
+
+            if (stocksToRender.length === 0) {
+                stockGridEl.innerHTML = `<p style="text-align: center; padding: 2rem; color: var(--dark-text);">No stocks found matching your criteria.</p>`;
+                return;
+            }
+
+            stocksToRender.forEach(stock => {
+                const stockCardHtml = renderStockCard(stock, isTradingView);
+                stockGridEl.insertAdjacentHTML('beforeend', stockCardHtml);
+            });
+
+            // Attach event listeners to newly rendered buttons
+            if (isTradingView) {
+                stockGridEl.querySelectorAll('.buy-btn').forEach(button => {
+                    button.onclick = () => openTransactionModal('buy', button.dataset.stockId);
+                });
+                stockGridEl.querySelectorAll('.sell-btn').forEach(button => {
+                    button.onclick = () => openTransactionModal('sell', button.dataset.stockId);
+                });
+                stockGridEl.querySelectorAll('.add-to-watchlist-btn').forEach(button => {
+                    button.onclick = () => toggleWatchlist(button.dataset.stockId);
+                });
+            }
+        }
+
+        function renderFilterButtons(isTradingView) {
+            const categories = isTradingView ? ["All", ...stockData.map(d => d.category), "Watchlist"] : ["All", ...stockData.map(d => d.category)];
+            const filterContainerId = isTradingView ? 'category-filter-trader' : 'category-filter-viewer';
+            const filterContainerEl = getEl(filterContainerId);
+            filterContainerEl.innerHTML = ''; // Clear existing buttons
+
+            categories.forEach(category => {
+                const button = document.createElement('button');
+                button.textContent = category;
+                button.classList.add('category-button');
+                if (currentFilter === category) {
+                    button.classList.add('active');
+                }
+                button.onclick = () => {
+                    currentFilter = category;
+                    renderFilterButtons(isTradingView); // Re-render to update active state
+                    renderStockCards(currentFilter, isTradingView);
+                };
+                filterContainerEl.appendChild(button);
+            });
+        }
+
+
+        // --- Event Listeners and Initial Setup ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Set initial theme based on local storage
+            if (localStorage.getItem(LOCAL_STORAGE_THEME_KEY) === 'dark') {
+                document.body.classList.add('dark-mode');
+                getEl('theme-icon').textContent = '�';
+                getEl('theme-text').textContent = 'Dark Mode';
+            } else {
+                getEl('theme-icon').textContent = '☀️';
+                getEl('theme-text').textContent = 'Light Mode';
+            }
+
+            // Check for existing logged-in user or sign in as guest
+            const storedUserId = localStorage.getItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
+            if (storedUserId) {
+                currentUserId = storedUserId;
+                getEl('user-id-display-text').textContent = currentUserId;
+                loadUserData(currentUserId);
+                showPage('role-selection-page');
+                startPriceUpdates();
+            } else {
+                // If no user is logged in, show the login page
+                showPage('login-page');
+            }
+            
+            // Auth Page Navigation
+            getEl('go-to-register').onclick = () => showPage('register-page');
+            getEl('go-to-login').onclick = () => showPage('login-page');
+            getEl('login-button').onclick = handleLogin;
+            getEl('register-button').onclick = handleRegister;
+            getEl('anonymous-sign-in').onclick = handleAnonymousSignIn;
+            getEl('logout-button').onclick = handleLogout;
+
+            // Role Selection Buttons
+            getEl('enter-as-trader').onclick = () => {
+                showPage('trading-section');
+                renderFilterButtons(true);
+                renderStockCards(currentFilter, true);
+                updatePortfolioDisplay();
+            };
+            getEl('enter-as-viewer').onclick = () => {
+                showPage('stock-viewer-section');
+                renderFilterButtons(false);
+                renderStockCards(currentFilter, false);
+            };
+
+            // Top Bar Navigation Buttons
+            getEl('nav-trader').onclick = () => {
+                showPage('trading-section');
+                renderFilterButtons(true);
+                renderStockCards(currentFilter, true);
+                updatePortfolioDisplay();
+            };
+            getEl('nav-viewer').onclick = () => {
+                showPage('stock-viewer-section');
+                renderFilterButtons(false);
+                renderStockCards(currentFilter, false);
+            };
+            // Admin button removed, so no click handler needed
+
+            // Modal Buttons
+            getEl('confirm-transaction-button').onclick = confirmTransaction;
+            getEl('cancel-transaction-button').onclick = closeTransactionModal;
+
+            // Theme Toggle
+            getEl('theme-toggle').onclick = () => {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                localStorage.setItem(LOCAL_STORAGE_THEME_KEY, isDarkMode ? 'dark' : 'light');
+                getEl('theme-icon').textContent = isDarkMode ? '🌙' : '☀️';
+                getEl('theme-text').textContent = isDarkMode ? 'Dark Mode' : 'Light Mode';
+            };
+        });
+    </script>
+</body>
+</html>
+�

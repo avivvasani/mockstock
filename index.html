@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ashoka Universal School Mock-Stock Challenge</title>
+    <title>Ashoka Universal School Mock-Stock Competition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -409,9 +409,9 @@
             transform: translateY(-2px);
         }
 
-        /* Login/Register Page Styles (removed from HTML, but keeping styles for reference if needed) */
+        /* Login/Register Page Styles */
         .auth-container {
-            display: none; /* Hidden by default now */
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -692,9 +692,9 @@
             font-weight: 600;
         }
         
-        /* Role Selection Page Styles (removed from HTML, but keeping styles for reference if needed) */
+        /* Role Selection Page Styles */
         .role-selection-container {
-            display: none; /* Hidden by default now */
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -866,13 +866,62 @@
             </div>
         </div>
 
+        <!-- Login Page -->
+        <div id="login-page" class="auth-container hidden">
+            <div class="auth-card">
+                <h2>Login to Mock-Stock Competition</h2>
+                <div class="form-group">
+                    <label for="login-username">Username:</label>
+                    <input type="text" id="login-username" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <button id="login-button" class="auth-button">Login</button>
+                <p id="login-error" class="error-message"></p>
+                <p class="auth-message">Don't have an account? <a href="#" id="go-to-register">Register here</a></p>
+                <p class="auth-message">Or <a href="#" id="anonymous-sign-in">Continue as Guest</a></p>
+            </div>
+        </div>
+
+        <!-- Registration Page -->
+        <div id="register-page" class="auth-container hidden">
+            <div class="auth-card">
+                <h2>Register for Mock-Stock Competition</h2>
+                <div class="form-group">
+                    <label for="register-username">Username:</label>
+                    <input type="text" id="register-username" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" placeholder="Create a password">
+                </div>
+                <button id="register-button" class="auth-button">Register</button>
+                <p id="register-error" class="error-message"></p>
+                <p class="auth-message">Already have an account? <a href="#" id="go-to-login">Login here</a></p>
+            </div>
+        </div>
+
+        <!-- Role Selection Page -->
+        <div id="role-selection-page" class="role-selection-container hidden">
+            <div class="role-selection-card">
+                <h2>Select Your Role</h2>
+                <p class="intro-text">Choose how you want to participate in the Mock-Stock Competition.</p>
+                <div class="role-buttons-group">
+                    <button id="enter-as-trader" class="role-button trader">Enter as Trader</button>
+                    <button id="enter-as-viewer" class="role-button viewer">Enter as Viewer</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Trading (Buying/Selling) Section - Default View -->
-        <div id="trading-section" class="container">
+        <div id="trading-section" class="container hidden">
             <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
-                Ashoka Universal School <br/> Mock-Stock Challenge (Trader)
+                Ashoka Universal School <br/> Mock-Stock Competition (Trader)
             </h1>
             <p class="intro-text">
-                Welcome to the Live Mock-Stock Market Trader for the Ashoka Universal School Mock-Stock Challenge!
+                Welcome to the Live Mock-Stock Market Trader for the Ashoka Universal School Mock-Stock Competition!
                 Here, you can monitor the real-time performance of various mock stocks across different sectors, buy, sell, and manage your portfolio.
                 Prices update every 3 seconds!
             </p>
@@ -906,6 +955,27 @@
             </div>
             <main id="stock-market-container-trader">
                 <ul id="stock-grid-trader" class="stock-grid">
+                    <!-- Stock cards will be rendered here by JS -->
+                </ul>
+            </main>
+        </div>
+
+        <!-- Stock Viewer (View Only) Section - Hidden by default, not used in this simplified version -->
+        <div id="stock-viewer-section" class="container hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                Ashoka Universal School <br/> Mock-Stock Competition (Viewer)
+            </h1>
+            <p class="intro-text">
+                Welcome to the Live Mock-Stock Market Viewer for the Ashoka Universal School Mock-Stock Competition!
+                Here, you can monitor the real-time performance of various mock stocks across different sectors.
+                Prices update every 3 seconds!
+            </p>
+
+            <div id="category-filter-viewer" class="category-filter">
+                <!-- Category buttons will be rendered here by JS -->
+            </div>
+            <main id="stock-market-container-viewer">
+                <ul id="stock-grid-viewer" class="stock-grid">
                     <!-- Stock cards will be rendered here by JS -->
                 </ul>
             </main>
@@ -949,7 +1019,7 @@
         // and persistent multi-user data across different browsers/devices are not a concern.
 
         // Global variables for local storage keys
-        const LOCAL_STORAGE_USERS_KEY = 'mockStockUsers'; // Still used for conceptual user data
+        const LOCAL_STORAGE_USERS_KEY = 'mockStockUsers';
         const LOCAL_STORAGE_CURRENT_USER_ID_KEY = 'mockStockCurrentUserId';
         const LOCAL_STORAGE_WATCHLIST_PREFIX = 'mockStockWatchlist_';
         const LOCAL_STORAGE_PORTFOLIO_PREFIX = 'mockStockPortfolio_';
@@ -957,7 +1027,8 @@
 
         let currentUserId = null;
         let currentWatchlist = [];
-        let currentPortfolio = { cashBalance: 100000, holdings: [] };
+        // Added 'transactions' array to portfolio for detailed history
+        let currentPortfolio = { cashBalance: 100000, holdings: [], transactions: [] };
         let currentFilter = "All"; // For stock categories
         let updatePricesIntervalId = null;
 
@@ -1000,7 +1071,7 @@
                     { id: "LTIM", name: "LTIMindtree", symbol: "LTIM", price: 5350.00, initialPrice: 5350.00, volatility: 0.028 },
                     { id: "COFORGE", name: "Coforge", symbol: "COFORGE", price: 6700.00, initialPrice: 6700.00, volatility: 0.032 },
                     { id: "INFIBEAM", name: "Infibeam Avenues", symbol: "INFIBEAM", price: 32.50, initialPrice: 32.50, volatility: 0.06 },
-                    { id: "CYIENT", name: "Cyient", symbol: "CYIENT", price: 2250.00, initialPrice: 2250.00, volatility: 0.031 },
+                    { id: "CYIENT", name: "Cyient", price: 2250.00, initialPrice: 2250.00, volatility: 0.031 },
                     { id: "MPHASIS", name: "Mphasis", symbol: "MPHASIS", price: 2750.00, initialPrice: 2750.00, volatility: 0.029 },
                     { id: "SONATSOFTW", name: "Sonata Software", symbol: "SONATSOFTW", price: 875.00, initialPrice: 875.00, volatility: 0.03 },
                     { id: "MASTEK", name: "Mastek", symbol: "MASTEK", price: 2450.00, initialPrice: 2450.00, volatility: 0.027 },
@@ -1181,7 +1252,7 @@
                 stocks: [
                     { id: "ZEEL", name: "Zee Entertainment", symbol: "ZEEL", price: 260.00, initialPrice: 260.00, volatility: 0.04 },
                     { id: "SUNTV", name: "Sun TV Network", symbol: "SUNTV", price: 680.00, initialPrice: 680.00, volatility: 0.035 },
-                    { id: "PVRINOX", name: "PVR INOX", symbol: "PVRINOX", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 }
+                    { id: "PVRINOX", name: "PVR INOX", price: 1550.00, initialPrice: 1550.00, volatility: 0.03 }
                 ]
             },
             {
@@ -1207,18 +1278,24 @@
 
         // Function to show/hide pages
         function showPage(pageId) {
-            // All pages are now hidden by default in HTML, only trading-section is shown
-            const tradingSection = getEl('trading-section');
-            const topBar = getEl('top-bar');
+            const pages = ['login-page', 'register-page', 'role-selection-page', 'trading-section', 'stock-viewer-section'];
+            pages.forEach(id => {
+                const page = getEl(id);
+                if (page) {
+                    page.classList.add('hidden');
+                }
+            });
+            const targetPage = getEl(pageId);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+            }
 
-            if (pageId === 'trading-section') {
-                tradingSection.classList.remove('hidden');
-                topBar.classList.remove('hidden');
-            } else {
-                // In this simplified version, other pages are not expected to be shown
-                // This block is mostly for safety/future expansion
-                tradingSection.classList.add('hidden');
+            // Manage top bar visibility
+            const topBar = getEl('top-bar');
+            if (pageId === 'login-page' || pageId === 'register-page' || pageId === 'role-selection-page') {
                 topBar.classList.add('hidden');
+            } else {
+                topBar.classList.remove('hidden');
             }
         }
 
@@ -1244,11 +1321,12 @@
         function loadUserData(userId) {
             try {
                 currentWatchlist = JSON.parse(localStorage.getItem(LOCAL_STORAGE_WATCHLIST_PREFIX + userId)) || [];
-                currentPortfolio = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + userId)) || { cashBalance: 100000, holdings: [] };
+                // Load transactions as well
+                currentPortfolio = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + userId)) || { cashBalance: 100000, holdings: [], transactions: [] };
             } catch (e) {
                 console.error(`Error loading data for user ${userId} from localStorage:`, e);
                 currentWatchlist = [];
-                currentPortfolio = { cashBalance: 100000, holdings: [] };
+                currentPortfolio = { cashBalance: 100000, holdings: [], transactions: [] };
             }
         }
 
@@ -1261,31 +1339,90 @@
             }
         }
 
-        // --- Auth Functions (Simplified for Guest Login) ---
-        function handleLogout() {
-            currentUserId = null;
-            localStorage.removeItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
-            // Reload page to simulate fresh guest session or clear data
-            window.location.reload(); 
+        // --- Auth Functions ---
+        function handleLogin() {
+            const loginUsername = getEl('login-username').value;
+            const loginPassword = getEl('login-password').value;
+            const loginErrorEl = getEl('login-error');
+            loginErrorEl.textContent = '';
+
+            if (!loginUsername || !loginPassword) {
+                loginErrorEl.textContent = 'Please enter both username and password.';
+                return;
+            }
+
+            const users = loadUsers();
+            if (users[loginUsername] && users[loginUsername].password === loginPassword) {
+                currentUserId = loginUsername; // Use username as ID for simplicity
+                localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
+                loadUserData(currentUserId);
+                showPage('role-selection-page'); // Go to role selection after login
+            } else {
+                loginErrorEl.textContent = 'Invalid username or password.';
+            }
         }
 
-        function initializeGuestSession() {
-            // Generate a unique ID for guest session if not already set
-            let storedUserId = localStorage.getItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
-            if (!storedUserId || !storedUserId.startsWith('guest_')) { // Ensure it's a guest ID or create new
-                currentUserId = 'guest_' + Math.random().toString(36).substring(2, 15);
-                localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
-            } else {
-                currentUserId = storedUserId;
+        function handleRegister() {
+            const registerUsername = getEl('register-username').value;
+            const registerPassword = getEl('register-password').value;
+            const registerErrorEl = getEl('register-error');
+            registerErrorEl.textContent = '';
+
+            if (!registerUsername || !registerPassword) {
+                registerErrorEl.textContent = 'Please fill in all fields.';
+                return;
             }
+            if (registerPassword.length < 6) {
+                registerErrorEl.textContent = 'Password should be at least 6 characters.';
+                return;
+            }
+
+            const users = loadUsers();
+            if (users[registerUsername]) {
+                registerErrorEl.textContent = 'This username is already taken. Please choose another.';
+                return;
+            }
+
+            users[registerUsername] = { password: registerPassword }; // Store password directly (insecure for real apps)
+            saveUsers(users);
+
+            // Automatically log in the newly registered user
+            currentUserId = registerUsername;
+            localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
+            // Initialize empty watchlist and default portfolio for the new user, including transactions
+            localStorage.setItem(LOCAL_STORAGE_WATCHLIST_PREFIX + currentUserId, JSON.stringify([]));
+            localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + currentUserId, JSON.stringify({ cashBalance: 100000, holdings: [], transactions: [] }));
             
-            getEl('user-id-display-text').textContent = currentUserId;
             loadUserData(currentUserId);
-            showPage('trading-section'); // Directly show trading section
-            renderFilterButtons(true); // Render for trader view
-            renderStockCards(currentFilter, true); // Render for trader view
-            updatePortfolioDisplay();
-            startPriceUpdates();
+            showPage('role-selection-page'); // Go to role selection after registration
+        }
+
+        function handleLogout() {
+            // Clear current session data
+            currentUserId = null;
+            currentWatchlist = [];
+            currentPortfolio = { cashBalance: 100000, holdings: [], transactions: [] }; // Reset portfolio
+            localStorage.removeItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
+            // Stop price updates
+            stopPriceUpdates();
+            // Redirect to login page
+            showPage('login-page');
+            // Clear input fields on login page
+            getEl('login-username').value = '';
+            getEl('login-password').value = '';
+            getEl('login-error').textContent = '';
+        }
+
+        function handleAnonymousSignIn() {
+            // Generate a unique ID for guest session
+            currentUserId = 'guest_' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
+            // Initialize empty watchlist and default portfolio for the guest, including transactions
+            localStorage.setItem(LOCAL_STORAGE_WATCHLIST_PREFIX + currentUserId, JSON.stringify([]));
+            localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + currentUserId, JSON.stringify({ cashBalance: 100000, holdings: [], transactions: [] }));
+            
+            loadUserData(currentUserId);
+            showPage('role-selection-page'); // Go to role selection after guest sign-in
         }
 
         // --- Stock Market Simulation Functions ---
@@ -1342,8 +1479,10 @@
             try {
                 await fetchRealTimeStockData(); // This updates stockMap in place
 
-                // The only active grid is 'stock-grid-trader' now
-                const stockGridEl = getEl('stock-grid-trader');
+                // Determine which grid is currently visible and update its elements
+                const isTradingViewActive = !document.getElementById('trading-section').classList.contains('hidden');
+                const targetGridId = isTradingViewActive ? 'stock-grid-trader' : 'stock-grid-viewer';
+                const stockGridEl = getEl(targetGridId);
 
                 // Iterate over each stock item currently in the DOM
                 stockGridEl.querySelectorAll('.stock-item').forEach(stockItemElement => {
@@ -1513,6 +1652,14 @@
                             averagePrice: stock.price
                         });
                     }
+                    // Record the buy transaction
+                    currentPortfolio.transactions.push({
+                        stockId: stock.id,
+                        type: 'buy',
+                        quantity: quantity,
+                        price: stock.price,
+                        timestamp: new Date().toISOString()
+                    });
                     modalMessageEl.textContent = `Successfully bought ${quantity} shares of ${stock.symbol}.`;
                     transactionSuccess = true;
                 } else {
@@ -1530,6 +1677,14 @@
                         if (existingHolding.quantity === 0) {
                             currentPortfolio.holdings.splice(existingHoldingIndex, 1);
                         }
+                        // Record the sell transaction
+                        currentPortfolio.transactions.push({
+                            stockId: stock.id,
+                            type: 'sell',
+                            quantity: quantity,
+                            price: stock.price,
+                            timestamp: new Date().toISOString()
+                        });
                         modalMessageEl.textContent = `Successfully sold ${quantity} shares of ${stock.symbol}.`;
                         transactionSuccess = true;
                     } else {
@@ -1544,7 +1699,8 @@
                 saveUserData(currentUserId); // Save updated portfolio to localStorage
                 updatePortfolioDisplay();
                 // Re-render only the active view
-                renderStockCards(currentFilter, true); // Always render for trader view now
+                const isTradingViewActive = !document.getElementById('trading-section').classList.contains('hidden');
+                renderStockCards(currentFilter, isTradingViewActive);
                 setTimeout(closeTransactionModal, 1000); // Close modal after a short delay
             }
         }
@@ -1579,25 +1735,24 @@
         function updatePortfolioDisplay() {
             getEl('portfolio-cash').textContent = `₹${currentPortfolio.cashBalance.toFixed(2)}`;
 
-            let totalInvested = 0;
+            let totalInvestedForHoldings = 0; // Renamed for clarity
             let currentHoldingsValue = 0;
-            let totalPNL = 0; // Initialize total P/L
 
             currentPortfolio.holdings.forEach(holding => {
                 const stock = stockMap[holding.stockId];
                 if (stock) {
                     const holdingInvested = holding.quantity * holding.averagePrice;
                     const holdingCurrentValue = holding.quantity * stock.price;
-                    totalInvested += holdingInvested;
+                    totalInvestedForHoldings += holdingInvested;
                     currentHoldingsValue += holdingCurrentValue;
-                    totalPNL += (holdingCurrentValue - holdingInvested); // Accumulate P/L
                 }
             });
 
-            getEl('portfolio-invested').textContent = `₹${totalInvested.toFixed(2)}`;
+            getEl('portfolio-invested').textContent = `₹${totalInvestedForHoldings.toFixed(2)}`;
             getEl('portfolio-current-value').textContent = `₹${currentHoldingsValue.toFixed(2)}`;
 
-            const overallProfitLoss = currentHoldingsValue - totalInvested;
+            // Overall P/L (Unrealized P/L on current holdings)
+            const overallProfitLoss = currentHoldingsValue - totalInvestedForHoldings;
             const portfolioOverallProfitLossEl = getEl('portfolio-overall-profit-loss');
             portfolioOverallProfitLossEl.textContent = `₹${overallProfitLoss.toFixed(2)}`;
             portfolioOverallProfitLossEl.classList.remove('positive', 'negative');
@@ -1607,13 +1762,16 @@
                 portfolioOverallProfitLossEl.classList.add('negative');
             }
 
-            // Update Total P/L display
+            // Total P/L (Net worth change from initial capital)
+            const initialCapital = 100000; // Assuming this is the starting capital
+            const totalProfitLoss = (currentPortfolio.cashBalance + currentHoldingsValue) - initialCapital;
+            
             const portfolioTotalProfitLossEl = getEl('portfolio-total-profit-loss');
-            portfolioTotalProfitLossEl.textContent = `₹${totalPNL.toFixed(2)}`;
+            portfolioTotalProfitLossEl.textContent = `₹${totalProfitLoss.toFixed(2)}`;
             portfolioTotalProfitLossEl.classList.remove('positive', 'negative');
-            if (totalPNL > 0) {
+            if (totalProfitLoss > 0) {
                 portfolioTotalProfitLossEl.classList.add('positive');
-            } else if (totalPNL < 0) {
+            } else if (totalProfitLoss < 0) {
                 portfolioTotalProfitLossEl.classList.add('negative');
             }
         }
@@ -1641,7 +1799,6 @@
                     </div>
             `;
 
-            // isTradingView is always true now for this section, but kept for clarity
             if (isTradingView) {
                 cardHtml += `
                     <div class="stock-actions">
@@ -1662,14 +1819,14 @@
             let stocksToRender = [];
             if (filter === "All") {
                 stocksToRender = allStocksFlattened;
-            } else if (filter === "Watchlist") { // isTradingView is always true here
+            } else if (filter === "Watchlist" && isTradingView) {
                 stocksToRender = allStocksFlattened.filter(stock => currentWatchlist.includes(stock.id));
             } else {
                 const selectedCategoryData = stockData.find(d => d.category === filter);
                 stocksToRender = selectedCategoryData ? selectedCategoryData.stocks : [];
             }
 
-            const stockGridEl = getEl('stock-grid-trader'); // Always target trader grid now
+            const stockGridEl = isTradingView ? getEl('stock-grid-trader') : getEl('stock-grid-viewer');
             stockGridEl.innerHTML = ''; // Clear existing cards
 
             if (stocksToRender.length === 0) {
@@ -1678,49 +1835,59 @@
             }
 
             stocksToRender.forEach(stock => {
-                const stockCardHtml = renderStockCard(stock, true); // Always true for isTradingView
+                const stockCardHtml = renderStockCard(stock, isTradingView);
                 stockGridEl.insertAdjacentHTML('beforeend', stockCardHtml);
             });
 
-            // Attach event listeners to newly rendered buttons
-            stockGridEl.querySelectorAll('.buy-btn').forEach(button => {
-                button.onclick = () => openTransactionModal('buy', button.dataset.stockId);
-            });
-            stockGridEl.querySelectorAll('.sell-btn').forEach(button => {
-                button.onclick = () => openTransactionModal('sell', button.dataset.stockId);
-            });
-            // Event listener for "Sell All" button
-            stockGridEl.querySelectorAll('.sell-all-btn').forEach(button => {
-                button.onclick = () => {
-                    const stockId = button.dataset.stockId;
-                    const stock = stockMap[stockId];
-                    if (!stock) return;
+            // Attach event listeners to newly rendered buttons only for trading view
+            if (isTradingView) {
+                stockGridEl.querySelectorAll('.buy-btn').forEach(button => {
+                    button.onclick = () => openTransactionModal('buy', button.dataset.stockId);
+                });
+                stockGridEl.querySelectorAll('.sell-btn').forEach(button => {
+                    button.onclick = () => openTransactionModal('sell', button.dataset.stockId);
+                });
+                // Event listener for "Sell All" button
+                stockGridEl.querySelectorAll('.sell-all-btn').forEach(button => {
+                    button.onclick = () => {
+                        const stockId = button.dataset.stockId;
+                        const stock = stockMap[stockId];
+                        if (!stock) return;
 
-                    const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
-                    if (holding && holding.quantity > 0) {
-                        openCustomConfirmModal(`Are you sure you want to sell all ${holding.quantity} shares of ${stock.name}?`, (confirmed) => {
-                            if (confirmed) {
-                                const revenue = holding.quantity * stock.price;
-                                currentPortfolio.cashBalance += revenue;
-                                currentPortfolio.holdings = currentPortfolio.holdings.filter(h => h.stockId !== stock.id);
-                                saveUserData(currentUserId);
-                                updatePortfolioDisplay();
-                                renderStockCards(currentFilter, true); // Re-render to update UI
-                            }
-                        });
-                    } else {
-                        // This case should ideally not be reachable if the button is correctly hidden
-                    }
-                };
-            });
-            stockGridEl.querySelectorAll('.add-to-watchlist-btn').forEach(button => {
-                button.onclick = () => toggleWatchlist(button.dataset.stockId);
-            });
+                        const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
+                        if (holding && holding.quantity > 0) {
+                            openCustomConfirmModal(`Are you sure you want to sell all ${holding.quantity} shares of ${stock.name}?`, (confirmed) => {
+                                if (confirmed) {
+                                    const revenue = holding.quantity * stock.price;
+                                    currentPortfolio.cashBalance += revenue;
+                                    // Record the sell transaction for all shares
+                                    currentPortfolio.transactions.push({
+                                        stockId: stock.id,
+                                        type: 'sell',
+                                        quantity: holding.quantity,
+                                        price: stock.price,
+                                        timestamp: new Date().toISOString()
+                                    });
+                                    currentPortfolio.holdings = currentPortfolio.holdings.filter(h => h.stockId !== stock.id);
+                                    saveUserData(currentUserId);
+                                    updatePortfolioDisplay();
+                                    renderStockCards(currentFilter, true); // Re-render to update UI
+                                }
+                            });
+                        } else {
+                            // This case should ideally not be reachable if the button is correctly hidden
+                        }
+                    };
+                });
+                stockGridEl.querySelectorAll('.add-to-watchlist-btn').forEach(button => {
+                    button.onclick = () => toggleWatchlist(button.dataset.stockId);
+                });
+            }
         }
 
         function renderFilterButtons(isTradingView) {
             const categories = ["All", ...stockData.map(d => d.category), "Watchlist"];
-            const filterContainerEl = getEl('category-filter-trader'); // Always target trader filter now
+            const filterContainerEl = isTradingView ? getEl('category-filter-trader') : getEl('category-filter-viewer');
             filterContainerEl.innerHTML = ''; // Clear existing buttons
 
             categories.forEach(category => {
@@ -1732,8 +1899,8 @@
                 }
                 button.onclick = () => {
                     currentFilter = category;
-                    renderFilterButtons(true); // Re-render to update active state
-                    renderStockCards(currentFilter, true);
+                    renderFilterButtons(isTradingView); // Re-render to update active state
+                    renderStockCards(currentFilter, isTradingView);
                 };
                 filterContainerEl.appendChild(button);
             });
@@ -1741,23 +1908,21 @@
 
         function exportPortfolioToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Stock Name,Symbol,Quantity Owned,Average Buy Price,Current Price,Current Value,Profit/Loss (per share),Total P/L\n";
+            // Updated CSV headers for transaction history
+            csvContent += "Transaction Type,Stock Name,Stock Symbol,Quantity,Price,Timestamp\n";
 
-            currentPortfolio.holdings.forEach(holding => {
-                const stock = stockMap[holding.stockId];
+            currentPortfolio.transactions.forEach(transaction => {
+                const stock = stockMap[transaction.stockId];
                 if (stock) {
-                    const pnlPerShare = (stock.price - holding.averagePrice).toFixed(2);
-                    const totalPNL = (holding.quantity * (stock.price - holding.averagePrice)).toFixed(2);
-                    const currentValue = (holding.quantity * stock.price).toFixed(2);
-
-                    csvContent += `${stock.name},${stock.symbol},${holding.quantity},${holding.averagePrice.toFixed(2)},${stock.price.toFixed(2)},${currentValue},${pnlPerShare},${totalPNL}\n`;
+                    const transactionDate = new Date(transaction.timestamp).toLocaleString(); // Format timestamp
+                    csvContent += `${transaction.type.toUpperCase()},"${stock.name}",${stock.symbol},${transaction.quantity},${transaction.price.toFixed(2)},"${transactionDate}"\n`;
                 }
             });
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "mock_stock_portfolio.csv");
+            link.setAttribute("download", `mock_stock_transactions_${currentUserId || 'guest'}.csv`);
             document.body.appendChild(link); // Required for Firefox
             link.click();
             document.body.removeChild(link); // Clean up
@@ -1776,11 +1941,41 @@
                 getEl('theme-text').textContent = 'Light Mode';
             }
 
-            // Initialize guest session directly
-            initializeGuestSession();
+            // Check for existing logged-in user or show login page
+            const storedUserId = localStorage.getItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
+            if (storedUserId) {
+                currentUserId = storedUserId;
+                getEl('user-id-display-text').textContent = currentUserId;
+                loadUserData(currentUserId);
+                showPage('role-selection-page'); // Go to role selection if user exists
+            } else {
+                // If no user is logged in, show the login page
+                showPage('login-page');
+            }
             
-            // Logout button
+            // Auth Page Navigation
+            getEl('go-to-register').onclick = () => showPage('register-page');
+            getEl('go-to-login').onclick = () => showPage('login-page');
+            getEl('login-button').onclick = handleLogin;
+            getEl('register-button').onclick = handleRegister;
+            getEl('anonymous-sign-in').onclick = handleAnonymousSignIn;
             getEl('logout-button').onclick = handleLogout;
+
+            // Role Selection Buttons
+            getEl('enter-as-trader').onclick = () => {
+                showPage('trading-section');
+                renderFilterButtons(true); // Render for trader view
+                renderStockCards(currentFilter, true); // Render for trader view
+                updatePortfolioDisplay();
+                startPriceUpdates();
+            };
+            getEl('enter-as-viewer').onclick = () => {
+                showPage('stock-viewer-section');
+                renderFilterButtons(false); // Render for viewer view
+                renderStockCards(currentFilter, false); // Render for viewer view
+                // Viewer doesn't need portfolio display or transaction modals
+                startPriceUpdates();
+            };
 
             // Modal Buttons
             getEl('confirm-transaction-button').onclick = confirmTransaction;

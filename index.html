@@ -866,9 +866,10 @@
         <!-- Top Bar for Navigation, Theme Toggle, and User Info -->
         <div id="top-bar" class="top-bar hidden">
             <div class="left-group">
-                <button id="nav-trader" class="nav-button">Trader</button>
-                <button id="nav-viewer" class="nav-button">Viewer</button>
-                <!-- Admin button removed as general item storage is no longer supported with localStorage -->
+                <!-- Trader and Viewer buttons removed -->
+                <div class="user-id-display">
+                    <strong>User:</strong> <span id="user-id-display-text"></span>
+                </div>
             </div>
             <div class="right-group">
                 <button id="logout-button" class="nav-button bg-red-500 text-white hover:bg-red-600">Logout</button>
@@ -916,28 +917,10 @@
             </div>
         </div>
 
-        <!-- Role Selection Page -->
-        <div id="role-selection-page" class="role-selection-container hidden">
-            <div class="role-selection-card">
-                <h2>How would you like to enter?</h2>
-                <div class="role-buttons-group">
-                    <button id="enter-as-trader" class="role-button trader">
-                        Enter as Trader
-                    </button>
-                    <button id="enter-as-viewer" class="role-button viewer">
-                        Enter as Viewer
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- Role Selection Page (Removed) -->
+        <!-- <div id="role-selection-page" class="role-selection-container hidden">...</div> -->
 
-        <!-- Admin Section (Removed - no longer supported with localStorage) -->
-        <!-- <div id="admin-section" class="container hidden">...</div> -->
-
-        <!-- Viewer Section (Removed - no longer supported with localStorage) -->
-        <!-- <div id="viewer-section" class="container hidden">...</div> -->
-
-        <!-- Trading (Buying/Selling) Section -->
+        <!-- Trading (Buying/Selling) Section - Default View -->
         <div id="trading-section" class="container hidden">
             <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
                 Ashoka Universal School <br/> Mock-Stock Challenge (Trader)
@@ -977,7 +960,7 @@
             </main>
         </div>
 
-        <!-- Stock Viewer (View Only) Section -->
+        <!-- Stock Viewer (View Only) Section - Hidden by default, not used in this simplified version -->
         <div id="stock-viewer-section" class="container hidden">
             <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
                 Ashoka Universal School <br/> Mock-Stock Challenge (Viewer)
@@ -1111,7 +1094,7 @@
                     { id: "TVSMOTOR", name: "TVS Motor Company", symbol: "TVSMOTORS", price: 2250.00, initialPrice: 2250.00, volatility: 0.03 },
                     { id: "HEROMOTOCO", name: "Hero MotoCorp", symbol: "HEROMOTOCO", price: 3200.00, initialPrice: 3200.00, volatility: 0.027 },
                     { id: "BOSCHLTD", name: "Bosch Ltd", symbol: "BOSCHLTD", price: 20500.00, initialPrice: 20500.00, volatility: 0.018 },
-                    { id: "MRF", name: "MRF", symbol: "MRF", price: 105000.00, initialPrice: 105000.00, volatility: 0.02 }
+                    { id: "MRF", name: "MRF", price: 105000.00, initialPrice: 105000.00, volatility: 0.02 }
                 ]
             },
             {
@@ -1280,7 +1263,7 @@
 
         // Function to show/hide pages
         function showPage(pageId) {
-            const pages = ['login-page', 'register-page', 'role-selection-page', 'trading-section', 'stock-viewer-section']; // Removed admin/viewer sections
+            const pages = ['login-page', 'register-page', 'trading-section', 'stock-viewer-section']; // Removed role-selection-page
             pages.forEach(id => {
                 const page = getEl(id);
                 if (page) {
@@ -1294,27 +1277,15 @@
 
             // Manage top bar visibility
             const topBar = getEl('top-bar');
-            if (pageId === 'login-page' || pageId === 'register-page' || pageId === 'role-selection-page') {
+            if (pageId === 'login-page' || pageId === 'register-page') { // Only hide for login/register
                 topBar.classList.add('hidden');
             } else {
                 topBar.classList.remove('hidden');
             }
-            updateNavButtonStates(pageId);
+            // updateNavButtonStates removed as nav buttons are gone
         }
 
-        // Update navigation button active states
-        function updateNavButtonStates(activePageId) {
-            const navButtons = document.querySelectorAll('.nav-button');
-            navButtons.forEach(button => {
-                button.classList.remove('active');
-            });
-            if (activePageId === 'trading-section') {
-                getEl('nav-trader').classList.add('active');
-            } else if (activePageId === 'stock-viewer-section') {
-                getEl('nav-viewer').classList.add('active');
-            }
-            // Admin button is removed, so no need to manage its state
-        }
+        // updateNavButtonStates function removed as navigation buttons are removed
 
         // --- Local Storage Data Management ---
         function loadUsers() {
@@ -1372,7 +1343,11 @@
                 currentUserId = loginUsername; // Use username as ID for simplicity
                 localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
                 loadUserData(currentUserId);
-                showPage('role-selection-page');
+                showPage('trading-section'); // Directly go to trader
+                renderFilterButtons(true); // Initial render for trader view
+                renderStockCards(currentFilter, true); // Initial render for trader view
+                updatePortfolioDisplay(); // Initial portfolio display
+                startPriceUpdates(); // Start updates after successful login
             } else {
                 loginErrorEl.textContent = 'Invalid username or password.';
             }
@@ -1410,7 +1385,11 @@
             localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + currentUserId, JSON.stringify({ cashBalance: 100000, holdings: [] }));
             
             loadUserData(currentUserId);
-            showPage('role-selection-page');
+            showPage('trading-section'); // Directly go to trader
+            renderFilterButtons(true); // Initial render for trader view
+            renderStockCards(currentFilter, true); // Initial render for trader view
+            updatePortfolioDisplay(); // Initial portfolio display
+            startPriceUpdates(); // Start updates after successful registration
         }
 
         function handleLogout() {
@@ -1429,10 +1408,12 @@
             localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + currentUserId, JSON.stringify({ cashBalance: 100000, holdings: [] }));
             
             loadUserData(currentUserId);
-            showPage('role-selection-page');
+            showPage('trading-section'); // Directly go to trader
+            renderFilterButtons(true); // Initial render for trader view
+            renderStockCards(currentFilter, true); // Initial render for trader view
+            updatePortfolioDisplay(); // Initial portfolio display
+            startPriceUpdates(); // Start updates after successful guest sign-in
         }
-
-        // --- Admin/Viewer sections removed as they relied on shared backend data ---
 
         // --- Stock Market Simulation Functions ---
         const normalRandom = (() => {
@@ -1470,7 +1451,7 @@
 
             for (const stockId in stockMap) {
                 const stock = stockMap[stockId];
-                const oldPrice = stock.price;
+                const oldPrice = stock.price; // Keep old price for change calculation
                 const { volatility } = stock;
                 const driftTerm = globalMarketDrift - (volatility * volatility) / 2;
                 const randomShockTerm = volatility * normalRandom();
@@ -1486,10 +1467,77 @@
 
         async function updatePrices() {
             try {
-                await fetchRealTimeStockData();
-                // Check which stock view is active and re-render only that one
+                await fetchRealTimeStockData(); // This updates stockMap in place
+
+                // Determine which grid is currently visible and update its elements
                 const isTradingViewActive = !document.getElementById('trading-section').classList.contains('hidden');
-                renderStockCards(currentFilter, isTradingViewActive);
+                const targetGridId = isTradingViewActive ? 'stock-grid-trader' : 'stock-grid-viewer';
+                const stockGridEl = getEl(targetGridId);
+
+                // Iterate over each stock item currently in the DOM
+                stockGridEl.querySelectorAll('.stock-item').forEach(stockItemElement => {
+                    const stockId = stockItemElement.dataset.stockId;
+                    const stock = stockMap[stockId]; // Get the latest data for this stock
+
+                    if (stock) {
+                        // Get the current displayed price to calculate change from last update
+                        const currentDisplayedPrice = parseFloat(stockItemElement.querySelector('.stock-price').textContent.replace('₹', ''));
+                        
+                        const priceElement = stockItemElement.querySelector('.stock-price');
+                        const changeValueElement = stockItemElement.querySelector('.change-value');
+                        const percentageChangeElement = stockItemElement.querySelector('.percentage-change');
+                        const iconElement = stockItemElement.querySelector('.price-change-icon');
+                        const tooltipPriceElement = stockItemElement.querySelector('.tooltip-price');
+                        const tooltipChangeElements = stockItemElement.querySelectorAll('.tooltip-change');
+
+                        const priceChange = stock.price - currentDisplayedPrice; // Change from last displayed price
+                        const percentageChange = (priceChange / currentDisplayedPrice) * 100;
+
+                        // Update text content
+                        priceElement.textContent = `₹${stock.price.toFixed(2)}`;
+                        changeValueElement.textContent = `Change: ₹${priceChange.toFixed(2)}`;
+                        percentageChangeElement.textContent = `Percentage: ${percentageChange.toFixed(2)}%`;
+                        tooltipPriceElement.textContent = `₹${stock.price.toFixed(2)}`;
+                        tooltipChangeElements[0].textContent = priceChange.toFixed(2);
+                        tooltipChangeElements[1].textContent = percentageChange.toFixed(2) + '%';
+
+
+                        // Update classes for styling (positive/negative) and animation
+                        // Remove previous state classes
+                        priceElement.classList.remove('positive', 'negative');
+                        changeValueElement.classList.remove('positive', 'negative');
+                        percentageChangeElement.classList.remove('positive', 'negative');
+                        iconElement.classList.remove('positive', 'negative');
+                        stockItemElement.classList.remove('price-up', 'price-down'); // Remove old animation class
+                        tooltipPriceElement.classList.remove('positive', 'negative');
+                        tooltipChangeElements.forEach(el => el.classList.remove('positive', 'negative'));
+
+
+                        if (priceChange > 0) {
+                            priceElement.classList.add('positive');
+                            changeValueElement.classList.add('positive');
+                            percentageChangeElement.classList.add('positive');
+                            iconElement.classList.add('positive');
+                            stockItemElement.classList.add('price-up'); // Trigger flash animation
+                            iconElement.innerHTML = '&#x25B2;'; // Up arrow
+                            tooltipPriceElement.classList.add('positive');
+                            tooltipChangeElements.forEach(el => el.classList.add('positive'));
+                        } else if (priceChange < 0) {
+                            priceElement.classList.add('negative');
+                            changeValueElement.classList.add('negative');
+                            percentageChangeElement.classList.add('negative');
+                            iconElement.classList.add('negative');
+                            stockItemElement.classList.add('price-down'); // Trigger flash animation
+                            iconElement.innerHTML = '&#x25BC;'; // Down arrow
+                            tooltipPriceElement.classList.add('negative');
+                            tooltipChangeElements.forEach(el => el.classList.add('negative'));
+                        } else {
+                            // If price hasn't changed, ensure no arrow is displayed
+                            iconElement.innerHTML = '';
+                        }
+                    }
+                });
+
                 updatePortfolioDisplay(); // Update portfolio display as well
             } catch (error) {
                 console.error("Failed to fetch real-time stock data:", error);
@@ -1650,6 +1698,8 @@
         }
 
         function renderStockCard(stock, isTradingView) {
+            // This function now primarily builds the initial card structure.
+            // Live price updates are handled by updatePrices() directly manipulating the DOM.
             const priceChange = stock.price - stock.initialPrice;
             const percentageChange = (priceChange / stock.initialPrice) * 100;
             const isAddedToWatchlist = currentWatchlist.includes(stock.id);
@@ -1710,8 +1760,8 @@
                 stocksToRender = selectedCategoryData ? selectedCategoryData.stocks : [];
             }
 
-            const targetGridId = isTradingView ? 'stock-grid-trader' : 'stock-grid-viewer';
-            const stockGridEl = getEl(targetGridId);
+            // Always render to the trading grid, as viewer section is not directly accessible anymore
+            const stockGridEl = getEl('stock-grid-trader'); 
             stockGridEl.innerHTML = ''; // Clear existing cards
 
             if (stocksToRender.length === 0) {
@@ -1739,9 +1789,9 @@
         }
 
         function renderFilterButtons(isTradingView) {
-            const categories = isTradingView ? ["All", ...stockData.map(d => d.category), "Watchlist"] : ["All", ...stockData.map(d => d.category)];
-            const filterContainerId = isTradingView ? 'category-filter-trader' : 'category-filter-viewer';
-            const filterContainerEl = getEl(filterContainerId);
+            // Since we're always going to the Trader view, filter categories are for Trader
+            const categories = ["All", ...stockData.map(d => d.category), "Watchlist"];
+            const filterContainerEl = getEl('category-filter-trader');
             filterContainerEl.innerHTML = ''; // Clear existing buttons
 
             categories.forEach(category => {
@@ -1766,7 +1816,7 @@
             // Set initial theme based on local storage
             if (localStorage.getItem(LOCAL_STORAGE_THEME_KEY) === 'dark') {
                 document.body.classList.add('dark-mode');
-                getEl('theme-icon').textContent = '�';
+                getEl('theme-icon').textContent = '🌙';
                 getEl('theme-text').textContent = 'Dark Mode';
             } else {
                 getEl('theme-icon').textContent = '☀️';
@@ -1779,8 +1829,11 @@
                 currentUserId = storedUserId;
                 getEl('user-id-display-text').textContent = currentUserId;
                 loadUserData(currentUserId);
-                showPage('role-selection-page');
-                startPriceUpdates();
+                showPage('trading-section'); // Directly go to trader
+                renderFilterButtons(true); // Initial render for trader view
+                renderStockCards(currentFilter, true); // Initial render for trader view
+                updatePortfolioDisplay(); // Initial portfolio display
+                startPriceUpdates(); // Start updates if user is already logged in
             } else {
                 // If no user is logged in, show the login page
                 showPage('login-page');
@@ -1794,32 +1847,13 @@
             getEl('anonymous-sign-in').onclick = handleAnonymousSignIn;
             getEl('logout-button').onclick = handleLogout;
 
-            // Role Selection Buttons
-            getEl('enter-as-trader').onclick = () => {
-                showPage('trading-section');
-                renderFilterButtons(true);
-                renderStockCards(currentFilter, true);
-                updatePortfolioDisplay();
-            };
-            getEl('enter-as-viewer').onclick = () => {
-                showPage('stock-viewer-section');
-                renderFilterButtons(false);
-                renderStockCards(currentFilter, false);
-            };
+            // Role Selection Buttons (Removed, so no event listeners needed)
+            // getEl('enter-as-trader').onclick = () => { ... };
+            // getEl('enter-as-viewer').onclick = () => { ... };
 
-            // Top Bar Navigation Buttons
-            getEl('nav-trader').onclick = () => {
-                showPage('trading-section');
-                renderFilterButtons(true);
-                renderStockCards(currentFilter, true);
-                updatePortfolioDisplay();
-            };
-            getEl('nav-viewer').onclick = () => {
-                showPage('stock-viewer-section');
-                renderFilterButtons(false);
-                renderStockCards(currentFilter, false);
-            };
-            // Admin button removed, so no click handler needed
+            // Top Bar Navigation Buttons (Removed, so no event listeners needed)
+            // getEl('nav-trader').onclick = () => { ... };
+            // getEl('nav-viewer').onclick = () => { ... };
 
             // Modal Buttons
             getEl('confirm-transaction-button').onclick = confirmTransaction;
@@ -1837,4 +1871,3 @@
     </script>
 </body>
 </html>
-�

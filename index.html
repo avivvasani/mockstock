@@ -260,7 +260,7 @@
             color: var(--negative-color);
         }
 
-        .percentage-change, .change-value { /* Renamed daily-change to change-value */
+        .change-value { /* Renamed daily-change to change-value */
             font-size: 1.5rem;
             font-weight: 600;
             line-height: 1.2;
@@ -813,7 +813,7 @@
             .stock-price {
                 font-size: 2rem;
             }
-            .percentage-change, .change-value {
+            .change-value {
                 font-size: 1.3rem;
             }
             .top-bar {
@@ -1282,10 +1282,7 @@
             } else {
                 topBar.classList.remove('hidden');
             }
-            // updateNavButtonStates removed as nav buttons are gone
         }
-
-        // updateNavButtonStates function removed as navigation buttons are removed
 
         // --- Local Storage Data Management ---
         function loadUsers() {
@@ -1471,7 +1468,8 @@
 
                 // Determine which grid is currently visible and update its elements
                 const isTradingViewActive = !document.getElementById('trading-section').classList.contains('hidden');
-                const targetGridId = isTradingViewActive ? 'stock-grid-trader' : 'stock-grid-viewer';
+                // Since the viewer section is no longer directly accessible, we only update the trading grid
+                const targetGridId = 'stock-grid-trader'; 
                 const stockGridEl = getEl(targetGridId);
 
                 // Iterate over each stock item currently in the DOM
@@ -1485,52 +1483,52 @@
                         
                         const priceElement = stockItemElement.querySelector('.stock-price');
                         const changeValueElement = stockItemElement.querySelector('.change-value');
-                        const percentageChangeElement = stockItemElement.querySelector('.percentage-change');
+                        // Removed percentageChangeElement
                         const iconElement = stockItemElement.querySelector('.price-change-icon');
                         const tooltipPriceElement = stockItemElement.querySelector('.tooltip-price');
-                        const tooltipChangeElements = stockItemElement.querySelectorAll('.tooltip-change');
+                        const tooltipChangeElements = stockItemElement.querySelectorAll('.tooltip-change'); // Now only 1 element for change value
 
                         const priceChange = stock.price - currentDisplayedPrice; // Change from last displayed price
-                        const percentageChange = (priceChange / currentDisplayedPrice) * 100;
+                        // Removed percentageChange calculation
 
                         // Update text content
                         priceElement.textContent = `₹${stock.price.toFixed(2)}`;
                         changeValueElement.textContent = `Change: ₹${priceChange.toFixed(2)}`;
-                        percentageChangeElement.textContent = `Percentage: ${percentageChange.toFixed(2)}%`;
+                        // Removed percentageChangeElement update
                         tooltipPriceElement.textContent = `₹${stock.price.toFixed(2)}`;
                         tooltipChangeElements[0].textContent = priceChange.toFixed(2);
-                        tooltipChangeElements[1].textContent = percentageChange.toFixed(2) + '%';
+                        // Removed tooltipChangeElements[1] update
 
 
                         // Update classes for styling (positive/negative) and animation
                         // Remove previous state classes
                         priceElement.classList.remove('positive', 'negative');
                         changeValueElement.classList.remove('positive', 'negative');
-                        percentageChangeElement.classList.remove('positive', 'negative');
+                        // Removed percentageChangeElement class removal
                         iconElement.classList.remove('positive', 'negative');
                         stockItemElement.classList.remove('price-up', 'price-down'); // Remove old animation class
                         tooltipPriceElement.classList.remove('positive', 'negative');
-                        tooltipChangeElements.forEach(el => el.classList.remove('positive', 'negative'));
+                        tooltipChangeElements[0].classList.remove('positive', 'negative'); // Only update the first tooltip change element
 
 
                         if (priceChange > 0) {
                             priceElement.classList.add('positive');
                             changeValueElement.classList.add('positive');
-                            percentageChangeElement.classList.add('positive');
+                            // Removed percentageChangeElement class add
                             iconElement.classList.add('positive');
                             stockItemElement.classList.add('price-up'); // Trigger flash animation
                             iconElement.innerHTML = '&#x25B2;'; // Up arrow
                             tooltipPriceElement.classList.add('positive');
-                            tooltipChangeElements.forEach(el => el.classList.add('positive'));
+                            tooltipChangeElements[0].classList.add('positive');
                         } else if (priceChange < 0) {
                             priceElement.classList.add('negative');
                             changeValueElement.classList.add('negative');
-                            percentageChangeElement.classList.add('negative');
+                            // Removed percentageChangeElement class add
                             iconElement.classList.add('negative');
                             stockItemElement.classList.add('price-down'); // Trigger flash animation
                             iconElement.innerHTML = '&#x25BC;'; // Down arrow
                             tooltipPriceElement.classList.add('negative');
-                            tooltipChangeElements.forEach(el => el.classList.add('negative'));
+                            tooltipChangeElements[0].classList.add('negative');
                         } else {
                             // If price hasn't changed, ensure no arrow is displayed
                             iconElement.innerHTML = '';
@@ -1701,7 +1699,7 @@
             // This function now primarily builds the initial card structure.
             // Live price updates are handled by updatePrices() directly manipulating the DOM.
             const priceChange = stock.price - stock.initialPrice;
-            const percentageChange = (priceChange / stock.initialPrice) * 100;
+            // Removed percentageChange calculation
             const isAddedToWatchlist = currentWatchlist.includes(stock.id);
             const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
             const hasHoldings = holding && holding.quantity > 0;
@@ -1717,9 +1715,7 @@
                         <span class="change-value ${priceChange > 0 ? 'positive' : priceChange < 0 ? 'negative' : ''}">
                             Change: ₹${priceChange.toFixed(2)}
                         </span>
-                        <span class="percentage-change ${percentageChange > 0 ? 'positive' : percentageChange < 0 ? 'negative' : ''}">
-                            Percentage: ${percentageChange.toFixed(2)}%
-                        </span>
+                        <!-- Removed percentage-change span -->
                         <span class="price-change-icon ${priceChange > 0 ? '▲' : priceChange < 0 ? '▼' : ''}">
                             ${priceChange > 0 ? '▲' : priceChange < 0 ? '▼' : ''}
                         </span>
@@ -1729,7 +1725,7 @@
                         <p class="tooltip-symbol">${stock.symbol}</p>
                         <p>Current Price: <span class="tooltip-price">₹${stock.price.toFixed(2)}</span></p>
                         <p>Change: <span class="tooltip-change">${priceChange.toFixed(2)}</span></p>
-                        <p>Percentage: <span class="tooltip-change">${percentageChange.toFixed(2)}%</span></p>
+                        <!-- Removed percentage from tooltip -->
                         ${hasHoldings ? `<p>Owned: ${holding.quantity} @ ₹${holding.averagePrice.toFixed(2)}</p>` : ''}
                     </div>
             `;
@@ -1846,14 +1842,6 @@
             getEl('register-button').onclick = handleRegister;
             getEl('anonymous-sign-in').onclick = handleAnonymousSignIn;
             getEl('logout-button').onclick = handleLogout;
-
-            // Role Selection Buttons (Removed, so no event listeners needed)
-            // getEl('enter-as-trader').onclick = () => { ... };
-            // getEl('enter-as-viewer').onclick = () => { ... };
-
-            // Top Bar Navigation Buttons (Removed, so no event listeners needed)
-            // getEl('nav-trader').onclick = () => { ... };
-            // getEl('nav-viewer').onclick = () => { ... };
 
             // Modal Buttons
             getEl('confirm-transaction-button').onclick = confirmTransaction;

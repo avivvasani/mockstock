@@ -1,0 +1,413 @@
+{
+  "updatedAt": 1755243414808,
+  "categories": [
+    "All",
+    "Agrochemicals",
+    "Automotive",
+    "Energy",
+    "FMCG",
+    "Finance",
+    "Healthcare",
+    "IT & Tech",
+    "Manufacturing & Infra",
+    "Metals & Mining",
+    "Pharma",
+    "Retail",
+    "Services",
+    "Telecom"
+  ],
+  "stocks": [
+    {
+      "id": "ADANIENT",
+      "symbol": "ADANIENT",
+      "name": "Adani Enterprises",
+      "category": "Metals & Mining",
+      "price": 3230.5,
+      "prevClose": 3230.5
+    },
+    {
+      "id": "ADANIPORTS",
+      "symbol": "ADANIPORTS",
+      "name": "Adani Ports & SEZ",
+      "category": "Services",
+      "price": 1380.75,
+      "prevClose": 1380.75
+    },
+    {
+      "id": "APOLLOHOSP",
+      "symbol": "APOLLOHOSP",
+      "name": "Apollo Hospitals",
+      "category": "Healthcare",
+      "price": 5200.2,
+      "prevClose": 5200.2
+    },
+    {
+      "id": "ASIANPAINT",
+      "symbol": "ASIANPAINT",
+      "name": "Asian Paints",
+      "category": "FMCG",
+      "price": 3300.0,
+      "prevClose": 3300.0
+    },
+    {
+      "id": "AXISBANK",
+      "symbol": "AXISBANK",
+      "name": "Axis Bank",
+      "category": "Finance",
+      "price": 1085.3,
+      "prevClose": 1085.3
+    },
+    {
+      "id": "BAJAJ-AUTO",
+      "symbol": "BAJAJ-AUTO",
+      "name": "Bajaj Auto",
+      "category": "Automotive",
+      "price": 8900.5,
+      "prevClose": 8900.5
+    },
+    {
+      "id": "BAJFINANCE",
+      "symbol": "BAJFINANCE",
+      "name": "Bajaj Finance",
+      "category": "Finance",
+      "price": 7650.1,
+      "prevClose": 7650.1
+    },
+    {
+      "id": "BAJAJFINSV",
+      "symbol": "BAJAJFINSV",
+      "name": "Bajaj Finserv",
+      "category": "Finance",
+      "price": 1785.4,
+      "prevClose": 1785.4
+    },
+    {
+      "id": "BPCL",
+      "symbol": "BPCL",
+      "name": "Bharat Petroleum",
+      "category": "Energy",
+      "price": 615.25,
+      "prevClose": 615.25
+    },
+    {
+      "id": "BHARTIARTL",
+      "symbol": "BHARTIARTL",
+      "name": "Bharti Airtel",
+      "category": "Telecom",
+      "price": 910.2,
+      "prevClose": 910.2
+    },
+    {
+      "id": "BRITANNIA",
+      "symbol": "BRITANNIA",
+      "name": "Britannia Industries",
+      "category": "FMCG",
+      "price": 5130.5,
+      "prevClose": 5130.5
+    },
+    {
+      "id": "CIPLA",
+      "symbol": "CIPLA",
+      "name": "Cipla",
+      "category": "Pharma",
+      "price": 1235.1,
+      "prevClose": 1235.1
+    },
+    {
+      "id": "COALINDIA",
+      "symbol": "COALINDIA",
+      "name": "Coal India",
+      "category": "Metals & Mining",
+      "price": 365.75,
+      "prevClose": 365.75
+    },
+    {
+      "id": "DIVISLAB",
+      "symbol": "DIVISLAB",
+      "name": "Divi's Laboratories",
+      "category": "Pharma",
+      "price": 3545.0,
+      "prevClose": 3545.0
+    },
+    {
+      "id": "DRREDDY",
+      "symbol": "DRREDDY",
+      "name": "Dr. Reddy's Laboratories",
+      "category": "Pharma",
+      "price": 5620.35,
+      "prevClose": 5620.35
+    },
+    {
+      "id": "EICHERMOT",
+      "symbol": "EICHERMOT",
+      "name": "Eicher Motors",
+      "category": "Automotive",
+      "price": 3650.75,
+      "prevClose": 3650.75
+    },
+    {
+      "id": "GRASIM",
+      "symbol": "GRASIM",
+      "name": "Grasim Industries",
+      "category": "Manufacturing & Infra",
+      "price": 2120.0,
+      "prevClose": 2120.0
+    },
+    {
+      "id": "HCLTECH",
+      "symbol": "HCLTECH",
+      "name": "HCL Technologies",
+      "category": "IT & Tech",
+      "price": 1240.6,
+      "prevClose": 1240.6
+    },
+    {
+      "id": "HDFCBANK",
+      "symbol": "HDFCBANK",
+      "name": "HDFC Bank",
+      "category": "Finance",
+      "price": 1650.45,
+      "prevClose": 1650.45
+    },
+    {
+      "id": "HDFCLIFE",
+      "symbol": "HDFCLIFE",
+      "name": "HDFC Life Insurance",
+      "category": "Finance",
+      "price": 650.15,
+      "prevClose": 650.15
+    },
+    {
+      "id": "HEROMOTOCO",
+      "symbol": "HEROMOTOCO",
+      "name": "Hero MotoCorp",
+      "category": "Automotive",
+      "price": 4100.25,
+      "prevClose": 4100.25
+    },
+    {
+      "id": "HINDALCO",
+      "symbol": "HINDALCO",
+      "name": "Hindalco Industries",
+      "category": "Metals & Mining",
+      "price": 480.4,
+      "prevClose": 480.4
+    },
+    {
+      "id": "HINDUNILVR",
+      "symbol": "HINDUNILVR",
+      "name": "Hindustan Unilever",
+      "category": "FMCG",
+      "price": 2500.25,
+      "prevClose": 2500.25
+    },
+    {
+      "id": "ICICIBANK",
+      "symbol": "ICICIBANK",
+      "name": "ICICI Bank",
+      "category": "Finance",
+      "price": 980.1,
+      "prevClose": 980.1
+    },
+    {
+      "id": "ITC",
+      "symbol": "ITC",
+      "name": "ITC Limited",
+      "category": "FMCG",
+      "price": 465.0,
+      "prevClose": 465.0
+    },
+    {
+      "id": "INDUSINDBK",
+      "symbol": "INDUSINDBK",
+      "name": "IndusInd Bank",
+      "category": "Finance",
+      "price": 1480.6,
+      "prevClose": 1480.6
+    },
+    {
+      "id": "INFY",
+      "symbol": "INFY",
+      "name": "Infosys",
+      "category": "IT & Tech",
+      "price": 1425.0,
+      "prevClose": 1425.0
+    },
+    {
+      "id": "JSWSTEEL",
+      "symbol": "JSWSTEEL",
+      "name": "JSW Steel",
+      "category": "Metals & Mining",
+      "price": 810.25,
+      "prevClose": 810.25
+    },
+    {
+      "id": "KOTAKBANK",
+      "symbol": "KOTAKBANK",
+      "name": "Kotak Mahindra Bank",
+      "category": "Finance",
+      "price": 1925.3,
+      "prevClose": 1925.3
+    },
+    {
+      "id": "LT",
+      "symbol": "LT",
+      "name": "Larsen & Toubro",
+      "category": "Manufacturing & Infra",
+      "price": 3325.4,
+      "prevClose": 3325.4
+    },
+    {
+      "id": "M&M",
+      "symbol": "M&M",
+      "name": "Mahindra & Mahindra",
+      "category": "Automotive",
+      "price": 1765.2,
+      "prevClose": 1765.2
+    },
+    {
+      "id": "MARUTI",
+      "symbol": "MARUTI",
+      "name": "Maruti Suzuki India",
+      "category": "Automotive",
+      "price": 10250.0,
+      "prevClose": 10250.0
+    },
+    {
+      "id": "NTPC",
+      "symbol": "NTPC",
+      "name": "NTPC Limited",
+      "category": "Energy",
+      "price": 180.0,
+      "prevClose": 180.0
+    },
+    {
+      "id": "NESTLEIND",
+      "symbol": "NESTLEIND",
+      "name": "Nestle India",
+      "category": "FMCG",
+      "price": 24550.0,
+      "prevClose": 24550.0
+    },
+    {
+      "id": "ONGC",
+      "symbol": "ONGC",
+      "name": "Oil & Natural Gas Corporation",
+      "category": "Energy",
+      "price": 198.25,
+      "prevClose": 198.25
+    },
+    {
+      "id": "POWERGRID",
+      "symbol": "POWERGRID",
+      "name": "Power Grid Corporation",
+      "category": "Energy",
+      "price": 235.4,
+      "prevClose": 235.4
+    },
+    {
+      "id": "RELIANCE",
+      "symbol": "RELIANCE",
+      "name": "Reliance Industries",
+      "category": "Energy",
+      "price": 2580.0,
+      "prevClose": 2580.0
+    },
+    {
+      "id": "SBILIFE",
+      "symbol": "SBILIFE",
+      "name": "SBI Life Insurance",
+      "category": "Finance",
+      "price": 1410.0,
+      "prevClose": 1410.0
+    },
+    {
+      "id": "SBIN",
+      "symbol": "SBIN",
+      "name": "State Bank of India",
+      "category": "Finance",
+      "price": 570.25,
+      "prevClose": 570.25
+    },
+    {
+      "id": "SUNPHARMA",
+      "symbol": "SUNPHARMA",
+      "name": "Sun Pharma",
+      "category": "Pharma",
+      "price": 1610.0,
+      "prevClose": 1610.0
+    },
+    {
+      "id": "TCS",
+      "symbol": "TCS",
+      "name": "Tata Consultancy Services",
+      "category": "IT & Tech",
+      "price": 3480.0,
+      "prevClose": 3480.0
+    },
+    {
+      "id": "TATACONSUM",
+      "symbol": "TATACONSUM",
+      "name": "Tata Consumer Products",
+      "category": "FMCG",
+      "price": 975.0,
+      "prevClose": 975.0
+    },
+    {
+      "id": "TATAMOTORS",
+      "symbol": "TATAMOTORS",
+      "name": "Tata Motors",
+      "category": "Automotive",
+      "price": 890.5,
+      "prevClose": 890.5
+    },
+    {
+      "id": "TATASTEEL",
+      "symbol": "TATASTEEL",
+      "name": "Tata Steel",
+      "category": "Metals & Mining",
+      "price": 132.75,
+      "prevClose": 132.75
+    },
+    {
+      "id": "TECHM",
+      "symbol": "TECHM",
+      "name": "Tech Mahindra",
+      "category": "IT & Tech",
+      "price": 1255.4,
+      "prevClose": 1255.4
+    },
+    {
+      "id": "TITAN",
+      "symbol": "TITAN",
+      "name": "Titan Company",
+      "category": "Retail",
+      "price": 3350.15,
+      "prevClose": 3350.15
+    },
+    {
+      "id": "ULTRACEMCO",
+      "symbol": "ULTRACEMCO",
+      "name": "UltraTech Cement",
+      "category": "Manufacturing & Infra",
+      "price": 9100.25,
+      "prevClose": 9100.25
+    },
+    {
+      "id": "UPL",
+      "symbol": "UPL",
+      "name": "UPL Limited",
+      "category": "Agrochemicals",
+      "price": 605.4,
+      "prevClose": 605.4
+    },
+    {
+      "id": "WIPRO",
+      "symbol": "WIPRO",
+      "name": "Wipro",
+      "category": "IT & Tech",
+      "price": 415.75,
+      "prevClose": 415.75
+    }
+  ]
+}

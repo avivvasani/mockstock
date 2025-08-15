@@ -1,65 +1,41 @@
+# MockStock (Firebase + Firestore, Free Tier)
 
-# Ashoka Mock-Stock — Firebase + GitHub Pages
+Single-page mock stock market:
+- Users can sign up / log in (Email+Password or Google).
+- Everyone sees the **same** prices from one Firestore doc: `market/state`.
+- **Admin-only** button “Tick Market Now” updates prices for all users (no Cloud Functions required).
 
-A lightweight mock stock market with **global, identical prices** for all users, **persistent accounts**, and **portable portfolios**.  
-Front-end is static (GitHub Pages). User data + prices live in Firebase (Auth + Firestore).  
-A Cloud Function updates a single **market state** so everyone sees the same prices.
+## 1) Firebase setup
+- Create a Firebase project (you already have: `mockstock-5c5e3`).
+- Enable **Authentication** → Sign-in methods: Email/Password and Google.
+- Enable **Firestore** (test or locked mode).
+- Paste your `firebaseConfig` into `script.js` (already set to your config here).
 
----
+## 2) Import market data
+Use the HTML uploader you created earlier *or* manually create `market/state` with fields:
+- `updatedAt`: number (milliseconds)
+- `categories`: array of strings (include `"All"` as first)
+- `stocks`: array of maps with keys: id, name, symbol, category, price, prevClose
 
-## Features
-- 🔐 Email/password sign-up + login from anywhere (optional guest mode).
-- 💾 Per-user portfolio/watchlist saved in Firestore (not localStorage).
-- 🌐 One shared market state in Firestore, updated by a scheduled Cloud Function.
-- 🌓 Dark mode-friendly, responsive UI.
-- 📦 Zero servers to manage (serverless).
+> I also provided a 50-stock NIFTY JSON earlier. Load that into `market/state`.
 
-## Quick start
+## 3) Firestore Rules
+Publish `firestore.rules` from Firebase Console → Firestore → Rules.
 
-### 1) Create Firebase project
-1. Go to Firebase Console → create project.
-2. Enable **Authentication** → Providers → enable *Email/Password* and *Anonymous* (optional).
-3. Enable **Firestore** (Native mode).
-4. Create a Web App → get your `firebaseConfig` object.
+## 4) Make yourself admin
+- Find your `uid` (after you log in once).
+- Create/Update: `users/{uid}` with `{ "role": "admin" }`.
 
-### 2) Clone this repo & configure
-```bash
-# in your terminal
-cp web/firebase-config.sample.js web/firebase-config.js
-# paste your config into web/firebase-config.js
-```
+## 5) Run
+- Open `index.html` (via VS Code Live Server or GitHub Pages).
+- Log in → if you're admin you will see **“Tick Market Now”** button.
+- Click it: prices update for everyone in real time.
 
-### 3) Deploy Cloud Function (global price feed)
-Install Firebase CLI, log in, then:
-```bash
-cd functions
-npm install
-# Set your region if desired: --region=asia-south1
-npx firebase deploy --only functions,firestore:rules
-```
-> The scheduled function `tickMarket` writes the latest prices into `firestore` under `market/state`.  
-> By default it ticks **every 1 minute** (GitHub Pages is static; the function keeps the market moving).
+## 6) Deploy to GitHub Pages
+- Push repo to GitHub.
+- Settings → Pages → Deploy from branch → `main` → `/root`.
+- Wait for the page link; open it.
 
-### 4) Host front-end on GitHub Pages
-Commit & push. In repo settings → Pages → serve `/web` as the site root (or use a `gh-pages` branch).  
-The app loads Firebase in the browser and subscribes to prices + user data.
-
-### 5) Security
-Firestore security rules in `web/firestore.rules` restrict:
-- `users/{uid}` → readable/writable only by that `uid`
-- `market/state` → read-only to everyone (prices) and writable only by Cloud Functions (via Admin SDK).
-
-> Tip: After deploying, in Firebase Console → Firestore → import `market/state` document once if it doesn't exist.  
-> The first tick will overwrite it with live values.
-
----
-
-## Local dev
-You can use `npx serve web` or any static server to preview. Market will stream once you set your Firebase config.
-
-## Editing prices/volatility
-- The function keeps a canonical `stocks` array and volatility per symbol.
-- Change symbols/categories in `functions/index.js` and `web/app.js` to match.
-
-## License
-MIT
+## Notes
+- Client keys in `script.js` are safe to expose; security is enforced in Firestore rules.
+- No Cloud Functions; stays on Firebase free tier.

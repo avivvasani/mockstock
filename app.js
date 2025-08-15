@@ -1,292 +1,643 @@
-// ======= app.js =======
+import { firebaseConfig } from './firebase-config.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+import { 
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, signInAnonymously, signOut,
+  deleteUser, updatePassword, updateEmail 
+} from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+import { 
+  getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction,
+  collection, getDocs, arrayUnion, arrayRemove
+} from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
-// Sections
-const authContainer = document.getElementById("auth-container");
-const authCard = document.getElementById("auth-card");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const btnLogin = document.getElementById("btn-login");
-const btnGuest = document.getElementById("btn-guest");
-const authMsg = document.getElementById("authMsg");
-const whoami = document.getElementById("whoami");
-const authWhenLoggedIn = document.getElementById("auth-when-logged-in");
-const btnLogout = document.getElementById("btn-logout");
-const themeBtn = document.getElementById("theme");
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const summarySection = document.getElementById("summary");
-const marketSection = document.getElementById("market-section");
-const adminPanel = document.getElementById("admin-panel");
+// DOM helpers
+const $ = id => document.getElementById(id);
+const fmt = n => '₹' + (Number(n || 0)).toLocaleString('en-IN', { maximumFractionDigits: 2 });
 
-// Admin controls
-const adminUserEmail = document.getElementById("admin-user-email");
-const adminUserPassword = document.getElementById("admin-user-password");
-const btnCreateUser = document.getElementById("admin-create-user");
-const btnChangePassword = document.getElementById("admin-change-password");
-const btnDeleteUser = document.getElementById("admin-delete-user");
-const adminUserMsg = document.getElementById("admin-user-msg");
-const btnViewAnalytics = document.getElementById("admin-view-analytics");
-const analyticsOutput = document.getElementById("analytics-output");
-const btnTickMarket = document.getElementById("btn-tick");
+let user = null;
+let market = { stocks: [] };
+let portfolio = null;
+let currentUserRole = null; // 'trader' or 'viewer'
 
-// Trade modal
-const tradeModal = document.getElementById("trade");
-const tradeTitle = document.getElementById("tradeTitle");
-const tradePrice = document.getElementById("tradePrice");
-const qtyInput = document.getElementById("qty");
-const btnBuy = document.getElementById("buy");
-const btnSell = document.getElementById("sell");
-const btnCancelTrade = document.getElementById("cancel");
-const tradeMsg = document.getElementById("tradeMsg");
+const START_CASH = 100000;
 
-// ======= Data Initialization =======
-let users = JSON.parse(localStorage.getItem("users")) || [
-    { username: "Admin", password: "Admin_123", role: "admin", cash: 100000, holdings: {} },
-];
+// Admin credentials (for client-side check - NOT SECURE FOR PRODUCTION)
+const ADMIN_EMAIL = "Admin"; // This will now be treated as a "username"
+const ADMIN_PASSWORD = "Admin_123";
 
-let stocks = JSON.parse(localStorage.getItem("stocks")) || [
-    { symbol: "AAPL", name: "Apple", price: 150 },
-    { symbol: "GOOGL", name: "Google", price: 2800 },
-    { symbol: "MSFT", name: "Microsoft", price: 300 },
-    { symbol: "TSLA", name: "Tesla", price: 700 },
-];
+// UI Elements
+const regularUserElements = [$('summary'), $('market-section')];
+const adminPanel = $('admin-panel');
+const authContainer = $('auth-container');
+const roleSelectionContainer = $('role-selection-container');
+const loginForm = $('login-form'); // The div containing username/password inputs and buttons
 
-let currentUser = null;
-
-// ======= Helpers =======
-function saveUsers() {
-    localStorage.setItem("users", JSON.stringify(users));
-}
-
-function saveStocks() {
-    localStorage.setItem("stocks", JSON.stringify(stocks));
-}
-
-// ======= Theme Toggle =======
-themeBtn?.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-});
-
-// ======= Login/Logout =======
-btnLogin.addEventListener("click", () => {
-    const username = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    const user = users.find(u => u.username === username && u.password === password);
-    if (user) {
-        currentUser = user;
-        loginUser();
-        authMsg.textContent = "";
+// --- AUTHENTICATION EVENTS ---
+$('btn-login').onclick = async () => {
+  try {
+    const username = $('username-input').value.trim(); 
+    const password = $('password-input').value.trim();
+    const userCredential = await signInWithEmailAndPassword(auth, username, password);
+    
+    // Client-side admin check (NOT SECURE FOR PRODUCTION)
+    if (username === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      displayAdminPanel(true);
+      $('whoami').textContent = `Admin User: ${userCredential.user.email || 'Admin'}`;
     } else {
-        authMsg.textContent = "Invalid credentials!";
+      displayRoleSelection(); // Show role selection for regular users
     }
-});
+    $('authMsg').textContent = ''; // Clear any previous auth messages
+  } catch (e) {
+    $('authMsg').textContent = `Error: ${e.message}`;
+    $('authMsg').style.color = 'red';
+  }
+};
 
-btnGuest.addEventListener("click", () => {
-    currentUser = { username: "Guest", role: "guest", cash: 50000, holdings: {} };
-    loginUser();
-});
+$('btn-signup').onclick = async () => {
+  try {
+    const username = $('username-input').value.trim();
+    const password = $('password-input').value.trim();
+    await createUserWithEmailAndPassword(auth, username, password);
+    $('authMsg').textContent = 'Account created! Please log in with your username.';
+    $('authMsg').style.color = 'green';
+  } catch (e) {
+    $('authMsg').textContent = `Error: ${e.message}`;
+    $('authMsg').style.color = 'red';
+  }
+};
 
-btnLogout.addEventListener("click", () => {
-    currentUser = null;
-    authContainer.classList.remove("hidden");
-    authWhenLoggedIn.classList.add("hidden");
-    summarySection.classList.add("hidden");
-    marketSection.classList.add("hidden");
-    adminPanel.classList.add("hidden");
-});
+$('btn-guest').onclick = async () => {
+  try {
+    await signInAnonymously(auth);
+    displayRoleSelection(); // Guests also choose a role
+    $('authMsg').textContent = '';
+  } catch (e) {
+    $('authMsg').textContent = `Error: ${e.message}`;
+    $('authMsg').style.color = 'red';
+  }
+};
 
-// ======= Login Setup =======
-function loginUser() {
-    authContainer.classList.add("hidden");
-    authWhenLoggedIn.classList.remove("hidden");
-    whoami.textContent = currentUser.username;
+$('btn-logout').onclick = async () => {
+  await signOut(auth);
+  // UI visibility handled by onAuthStateChanged
+};
 
-    // Show trading sections
-    summarySection.classList.remove("hidden");
-    marketSection.classList.remove("hidden");
+// --- ROLE SELECTION ---
+$('role-trader').onclick = () => selectRole('trader');
+$('role-viewer').onclick = () => selectRole('viewer');
 
-    // Admin-specific features
-    if (currentUser.role === "admin") {
-        adminPanel.classList.remove("hidden");
-        btnTickMarket.classList.remove("hidden");
+function displayRoleSelection() {
+    authContainer.classList.add('hidden'); // Hide login form
+    roleSelectionContainer.classList.remove('hidden'); // Show role selection
+    adminPanel.classList.add('hidden'); // Ensure admin panel is hidden
+    regularUserElements.forEach(el => el.classList.add('hidden')); // Hide main app content
+}
+
+async function selectRole(role) {
+    currentUserRole = role;
+    // Save the role in the user's Firestore document (optional, but good for persistence)
+    if (user && user.uid) {
+        const uref = doc(db, 'users', user.uid);
+        await updateDoc(uref, {
+            lastSelectedRole: role
+        }).catch(e => console.error("Error saving user role:", e));
+    }
+
+    roleSelectionContainer.classList.add('hidden'); // Hide role selection
+    displayMainAppUI(role); // Show main app content based on role
+}
+
+// --- UI VISIBILITY FUNCTIONS ---
+function displayAdminPanel(isAdmin) {
+  if (isAdmin) {
+    adminPanel.classList.remove('hidden');
+    regularUserElements.forEach(el => el.classList.add('hidden'));
+    authContainer.classList.add('hidden');
+    roleSelectionContainer.classList.add('hidden');
+    $('btn-tick').classList.remove('hidden'); // Show admin tick button
+  } else {
+    adminPanel.classList.add('hidden');
+    $('btn-tick').classList.add('hidden'); // Hide admin tick button
+  }
+}
+
+function displayMainAppUI(role) {
+    authContainer.classList.add('hidden'); // Hide login form
+    roleSelectionContainer.classList.add('hidden'); // Hide role selection
+    adminPanel.classList.add('hidden'); // Ensure admin panel is hidden
+
+    // Show regular user elements
+    regularUserElements.forEach(el => el.classList.remove('hidden'));
+
+    // Adjust specific UI elements based on role
+    if (role === 'trader') {
+        $('summary').classList.remove('hidden'); // Traders see full portfolio summary
+        $('watchlist-header').classList.add('hidden'); // No separate watchlist header for traders (it's part of holdings)
+    } else if (role === 'viewer') {
+        $('summary').classList.remove('hidden'); // Viewers also see portfolio summary (but only cash/watchlist)
+        // Adjust the portfolio summary for viewers
+        $('invested').parentElement.classList.add('hidden');
+        $('currentValue').parentElement.classList.add('hidden');
+        $('pl').parentElement.classList.add('hidden');
+        $('holdingsList').innerHTML = '<p class="text-gray-500 italic">Viewers do not have holdings.</p>';
+        $('watchlist-header').classList.remove('hidden'); // Show watchlist header
+    }
+    
+    // Render market cards with appropriate buttons (trade vs watchlist)
+    renderMarket(); 
+}
+
+// --- AUTH STATE CHANGE LISTENER ---
+onAuthStateChanged(auth, async (u) => {
+  user = u;
+  $('authMsg').textContent = ''; // Clear auth messages on state change
+
+  if (!u) {
+    // User logged out
+    $('auth-when-logged-in').classList.add('hidden');
+    authContainer.classList.remove('hidden'); // Show login form
+    roleSelectionContainer.classList.add('hidden'); // Hide role selection
+    displayAdminPanel(false); // Ensure admin panel is hidden
+    regularUserElements.forEach(el => el.classList.add('hidden')); // Hide main app content
+    currentUserRole = null; // Reset role
+    $('whoami').textContent = ''; // Clear username display
+    return;
+  }
+
+  // User logged in or state changed (e.g., page refresh)
+  $('auth-when-logged-in').classList.remove('hidden');
+  $('whoami').textContent = `Logged in as: ${u.email || 'Guest User'}`;
+
+  // Admin check (client-side)
+  if (u.email === ADMIN_EMAIL) {
+    displayAdminPanel(true);
+    currentUserRole = null; // Admin has no 'trader'/'viewer' role in this context
+  } else {
+    // Ensure user document exists (important for new sign-ups or guest users)
+    await ensureUserDoc(u.uid);
+    // Subscribe to portfolio and market data
+    subscribePortfolio(u.uid);
+    subscribeMarket();
+
+    // Check if user previously selected a role and resume it, otherwise show role selection
+    const userDocRef = doc(db, 'users', u.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists() && userDocSnap.data().lastSelectedRole) {
+        selectRole(userDocSnap.data().lastSelectedRole); // Resume previous role
     } else {
-        adminPanel.classList.add("hidden");
-        btnTickMarket.classList.add("hidden");
+        displayRoleSelection(); // Prompt for role selection
     }
+  }
+});
 
-    // Render portfolio & market
-    renderPortfolio();
-    renderMarket();
+// --- FIREBASE & DATA MANAGEMENT ---
+async function ensureUserDoc(uid) {
+  const ref = doc(db, 'users', uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      createdAt: Date.now(),
+      cashBalance: START_CASH,
+      holdings: [],
+      transactions: [],
+      watchlist: [] // Initialize watchlist for all users
+    });
+  }
 }
 
-// ======= Portfolio Rendering =======
-function renderPortfolio() {
-    const cashEl = document.getElementById("cash");
-    const investedEl = document.getElementById("invested");
-    const currentValueEl = document.getElementById("currentValue");
-    const plEl = document.getElementById("pl");
-    const holdingsList = document.getElementById("holdingsList");
-
-    const holdings = currentUser.holdings || {};
-    let invested = 0;
-    let currentValue = 0;
-
-    let holdingsHTML = "";
-
-    for (let symbol in holdings) {
-        const stock = stocks.find(s => s.symbol === symbol);
-        if (!stock) continue;
-        const qty = holdings[symbol];
-        invested += qty * stock.price; // Assuming bought at current price
-        currentValue += qty * stock.price;
-
-        holdingsHTML += `<div class="holding-item p-2 rounded-md flex justify-between">
-            <span>${stock.name} (${symbol}) x${qty}</span>
-            <span>$${(qty * stock.price).toFixed(2)}</span>
-        </div>`;
-    }
-
-    holdingsList.innerHTML = holdingsHTML || "<p>No holdings yet.</p>";
-
-    cashEl.textContent = `$${currentUser.cash.toFixed(2)}`;
-    investedEl.textContent = `$${invested.toFixed(2)}`;
-    currentValueEl.textContent = `$${currentValue.toFixed(2)}`;
-    plEl.textContent = `$${(currentValue + currentUser.cash - 100000).toFixed(2)}`; // assuming starting cash 100k
+function subscribePortfolio(uid) {
+  const ref = doc(db, 'users', uid);
+  return onSnapshot(ref, (snap) => {
+    portfolio = snap.data();
+    renderSummary();
+  });
 }
 
-// ======= Market Rendering =======
+function subscribeMarket() {
+  const ref = doc(db, 'market', 'state');
+  onSnapshot(ref, (snap) => {
+    if (snap.exists()) {
+      market = snap.data();
+      renderMarket(); // Re-render market when prices tick
+    }
+  });
+}
+
+// --- RENDERING FUNCTIONS ---
+function renderSummary() {
+  if (!portfolio) return;
+
+  const cashElement = $('cash');
+  const investedElement = $('invested');
+  const currentValueElement = $('currentValue');
+  const plElement = $('pl');
+  const holdingsListElement = $('holdingsList');
+  const watchlistListElement = $('watchlistList');
+  const watchlistHeaderElement = $('watchlist-header');
+
+  cashElement.textContent = fmt(portfolio.cashBalance);
+
+  if (currentUserRole === 'trader') {
+    // Show full portfolio for traders
+    investedElement.parentElement.classList.remove('hidden');
+    currentValueElement.parentElement.classList.remove('hidden');
+    plElement.parentElement.classList.remove('hidden');
+    holdingsListElement.classList.remove('hidden');
+    watchlistHeaderElement.classList.add('hidden'); // Watchlist part of holdings for traders
+
+    const map = Object.fromEntries(market.stocks.map(s => [s.id, s.price]));
+    let invested = 0, current = 0;
+    for (const h of (portfolio.holdings || [])) {
+      invested += (h.avg || 0) * h.qty;
+      current += (map[h.id] || 0) * h.qty;
+    }
+    investedElement.textContent = fmt(invested);
+    currentValueElement.textContent = fmt(current);
+    const pl = current + portfolio.cashBalance - START_CASH;
+    plElement.textContent = fmt(pl);
+
+    // Render holdings list
+    holdingsListElement.innerHTML = '';
+    if (portfolio.holdings && portfolio.holdings.length > 0) {
+      for (const h of portfolio.holdings) {
+        const stock = market.stocks.find(s => s.id === h.id);
+        if (stock) {
+          const holdingItem = document.createElement('div');
+          holdingItem.className = 'flex justify-between items-center bg-gray-50 p-2 rounded holding-item';
+          holdingItem.innerHTML = `
+            <span>${stock.symbol} (${stock.name}): ${h.qty} shares</span>
+            <span class="text-xs text-gray-500">Avg Cost: ${fmt(h.avg)}</span>
+          `;
+          holdingsListElement.appendChild(holdingItem);
+        }
+      }
+    } else {
+      holdingsListElement.innerHTML = '<p class="text-gray-500 italic">No holdings yet. Start trading!</p>';
+    }
+    // Clear viewer-specific elements
+    watchlistListElement.innerHTML = '';
+
+  } else if (currentUserRole === 'viewer') {
+    // Hide trading-specific portfolio parts for viewers
+    investedElement.parentElement.classList.add('hidden');
+    currentValueElement.parentElement.classList.add('hidden');
+    plElement.parentElement.classList.add('hidden');
+    holdingsListElement.innerHTML = '<p class="text-gray-500 italic">Viewers do not have holdings.</p>';
+    watchlistHeaderElement.classList.remove('hidden');
+
+    // Render watchlist
+    watchlistListElement.innerHTML = '';
+    if (portfolio.watchlist && portfolio.watchlist.length > 0) {
+        const map = Object.fromEntries(market.stocks.map(s => [s.id, s.price]));
+        for (const stockId of portfolio.watchlist) {
+            const stock = market.stocks.find(s => s.id === stockId);
+            if (stock) {
+                const watchlistItem = document.createElement('div');
+                watchlistItem.className = 'flex justify-between items-center bg-gray-50 p-2 rounded holding-item';
+                watchlistItem.innerHTML = `
+                    <span>${stock.symbol} (${stock.name})</span>
+                    <span class="text-base font-semibold">${fmt(stock.price)}</span>
+                `;
+                watchlistListElement.appendChild(watchlistItem);
+            }
+        }
+    } else {
+        watchlistListElement.innerHTML = '<p class="text-gray-500 italic">Your watchlist is empty. Add stocks from the market!</p>';
+    }
+  }
+}
+
 function renderMarket() {
-    const marketEl = document.getElementById("market");
-    marketEl.innerHTML = "";
+  if (!market?.stocks?.length) return;
+  
+  // Populate category filter
+  const categories = ['All', ...new Set(market.stocks.map(s => s.category))];
+  const categoryFilter = $('categoryFilter');
+  categoryFilter.innerHTML = '';
+  categories.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat;
+    option.textContent = cat;
+    categoryFilter.appendChild(option);
+  });
+  categoryFilter.onchange = () => renderCards(categoryFilter.value === 'All' ? null : categoryFilter.value);
 
-    stocks.forEach(stock => {
-        const card = document.createElement("div");
-        card.className = "card p-4 rounded-md shadow-md flex flex-col gap-2";
+  // Update market meta (last updated time)
+  const lastUpdated = market.updatedAt ? new Date(market.updatedAt).toLocaleString() : 'N/A';
+  $('marketMeta').textContent = `Last updated: ${lastUpdated}`;
 
-        const nameEl = document.createElement("div");
-        nameEl.textContent = `${stock.name} (${stock.symbol})`;
-        nameEl.className = "font-bold";
-
-        const priceEl = document.createElement("div");
-        priceEl.textContent = `$${stock.price.toFixed(2)}`;
-        priceEl.className = "price";
-
-        const btnTrade = document.createElement("button");
-        btnTrade.textContent = "Trade";
-        btnTrade.className = "btn bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600";
-        btnTrade.addEventListener("click", () => openTradeModal(stock));
-
-        card.appendChild(nameEl);
-        card.appendChild(priceEl);
-        card.appendChild(btnTrade);
-
-        marketEl.appendChild(card);
-    });
+  renderCards(categoryFilter.value === 'All' ? null : categoryFilter.value);
 }
 
-// ======= Trade Modal =======
-function openTradeModal(stock) {
-    tradeModal.showModal();
-    tradeTitle.textContent = `${stock.name} (${stock.symbol})`;
-    tradePrice.textContent = `Price: $${stock.price.toFixed(2)}`;
-    qtyInput.value = 1;
-    tradeMsg.textContent = "";
+function renderCards(category = null) {
+  let list = category ? market.stocks.filter(s => s.category === category) : market.stocks;
+  
+  // Apply search filter if active
+  const searchTerm = $('search').value.toLowerCase();
+  if (searchTerm) {
+    list = list.filter(s => 
+      s.name.toLowerCase().includes(searchTerm) || 
+      s.symbol.toLowerCase().includes(searchTerm)
+    );
+  }
 
-    btnBuy.onclick = () => {
-        const qty = parseInt(qtyInput.value);
-        const cost = stock.price * qty;
-        if (currentUser.cash >= cost) {
-            currentUser.cash -= cost;
-            currentUser.holdings = currentUser.holdings || {};
-            currentUser.holdings[stock.symbol] = (currentUser.holdings[stock.symbol] || 0) + qty;
-            saveUsers();
-            renderPortfolio();
-            tradeMsg.textContent = `Bought ${qty} shares!`;
+  const marketDiv = $('market');
+  marketDiv.innerHTML = '';
+  if (list.length === 0) {
+    marketDiv.innerHTML = '<p class="text-center text-gray-500 col-span-full">No stocks found matching your criteria.</p>';
+    return;
+  }
+
+  for (const s of list) {
+    const card = document.createElement('div');
+    card.className = 'card p-6 space-y-3 bg-white rounded-xl shadow-lg border border-gray-200';
+    const ch = (s.price - s.prevClose);
+    const cls = ch >= 0 ? 'good' : 'bad'; // Tailwind class for color
+
+    let actionButtonHtml = '';
+    const isOnWatchlist = portfolio?.watchlist?.includes(s.id);
+
+    if (currentUserRole === 'trader') {
+        actionButtonHtml = `<button class="btn btn-accent text-white px-4 py-2 rounded-md transition-colors" data-id="${s.id}" data-action="trade">Trade</button>`;
+    } else if (currentUserRole === 'viewer') {
+        if (isOnWatchlist) {
+            actionButtonHtml = `<button class="btn watchlist-btn-remove px-4 py-2 rounded-md transition-colors" data-id="${s.id}" data-action="remove-watchlist">Remove from Watchlist</button>`;
         } else {
-            tradeMsg.textContent = "Not enough cash!";
+            actionButtonHtml = `<button class="btn watchlist-btn-add px-4 py-2 rounded-md transition-colors" data-id="${s.id}" data-action="add-watchlist">Add to Watchlist</button>`;
         }
-    };
+    }
 
-    btnSell.onclick = () => {
-        const qty = parseInt(qtyInput.value);
-        currentUser.holdings = currentUser.holdings || {};
-        if ((currentUser.holdings[stock.symbol] || 0) >= qty) {
-            currentUser.holdings[stock.symbol] -= qty;
-            if (currentUser.holdings[stock.symbol] === 0) delete currentUser.holdings[stock.symbol];
-            currentUser.cash += stock.price * qty;
-            saveUsers();
-            renderPortfolio();
-            tradeMsg.textContent = `Sold ${qty} shares!`;
-        } else {
-            tradeMsg.textContent = "Not enough shares!";
-        }
-    };
+    card.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="font-bold text-xl">${s.name}</div>
+        <div class="text-sm opacity-80 category-pill pill">${s.symbol}</div>
+      </div>
+      <div class="flex items-end justify-between">
+        <div class="price text-4xl font-bold">${fmt(s.price)}</div>
+        <div class="${cls} font-bold text-lg">${ch >= 0 ? '▲' : '▼'} ${ch.toFixed(2)}</div>
+      </div>
+      <div class="flex gap-4 pt-2">
+        ${actionButtonHtml}
+      </div>
+    `;
+    marketDiv.appendChild(card);
+  }
 
-    btnCancelTrade.onclick = () => tradeModal.close();
+  // Attach event listeners for dynamic buttons
+  marketDiv.querySelectorAll('button[data-action]').forEach(btn => {
+    const stockId = btn.dataset.id;
+    const action = btn.dataset.action;
+    
+    if (action === 'trade') {
+        btn.onclick = () => openTrade(stockId);
+    } else if (action === 'add-watchlist') {
+        btn.onclick = () => addToWatchlist(stockId);
+    } else if (action === 'remove-watchlist') {
+        btn.onclick = () => removeFromWatchlist(stockId);
+    }
+  });
 }
 
-// ======= Admin Functions =======
-btnCreateUser.addEventListener("click", () => {
-    const username = adminUserEmail.value.trim();
-    const password = adminUserPassword.value.trim();
-    if (!username || !password) {
-        adminUserMsg.textContent = "Enter username and password!";
-        return;
-    }
-    if (users.find(u => u.username === username)) {
-        adminUserMsg.textContent = "User already exists!";
-        return;
-    }
-    users.push({ username, password, role: "user", cash: 100000, holdings: {} });
-    saveUsers();
-    adminUserMsg.textContent = `User "${username}" created!`;
-});
+// Search input event listener
+$('search').onkeyup = () => renderCards($('categoryFilter').value === 'All' ? null : $('categoryFilter').value);
 
-btnChangePassword.addEventListener("click", () => {
-    const username = adminUserEmail.value.trim();
-    const password = adminUserPassword.value.trim();
-    const user = users.find(u => u.username === username);
-    if (!user) {
-        adminUserMsg.textContent = "User not found!";
+// --- WATCHLIST FUNCTIONS ---
+async function addToWatchlist(stockId) {
+    if (!user || !user.uid) {
+        $('authMsg').textContent = 'Please log in to manage your watchlist.';
+        $('authMsg').style.color = 'red';
         return;
     }
-    user.password = password;
-    saveUsers();
-    adminUserMsg.textContent = `Password for "${username}" updated!`;
-});
+    try {
+        const uref = doc(db, 'users', user.uid);
+        await updateDoc(uref, {
+            watchlist: arrayUnion(stockId)
+        });
+        // UI will update via onSnapshot for portfolio
+        console.log(`Added ${stockId} to watchlist.`);
+    } catch (e) {
+        console.error("Error adding to watchlist:", e);
+        $('authMsg').textContent = `Error adding to watchlist: ${e.message}`;
+        $('authMsg').style.color = 'red';
+    }
+}
 
-btnDeleteUser.addEventListener("click", () => {
-    const username = adminUserEmail.value.trim();
-    const index = users.findIndex(u => u.username === username);
-    if (index === -1) {
-        adminUserMsg.textContent = "User not found!";
+async function removeFromWatchlist(stockId) {
+    if (!user || !user.uid) {
+        $('authMsg').textContent = 'Please log in to manage your watchlist.';
+        $('authMsg').style.color = 'red';
         return;
     }
-    if (users[index].role === "admin") {
-        adminUserMsg.textContent = "Cannot delete Admin!";
-        return;
+    try {
+        const uref = doc(db, 'users', user.uid);
+        await updateDoc(uref, {
+            watchlist: arrayRemove(stockId)
+        });
+        // UI will update via onSnapshot for portfolio
+        console.log(`Removed ${stockId} from watchlist.`);
+    } catch (e) {
+        console.error("Error removing from watchlist:", e);
+        $('authMsg').textContent = `Error removing from watchlist: ${e.message}`;
+        $('authMsg').style.color = 'red';
     }
-    users.splice(index, 1);
-    saveUsers();
-    adminUserMsg.textContent = `User "${username}" deleted!`;
-});
+}
 
-btnViewAnalytics.addEventListener("click", () => {
-    analyticsOutput.innerHTML = users.map(u => {
-        return `<p>${u.username} - Role: ${u.role} - Cash: $${u.cash.toFixed(2)} - Holdings: ${JSON.stringify(u.holdings)}</p>`;
-    }).join("");
-});
 
-// ======= Market Tick (Admin Only) =======
-btnTickMarket.addEventListener("click", () => {
-    stocks.forEach(s => {
-        const change = (Math.random() - 0.5) * 10; // random -5 to +5
-        s.price = Math.max(1, s.price + change);
+// --- TRADING FUNCTIONS ---
+let tradeStock = null;
+function openTrade(id) {
+  tradeStock = market.stocks.find(s => s.id === id);
+  $('tradeTitle').textContent = `${tradeStock.name} (${tradeStock.symbol})`;
+  $('tradePrice').textContent = `Price: ${fmt(tradeStock.price)}`;
+  $('qty').value = 1;
+  $('tradeMsg').textContent = '';
+  $('trade').showModal();
+}
+
+$('cancel').onclick = () => $('trade').close();
+
+$('buy').onclick = () => doTrade('BUY');
+$('sell').onclick = () => doTrade('SELL');
+
+async function doTrade(side) {
+  try {
+    const qty = Math.max(1, Number($('qty').value || 1));
+    if (qty <= 0) throw new Error('Quantity must be at least 1.');
+
+    const px = tradeStock.price;
+    const uid = user.uid;
+
+    await runTransaction(db, async (tx) => {
+      const uref = doc(db, 'users', uid);
+      const usnap = await tx.get(uref);
+      const u = usnap.data();
+      let cash = u.cashBalance;
+      const holdings = [...(u.holdings || [])];
+      const tcost = Number((px * qty).toFixed(2));
+
+      if (side === 'BUY') {
+        if (cash < tcost) throw new Error('Insufficient cash');
+        cash -= tcost;
+        const idx = holdings.findIndex(h => h.id === tradeStock.id);
+        if (idx >= 0) {
+          const h = holdings[idx];
+          const newQty = h.qty + qty;
+          const newAvg = ((h.avg * h.qty) + tcost) / newQty;
+          holdings[idx] = { id: h.id, qty: newQty, avg: Number(newAvg.toFixed(2)) };
+        } else {
+          holdings.push({ id: tradeStock.id, qty, avg: px });
+        }
+      } else { // SELL
+        const idx = holdings.findIndex(h => h.id === tradeStock.id);
+        if (idx < 0 || holdings[idx].qty < qty) throw new Error('Not enough shares to sell.');
+        const h = holdings[idx];
+        const newQty = h.qty - qty;
+        if (newQty === 0) { 
+          holdings.splice(idx, 1); 
+        } else { 
+          holdings[idx] = { ...h, qty: newQty }; 
+        }
+        cash += tcost;
+      }
+
+      const transactions = [...(u.transactions || [])];
+      transactions.push({ ts: Date.now(), id: tradeStock.id, side, qty, px });
+
+      tx.update(uref, { cashBalance: Number(cash.toFixed(2)), holdings, transactions });
     });
-    saveStocks();
-    renderMarket();
-    renderPortfolio();
-});
 
-// ======= Initial Rendering =======
-renderMarket();
+    $('tradeMsg').textContent = 'Trade successful!';
+    $('tradeMsg').style.color = 'green';
+    setTimeout(() => $('trade').close(), 800);
+  } catch (e) {
+    $('tradeMsg').textContent = `Trade failed: ${e.message}`;
+    $('tradeMsg').style.color = 'red';
+  }
+}
+
+// --- THEME TOGGLE ---
+$('theme').onclick = () => document.body.classList.toggle('dark');
+
+// --- ADMIN PANEL FUNCTIONS (Client-side - NOT SECURE FOR PRODUCTION) ---
+$('admin-create-user').onclick = async () => {
+  const email = $('admin-user-email').value.trim();
+  const password = $('admin-user-password').value.trim();
+  const msgElement = $('admin-user-msg');
+  if (!email || !password) {
+    msgElement.textContent = 'Email and Password are required to create a user.';
+    msgElement.style.color = 'red';
+    return;
+  }
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await ensureUserDoc(userCredential.user.uid); // Create user's Firestore document
+    msgElement.textContent = `User ${email} created successfully!`;
+    msgElement.style.color = 'green';
+  } catch (e) {
+    msgElement.textContent = `Error creating user: ${e.message}`;
+    msgElement.style.color = 'red';
+  }
+};
+
+$('admin-change-password').onclick = async () => {
+  const email = $('admin-user-email').value.trim();
+  const newPassword = $('admin-user-password').value.trim();
+  const msgElement = $('admin-user-msg');
+  if (!email || !newPassword) {
+    msgElement.textContent = 'Email and New Password are required to change password.';
+    msgElement.style.color = 'red';
+    return;
+  }
+  
+  msgElement.textContent = 'Password change for other users requires Firebase Admin SDK. For current user: re-authenticate and then use updatePassword().';
+  msgElement.style.color = 'orange';
+};
+
+$('admin-delete-user').onclick = async () => {
+  const emailToDelete = $('admin-user-email').value.trim();
+  const msgElement = $('admin-user-msg');
+  if (!emailToDelete) {
+    msgElement.textContent = 'Email is required to delete a user.';
+    msgElement.style.color = 'red';
+    return;
+  }
+
+  msgElement.textContent = 'User deletion for other users requires Firebase Admin SDK.';
+  msgElement.style.color = 'orange';
+};
+
+$('admin-view-analytics').onclick = async () => {
+  const analyticsOutput = $('analytics-output');
+  analyticsOutput.innerHTML = '<p class="text-gray-500">Fetching user data...</p>';
+  try {
+    const usersColRef = collection(db, 'users');
+    const querySnapshot = await getDocs(usersColRef);
+    
+    let analyticsHtml = '<ul class="divide-y divide-gray-200">';
+    querySnapshot.forEach((doc) => {
+      const userData = doc.data();
+      const userId = doc.id;
+      analyticsHtml += `
+        <li class="py-4 px-3 border-b border-gray-200 last:border-b-0">
+          <p class="font-semibold text-blue-700">User ID: <span class="text-blue-500 break-words">${userId}</span></p>
+          <p class="text-gray-700">Cash Balance: <span class="font-medium">${fmt(userData.cashBalance)}</span></p>
+          <p class="text-gray-700">Holdings: <span class="font-mono text-xs break-words">${JSON.stringify(userData.holdings || [])}</span></p>
+          <p class="text-gray-700">Transactions: <span class="font-mono text-xs break-words">${JSON.stringify(userData.transactions || [])}</span></p>
+          <p class="text-gray-700">Watchlist: <span class="font-mono text-xs break-words">${JSON.stringify(userData.watchlist || [])}</span></p>
+          <p class="text-xs text-gray-500">Created At: ${new Date(userData.createdAt).toLocaleString()}</p>
+          <p class="text-xs text-gray-500">Last Role: ${userData.lastSelectedRole || 'N/A'}</p>
+        </li>
+      `;
+    });
+    analyticsHtml += '</ul>';
+    analyticsOutput.innerHTML = analyticsHtml;
+  } catch (e) {
+    analyticsOutput.innerHTML = `<p class="text-red-500">Error fetching analytics: ${e.message}</p>`;
+  }
+};
+
+// --- ADMIN MARKET TICK ---
+$('btn-tick').onclick = async () => {
+  try {
+    const ref = doc(db, "market", "state");
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+        $('marketMeta').textContent = "Market data not found!";
+        $('marketMeta').style.color = 'red';
+        return;
+    }
+
+    const data = snap.data();
+    const stocks = data.stocks.map(stock => {
+        const changePercent = (Math.random() * 4 - 2) / 100; // -2% to +2%
+        const newPrice = +(stock.price * (1 + changePercent)).toFixed(2);
+        return {
+            ...stock,
+            prevClose: stock.price,
+            price: newPrice
+        };
+    });
+
+    await setDoc(ref, {
+        ...data,
+        stocks,
+        updatedAt: Date.now()
+    });
+
+    $('marketMeta').textContent = "✅ Market prices updated!";
+    $('marketMeta').style.color = 'green';
+    setTimeout(() => {
+        // Clear message after a short delay
+        $('marketMeta').textContent = `Last updated: ${new Date(Date.now()).toLocaleString()}`;
+        $('marketMeta').style.color = ''; // Reset color
+    }, 2000);
+  } catch (e) {
+    $('marketMeta').textContent = `Error ticking market: ${e.message}`;
+    $('marketMeta').style.color = 'red';
+  }
+};

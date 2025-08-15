@@ -1,0 +1,79 @@
+:root{
+  --bg:#0b1020;
+  --panel:#121936;
+  --card:#1a2352;
+  --muted:#8ea2ff;
+  --text:#eaf0ff;
+  --accent:#6ea8fe;
+  --up:#32d296;
+  --down:#ff6b6b;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Roboto, "Segoe UI", Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+  color:var(--text);
+  background: radial-gradient(1200px 800px at 80% -100px, #20308055, transparent), var(--bg);
+}
+.hidden{ display:none !important; }
+.muted{ color:var(--muted); opacity:.9 }
+
+.topbar{
+  position:sticky; top:0; z-index:10;
+  background:linear-gradient(180deg, #101735, #0f1631cc);
+  border-bottom:1px solid #26306b;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px;
+  backdrop-filter:saturate(1.2) blur(6px);
+}
+.brand{font-weight:800; letter-spacing:.5px}
+.auth{display:flex; gap:12px}
+.auth-row{display:flex; gap:8px; align-items:center}
+.auth-row input{
+  background:#0f1631; border:1px solid #2a3575; color:var(--text);
+  padding:6px 10px; border-radius:10px; outline:none; min-width:180px;
+}
+.auth-row button{
+  background:#1d2a63; border:1px solid #2a3a86; color:var(--text);
+  padding:6px 12px; border-radius:10px; cursor:pointer;
+}
+.auth-row button:hover{ background:#22306f }
+
+.container{ max-width:1100px; margin:24px auto; padding:0 16px }
+.controls{
+  display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:12px
+}
+.controls select, .controls input{
+  background:#0f1631; border:1px solid #2a3575; color:var(--text);
+  padding:8px 10px; border-radius:10px; outline:none;
+}
+.primary{
+  background:#2a48b3; border:1px solid #3b5cf0; color:white;
+  padding:8px 14px; border-radius:12px; font-weight:600; cursor:pointer;
+  box-shadow:0 8px 20px -10px #3b5cf0;
+}
+.primary:hover{ background:#3856cf }
+.meta{ margin:8px 0 16px }
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap:12px;
+}
+.card{
+  background:linear-gradient(180deg, #162051, #141b3f);
+  border:1px solid #2b3574;
+  border-radius:16px; padding:14px;
+  display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 10px 30px -15px #2b3574;
+}
+.symbol{ font-weight:800; letter-spacing:.4px }
+.row{ display:flex; align-items:center; justify-content:space-between }
+.price{ font-size:22px; font-weight:700 }
+.chip{
+  font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid #30408f; background:#172055; color:var(--muted)
+}
+.up{ color:var(--up) }
+.down{ color:var(--down) }
+.foot{ text-align:center; padding:28px 0; opacity:.7 }

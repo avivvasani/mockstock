@@ -1,17 +1,22 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Market: read for everyone, write only through server (Custom Claims) or Admin SDK
+    // Publicly readable market; only admins can write the shared state.
     match /market/state {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      allow read: if true; // (or restrict to auth != null)
+      allow write: if isAdmin();
     }
 
-    // User-scoped docs
+    // Each user can read/write their own user profile doc.
     match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
     }
   }
 }

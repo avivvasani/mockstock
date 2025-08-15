@@ -2,95 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MockStock</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    :root{ --bg:#f8f8f0; --card:#fff; --ink:#222; --accent:#0b7d4e; --good:#16a34a; --bad:#dc2626; }
-    body.dark{ --bg:#0f1222; --card:#20233b; --ink:#e7e7f7; --accent:#4ade80; }
-    body{ background:var(--bg); color:var(--ink); font-family:'Poppins',sans-serif; }
-    .card{ background:var(--card); border:1px solid rgba(0,0,0,.06); border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.05); }
-    .btn{ border-radius:999px; padding:.6rem 1rem; font-weight:700 }
-    .btn-accent{ background:var(--accent); color:white }
-    .pill{ border:1px solid rgba(0,0,0,.08); padding:.4rem .8rem; border-radius:999px }
-    .price{ font-size:1.6rem; font-weight:800 }
-    .good{ color:var(--good) } .bad{ color:var(--bad) }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="min-h-screen">
-  <div class="max-w-6xl mx-auto p-6 space-y-6">
-    <header class="flex items-center justify-between">
-      <h1 class="text-2xl font-extrabold">MockStock Market</h1>
-      <div class="flex items-center gap-2">
-        <button id="theme" class="pill">Toggle theme</button>
-        <button id="logout" class="pill">Logout</button>
+<body>
+  <header class="topbar">
+    <div class="brand">MockStock</div>
+    <div class="auth">
+      <div id="auth-when-logged-out" class="auth-row">
+        <input id="email" type="email" placeholder="email" />
+        <input id="password" type="password" placeholder="password" />
+        <button id="btn-signup">Sign up</button>
+        <button id="btn-login">Log in</button>
+        <button id="btn-google">Google</button>
       </div>
-    </header>
+      <div id="auth-when-logged-in" class="auth-row hidden">
+        <span id="whoami"></span>
+        <button id="btn-logout">Log out</button>
+      </div>
+    </div>
+  </header>
 
-    <!-- Auth -->
-    <section id="auth" class="card p-6 space-y-4">
-      <h2 class="text-xl font-bold">Login / Register</h2>
-      <div class="grid md:grid-cols-3 gap-4">
-        <input id="email" class="pill" type="email" placeholder="Email" />
-        <input id="pass" class="pill" type="password" placeholder="Password" />
-        <div class="flex gap-2">
-          <button id="login" class="btn btn-accent">Login</button>
-          <button id="register" class="pill">Register</button>
-          <button id="guest" class="pill">Guest</button>
-        </div>
-      </div>
-      <p id="authMsg" class="text-sm"></p>
+  <main class="container">
+    <section class="controls">
+      <label>
+        Category
+        <select id="categoryFilter"></select>
+      </label>
+
+      <input id="search" type="text" placeholder="Search by name or symbol" />
+
+      <!-- Admin-only -->
+      <button id="btn-tick" class="primary hidden" title="Admins: push a new price tick for everyone">
+        Tick Market Now
+      </button>
     </section>
 
-    <!-- Portfolio summary -->
-    <section id="summary" class="card p-6 hidden">
-      <div class="grid sm:grid-cols-4 gap-4 text-center">
-        <div>
-          <div class="text-sm opacity-70">Cash</div>
-          <div id="cash" class="text-2xl font-extrabold">₹0</div>
-        </div>
-        <div>
-          <div class="text-sm opacity-70">Invested</div>
-          <div id="invested" class="text-2xl font-extrabold">₹0</div>
-        </div>
-        <div>
-          <div class="text-sm opacity-70">Current Value</div>
-          <div id="currentValue" class="text-2xl font-extrabold">₹0</div>
-        </div>
-        <div>
-          <div class="text-sm opacity-70">P/L</div>
-          <div id="pl" class="text-2xl font-extrabold">₹0</div>
-        </div>
-      </div>
-    </section>
+    <section id="marketMeta" class="meta muted"></section>
 
-    <!-- Categories filter -->
-    <section id="filters" class="hidden">
-      <div id="cats" class="flex flex-wrap gap-2"></div>
-    </section>
+    <section id="stocksGrid" class="grid"></section>
+  </main>
 
-    <!-- Market grid -->
-    <section id="market" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 hidden"></section>
+  <footer class="foot muted">© MockStock — demo only</footer>
 
-    <!-- Trade modal -->
-    <dialog id="trade" class="card p-6 w-full max-w-md">
-      <h3 id="tradeTitle" class="text-lg font-bold"></h3>
-      <p id="tradePrice" class="opacity-80"></p>
-      <div class="mt-4 flex gap-2 items-center">
-        <input id="qty" class="pill flex-1" type="number" min="1" value="1"/>
-        <button id="buy" class="btn btn-accent">Buy</button>
-        <button id="sell" class="pill">Sell</button>
-        <button id="cancel" class="pill">Cancel</button>
-      </div>
-      <p id="tradeMsg" class="mt-3 text-sm"></p>
-    </dialog>
-  </div>
-
-  <!-- Firebase -->
-  <script type="module" src="./firebase-config.js"></script>
-  <script type="module" src="./app.js"></script>
+  <!-- App -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>

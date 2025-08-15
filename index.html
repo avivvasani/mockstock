@@ -3,51 +3,154 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MockStock</title>
+  <title>Ashoka MockStock</title>
   <link rel="stylesheet" href="style.css" />
   <!-- Tailwind CSS for styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Custom styles for the dark mode toggle and general layout */
+    /* Custom styles for the Ashoka theme */
+    body {
+      font-family: 'Inter', sans-serif; /* Using Inter for a clean, modern look */
+      background-color: #f8fafc; /* Light blue-gray background */
+      color: #1f2937; /* Dark gray text */
+    }
+
+    /* Dark mode adjustments */
     body.dark {
-      background-color: #1a202c;
+      background-color: #1a202c; /* Dark charcoal */
+      color: #e2e8f0; /* Light gray text */
+    }
+    .dark .topbar,
+    .dark .auth-row input,
+    .dark .auth-row button,
+    .dark .card,
+    .dark #admin-panel,
+    .dark .controls,
+    .dark #summary,
+    .dark .modal,
+    .dark #analytics-output,
+    .dark .holding-item {
+      background-color: #2d3748; /* Darker blue-gray */
+      border-color: #4a5568;
       color: #e2e8f0;
     }
-    .dark .topbar {
-      background-color: #2d3748;
-    }
-    .dark .auth-row input, .dark .auth-row button {
-      background-color: #4a5568;
-      color: #e2e8f0;
-      border-color: #2d3748;
-    }
-    .dark .btn-primary {
-      background-color: #4299e1;
-    }
-    .dark .btn-accent {
-      background-color: #f6ad55;
+    .dark .auth-row input {
+      color: #e2e8f0; /* Ensure text is visible in dark mode inputs */
     }
     .dark .pill {
-      background-color: #2d3748;
+      background-color: #4a5568;
+      color: #cbd5e0;
     }
-    .dark .card {
-      background-color: #2d3748;
-      border-color: #4a5568;
+    .dark .btn-primary,
+    .dark .btn-accent {
+      background-color: #4299e1; /* Maintain distinct button colors */
+    }
+    .dark .btn-primary:hover,
+    .dark .btn-accent:hover {
+      background-color: #3182ce;
+    }
+    .dark .bg-green-500, .dark .bg-green-600 { background-color: #34d399; }
+    .dark .bg-yellow-600 { background-color: #fbbf24; }
+    .dark .bg-red-500, .dark .bg-red-600 { background-color: #ef4444; }
+    .dark .bg-gray-500, .dark .bg-gray-700 { background-color: #6b7280; }
+    .dark .bg-purple-600 { background-color: #8b5cf6; }
+
+
+    /* General component styling */
+    .topbar {
+      background-color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-bottom-left-radius: 12px; /* More rounded */
+      border-bottom-right-radius: 12px;
+    }
+    .brand {
+      color: #2563eb; /* A vibrant blue for the brand */
+      font-weight: 700;
+      font-size: 2.25rem; /* Larger brand text */
+    }
+    .auth-row input {
+      border: 1px solid #cbd5e0;
+      border-radius: 8px; /* Rounded inputs */
+      padding: 0.6rem 0.8rem;
+    }
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px; /* Rounded buttons */
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle button shadow */
+    }
+    .btn:hover {
+      transform: translateY(-1px); /* Slight lift on hover */
+    }
+    .btn-primary { /* General primary button style, e.g., Tick Market */
+      background-color: #3b82f6; /* Tailwind blue-500 */
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #2563eb; /* Tailwind blue-600 */
+    }
+    .btn-accent { /* Trade button style */
+      background-color: #10b981; /* Tailwind emerald-500 */
+      color: white;
+    }
+    .btn-accent:hover {
+      background-color: #059669; /* Tailwind emerald-600 */
+    }
+    .btn.bg-green-500:hover { background-color: #10b981; } /* Darker green for buy/create */
+    .btn.bg-red-500:hover { background-color: #dc2626; } /* Darker red for sell/delete */
+    .btn.bg-gray-500:hover { background-color: #4b5563; } /* Darker gray for cancel */
+    .btn.bg-yellow-600:hover { background-color: #d97706; } /* Darker yellow for change password */
+    .btn.bg-purple-600:hover { background-color: #7c3aed; } /* Darker purple for analytics */
+
+    .pill {
+      background-color: #e0e7ff; /* Light blue pill background */
+      color: #3730a3; /* Darker blue text for pills */
+      padding: 0.3rem 0.8rem;
+      border-radius: 9999px; /* Fully rounded */
+      font-size: 0.875rem;
+    }
+    .card {
+      background-color: #ffffff;
+      border-radius: 12px; /* More rounded cards */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Stronger shadow for cards */
+      border: 1px solid #e2e8f0; /* Subtle border */
+    }
+    .price {
+      color: #1f2937;
+      font-weight: 700;
     }
     .good {
-      color: #48bb78; /* Green */
+      color: #22c55e; /* Brighter green */
+      font-weight: 600;
     }
     .bad {
-      color: #ef4444; /* Red */
+      color: #ef4444; /* Standard red */
+      font-weight: 600;
     }
     .hidden {
       display: none !important;
+    }
+    .modal {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .backdrop: {
+        background-color: rgba(0,0,0,0.6);
+    }
+    .holding-item {
+        background-color: #f0f4f8; /* Very light blue-gray for holding items */
+        border-radius: 6px;
+    }
+    .dark .holding-item {
+        background-color: #3c4b5e;
     }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col font-sans">
   <header class="topbar bg-white shadow-md p-4 flex justify-between items-center rounded-b-lg">
-    <div class="brand text-2xl font-bold text-indigo-700">MockStock</div>
+    <div class="brand text-2xl font-bold text-indigo-700">Ashoka MockStock</div>
     <div class="auth space-y-2 md:space-y-0 md:flex md:space-x-4">
       <div id="auth-when-logged-out" class="auth-row flex flex-col md:flex-row items-center gap-2">
         <input id="email" type="email" placeholder="email" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
@@ -149,7 +252,7 @@
   </main>
 
   <footer class="foot bg-gray-200 text-gray-600 text-center p-4 text-sm mt-6 rounded-t-lg">
-    © MockStock — demo only. Developed with Firebase.
+    © Ashoka MockStock — A learning tool for students.
   </footer>
 
   <!-- Trade Modal -->

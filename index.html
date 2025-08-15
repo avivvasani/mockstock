@@ -2,174 +2,335 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ashoka MockStock</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- Tailwind CSS for styling -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts - Inter for modern typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Custom styles for the Ashoka theme */
+    /* Base styles - Ashoka inspired */
     body {
-      font-family: 'Inter', sans-serif; /* Using Inter for a clean, modern look */
-      background-color: #f8fafc; /* Light blue-gray background */
-      color: #1f2937; /* Dark gray text */
+      font-family: 'Inter', sans-serif;
+      background-color: #E3F2FD; /* Light Blue background */
+      color: #37474F; /* Dark Slate Gray for general text */
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* Dark mode adjustments */
+    /* Dark mode styles */
     body.dark {
-      background-color: #1a202c; /* Dark charcoal */
-      color: #e2e8f0; /* Light gray text */
+      background-color: #212B36; /* Darker charcoal */
+      color: #E0E0E0; /* Light gray for text */
     }
     .dark .topbar,
+    .dark .auth-card,
     .dark .auth-row input,
-    .dark .auth-row button,
+    .dark .btn-secondary, /* New button style */
     .dark .card,
     .dark #admin-panel,
     .dark .controls,
     .dark #summary,
     .dark .modal,
     .dark #analytics-output,
-    .dark .holding-item {
-      background-color: #2d3748; /* Darker blue-gray */
-      border-color: #4a5568;
-      color: #e2e8f0;
+    .dark .holding-item,
+    .dark .category-pill,
+    .dark .role-selection-card {
+      background-color: #2D3748; /* Dark blue-gray */
+      border-color: #4A5568;
+      color: #E0E0E0;
     }
     .dark .auth-row input {
-      color: #e2e8f0; /* Ensure text is visible in dark mode inputs */
+      color: #E0E0E0;
     }
-    .dark .pill {
-      background-color: #4a5568;
-      color: #cbd5e0;
+    .dark .brand {
+      color: #64B5F6; /* Lighter blue for dark mode brand */
     }
-    .dark .btn-primary,
+    .dark .btn-primary {
+      background-color: #64B5F6; /* Lighter blue for primary in dark mode */
+      color: #1F2937;
+    }
+    .dark .btn-primary:hover {
+      background-color: #42A5F5;
+    }
     .dark .btn-accent {
-      background-color: #4299e1; /* Maintain distinct button colors */
+      background-color: #81C784; /* Green accent for dark mode */
     }
-    .dark .btn-primary:hover,
     .dark .btn-accent:hover {
-      background-color: #3182ce;
+      background-color: #66BB6A;
     }
-    .dark .bg-green-500, .dark .bg-green-600 { background-color: #34d399; }
-    .dark .bg-yellow-600 { background-color: #fbbf24; }
-    .dark .bg-red-500, .dark .bg-red-600 { background-color: #ef4444; }
-    .dark .bg-gray-500, .dark .bg-gray-700 { background-color: #6b7280; }
-    .dark .bg-purple-600 { background-color: #8b5cf6; }
+    .dark .btn-logout {
+      background-color: #EF5350; /* Red for logout in dark mode */
+    }
+    .dark .btn-logout:hover {
+      background-color: #E53935;
+    }
+    .dark .good { color: #81C784; } /* Green */
+    .dark .bad { color: #EF5350; } /* Red */
+    .dark .text-indigo-700 { color: #64B5F6; } /* Adjust specific color for dark mode */
+    .dark .text-gray-600 { color: #A0AEC0; }
+    .dark .text-gray-500 { color: #CBD5E0; }
 
 
-    /* General component styling */
+    /* Header/Topbar */
     .topbar {
-      background-color: #ffffff;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      border-bottom-left-radius: 12px; /* More rounded */
-      border-bottom-right-radius: 12px;
+      background-color: #FFFFFF;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+      border-bottom-left-radius: 16px; /* More pronounced rounded corners */
+      border-bottom-right-radius: 16px;
+      padding: 1rem 2rem;
     }
     .brand {
-      color: #2563eb; /* A vibrant blue for the brand */
+      color: #1A73E8; /* Deep blue for the brand, reminiscent of Ashoka */
       font-weight: 700;
-      font-size: 2.25rem; /* Larger brand text */
+      font-size: 2.5rem; /* Larger and more prominent */
+      letter-spacing: -0.05em; /* Slightly tighter letter spacing */
+    }
+
+    /* Auth Card (Login/Role Selection) */
+    .auth-card {
+      background-color: #FFFFFF;
+      border-radius: 20px; /* Very rounded card */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Stronger, softer shadow */
+      padding: 3rem;
+      width: 100%;
+      max-width: 450px; /* Slightly wider for better content distribution */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .auth-card h2 {
+      font-size: 2.25rem; /* text-4xl */
+      font-weight: 700; /* Extra bold */
+      color: #1A73E8; /* Ashoka blue */
+      margin-bottom: 1.5rem;
+      text-align: center;
     }
     .auth-row input {
-      border: 1px solid #cbd5e0;
-      border-radius: 8px; /* Rounded inputs */
-      padding: 0.6rem 0.8rem;
+      border: 1px solid #BBDEFB; /* Light blue border */
+      border-radius: 12px; /* Rounded inputs */
+      padding: 1rem 1.25rem; /* More padding */
+      width: 100%;
+      font-size: 1.125rem; /* Larger text in inputs */
+      background-color: #F8F8F8; /* Slight off-white background */
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
+    .auth-row input:focus {
+      border-color: #1976D2; /* Darker blue on focus */
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2); /* Soft blue glow */
+      outline: none;
+    }
+
+    /* General Button Styles */
     .btn {
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px; /* Rounded buttons */
-      font-weight: 500;
-      transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle button shadow */
+      padding: 0.9rem 1.8rem;
+      border-radius: 12px;
+      font-weight: 600; /* Semi-bold */
+      transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      text-align: center;
     }
     .btn:hover {
-      transform: translateY(-1px); /* Slight lift on hover */
+      transform: translateY(-2px); /* More pronounced lift */
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
     }
-    .btn-primary { /* General primary button style, e.g., Tick Market */
-      background-color: #3b82f6; /* Tailwind blue-500 */
+
+    /* Primary Button - Login */
+    #btn-login {
+      background-color: #1976D2; /* Strong blue */
       color: white;
     }
-    .btn-primary:hover {
-      background-color: #2563eb; /* Tailwind blue-600 */
+    #btn-login:hover {
+      background-color: #1565C0; /* Darker blue */
     }
-    .btn-accent { /* Trade button style */
-      background-color: #10b981; /* Tailwind emerald-500 */
+
+    /* Secondary Buttons - Sign Up, Guest, Role Selection */
+    .btn-secondary {
+        background-color: transparent;
+        color: #1976D2;
+        border: 2px solid #1976D2; /* Blue outline */
+        box-shadow: none;
+    }
+    .btn-secondary:hover {
+        background-color: #E3F2FD; /* Light blue fill on hover */
+        border-color: #1565C0;
+        transform: translateY(-1px);
+    }
+
+    /* Destructive Button - Logout, Delete User */
+    .btn-logout, .btn.bg-red-600 {
+      background-color: #D32F2F; /* Red */
       color: white;
     }
-    .btn-accent:hover {
-      background-color: #059669; /* Tailwind emerald-600 */
+    .btn-logout:hover, .btn.bg-red-600:hover {
+      background-color: #C62828; /* Darker red */
     }
-    .btn.bg-green-500:hover { background-color: #10b981; } /* Darker green for buy/create */
-    .btn.bg-red-500:hover { background-color: #dc2626; } /* Darker red for sell/delete */
-    .btn.bg-gray-500:hover { background-color: #4b5563; } /* Darker gray for cancel */
-    .btn.bg-yellow-600:hover { background-color: #d97706; } /* Darker yellow for change password */
-    .btn.bg-purple-600:hover { background-color: #7c3aed; } /* Darker purple for analytics */
+
+    /* Accent Buttons - Trade, Create, Change Password, Analytics */
+    .btn-accent, .btn.bg-green-600, .btn.bg-yellow-600, .btn.bg-purple-600 {
+      background-color: #4CAF50; /* Green */
+      color: white;
+    }
+    .btn-accent:hover, .btn.bg-green-600:hover { background-color: #388E3C; }
+    .btn.bg-yellow-600 { background-color: #FBC02D; } /* Yellow */
+    .btn.bg-yellow-600:hover { background-color: #F9A825; }
+    .btn.bg-purple-600 { background-color: #8E24AA; } /* Purple */
+    .btn.bg-purple-600:hover { background-color: #7B1FA2; }
+    .btn.bg-blue-500 { background-color: #2196F3; } /* Light blue */
+    .btn.bg-blue-500:hover { background-color: #1976D2; }
 
     .pill {
-      background-color: #e0e7ff; /* Light blue pill background */
-      color: #3730a3; /* Darker blue text for pills */
-      padding: 0.3rem 0.8rem;
-      border-radius: 9999px; /* Fully rounded */
+      background-color: #BBDEFB; /* Lighter blue pill */
+      color: #1A237E; /* Dark blue text */
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
       font-size: 0.875rem;
+      font-weight: 500;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Inner shadow */
     }
     .card {
-      background-color: #ffffff;
-      border-radius: 12px; /* More rounded cards */
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Stronger shadow for cards */
-      border: 1px solid #e2e8f0; /* Subtle border */
+      background-color: #FFFFFF;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border: 1px solid #E0E0E0;
     }
     .price {
-      color: #1f2937;
+      color: #1F2937;
       font-weight: 700;
+      font-size: 2.25rem; /* text-4xl */
     }
     .good {
-      color: #22c55e; /* Brighter green */
+      color: #4CAF50; /* Stronger green */
       font-weight: 600;
+      font-size: 1.125rem; /* text-lg */
     }
     .bad {
-      color: #ef4444; /* Standard red */
+      color: #F44336; /* Stronger red */
       font-weight: 600;
+      font-size: 1.125rem;
     }
     .hidden {
       display: none !important;
     }
     .modal {
         border: none;
-        border-radius: 12px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        max-width: 500px;
+        width: 90%;
+        padding: 2.5rem;
     }
-    .backdrop: {
-        background-color: rgba(0,0,0,0.6);
+    .modal::backdrop {
+      background-color: rgba(0,0,0,0.6);
     }
     .holding-item {
-        background-color: #f0f4f8; /* Very light blue-gray for holding items */
-        border-radius: 6px;
+        background-color: #E3F2FD; /* Very light blue for holding items */
+        border-radius: 10px;
+        padding: 0.8rem 1.2rem;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
     }
     .dark .holding-item {
-        background-color: #3c4b5e;
+        background-color: #3C4B5E;
+    }
+
+    /* Role Selection Card */
+    .role-selection-card {
+        background-color: #FFFFFF;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 3rem;
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .role-selection-card h2 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #1A73E8;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    /* Watchlist styling */
+    .watchlist-btn-add {
+        background-color: #FFC107; /* Gold/Yellow for add to watchlist */
+        color: #37474F;
+    }
+    .watchlist-btn-add:hover {
+        background-color: #FFB300;
+    }
+    .watchlist-btn-remove {
+        background-color: #EF6C00; /* Orange for remove from watchlist */
+        color: white;
+    }
+    .watchlist-btn-remove:hover {
+        background-color: #E65100;
+    }
+    .dark .watchlist-btn-add {
+        background-color: #FBC02D;
+        color: #1F2937;
+    }
+    .dark .watchlist-btn-add:hover {
+        background-color: #F9A825;
+    }
+    .dark .watchlist-btn-remove {
+        background-color: #FB8C00;
+        color: #E0E0E0;
+    }
+    .dark .watchlist-btn-remove:hover {
+        background-color: #F57C00;
     }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col font-sans">
-  <header class="topbar bg-white shadow-md p-4 flex justify-between items-center rounded-b-lg">
+  <header class="topbar bg-white shadow-md p-4 flex justify-between items-center rounded-b-lg z-10">
     <div class="brand text-2xl font-bold text-indigo-700">Ashoka MockStock</div>
-    <div class="auth space-y-2 md:space-y-0 md:flex md:space-x-4">
-      <div id="auth-when-logged-out" class="auth-row flex flex-col md:flex-row items-center gap-2">
-        <input id="email" type="email" placeholder="email" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <input id="password" type="password" placeholder="password" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <button id="btn-signup" class="btn bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition-colors">Sign up</button>
-        <button id="btn-login" class="btn bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">Log in</button>
-        <button id="btn-guest" class="btn bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">Guest</button>
-        <button id="btn-google" class="btn bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">Google</button>
-      </div>
-      <div id="auth-when-logged-in" class="auth-row hidden flex items-center gap-4">
-        <span id="whoami" class="text-lg font-medium"></span>
-        <button id="btn-logout" class="btn bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">Log out</button>
-        <button id="theme" class="btn bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors">Toggle Theme</button>
-      </div>
-      <span id="authMsg" class="text-sm text-red-500 ml-4"></span>
+    <div id="auth-when-logged-in" class="auth-row hidden flex items-center gap-4">
+      <span id="whoami" class="text-lg font-medium"></span>
+      <button id="btn-logout" class="btn btn-logout px-4 py-2 rounded-md">Log out</button>
+      <button id="theme" class="btn btn-secondary px-4 py-2 rounded-md">Toggle Theme</button>
     </div>
   </header>
 
   <main class="container mx-auto p-4 flex-grow grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Centered Authentication Card (visible when logged out) -->
+    <section id="auth-container" class="col-span-full flex items-center justify-center min-h-[calc(100vh-100px)] absolute inset-0 z-20">
+        <div id="auth-card" class="auth-card">
+            <h2 class="text-3xl font-semibold text-center mb-6">Welcome to Ashoka MockStock</h2>
+            <div id="login-form" class="auth-row w-full space-y-4">
+                <input id="username-input" type="text" placeholder="Username" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <input id="password-input" type="password" placeholder="Password" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <button id="btn-login" class="btn bg-green-500 text-white px-4 py-2 rounded-md">Log in</button>
+                <button id="btn-signup" class="btn btn-secondary px-4 py-2 rounded-md">Sign up</button>
+                <div class="flex justify-center w-full mt-4">
+                    <button id="btn-guest" class="btn text-gray-600 px-4 py-2 rounded-md hover:underline transition-colors">Continue as Guest</button>
+                </div>
+            </div>
+            <span id="authMsg" class="text-sm text-red-500 ml-4 mt-2 text-center"></span>
+        </div>
+    </section>
+
+    <!-- Role Selection Card (visible after login, before main app) -->
+    <section id="role-selection-container" class="col-span-full flex items-center justify-center min-h-[calc(100vh-100px)] absolute inset-0 z-20 hidden">
+        <div class="role-selection-card">
+            <h2 class="text-3xl font-semibold text-center mb-6">Choose Your Role</h2>
+            <p class="text-center text-lg mb-8">How would you like to participate in the MockStock market today?</p>
+            <div class="flex flex-col md:flex-row gap-6 w-full max-w-md">
+                <button id="role-trader" class="btn btn-primary flex-grow">
+                    <span class="text-xl">📈</span> <span class="ml-2">Trader</span>
+                </button>
+                <button id="role-viewer" class="btn btn-secondary flex-grow">
+                    <span class="text-xl">👁️</span> <span class="ml-2">Viewer</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
     <!-- User Portfolio Summary -->
     <section id="summary" class="bg-white p-6 rounded-lg shadow-md col-span-1 hidden">
       <h2 class="text-xl font-semibold mb-4">Your Portfolio</h2>
@@ -190,19 +351,23 @@
         <div id="holdingsList" class="space-y-1 text-sm">
           <!-- Holdings will be rendered here -->
         </div>
+        <h3 id="watchlist-header" class="text-lg font-semibold mt-6 hidden">Your Watchlist</h3>
+        <div id="watchlistList" class="space-y-1 text-sm">
+          <!-- Watchlist will be rendered here -->
+        </div>
       </div>
     </section>
 
     <!-- Market Controls and Stocks Grid -->
-    <section id="market-section" class="col-span-1 md:col-span-2 space-y-6">
+    <section id="market-section" class="col-span-1 md:col-span-2 space-y-6 hidden">
       <div class="controls bg-white p-6 rounded-lg shadow-md flex flex-wrap gap-4 items-center">
-        <label class="flex flex-col">
-          <span class="text-sm text-gray-600">Category</span>
+        <label class="flex flex-col flex-grow">
+          <span class="text-sm text-gray-600 mb-1">Category</span>
           <select id="categoryFilter" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
         </label>
         <input id="search" type="text" placeholder="Search by name or symbol" class="p-2 border border-gray-300 rounded-md flex-grow focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         <!-- Admin-only -->
-        <button id="btn-tick" class="btn bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors hidden" title="Admins: push a new price tick for everyone">
+        <button id="btn-tick" class="btn btn-primary px-4 py-2 rounded-md hidden" title="Admins: push a new price tick for everyone">
           Tick Market Now
         </button>
       </div>
@@ -231,9 +396,9 @@
               <input type="password" id="admin-user-password" placeholder="password" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div class="flex flex-col sm:flex-row gap-2">
-              <button id="admin-create-user" class="btn bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex-grow">Create User</button>
-              <button id="admin-change-password" class="btn bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors flex-grow">Change Password</button>
-              <button id="admin-delete-user" class="btn bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors flex-grow">Delete User</button>
+              <button id="admin-create-user" class="btn btn-accent px-4 py-2 rounded-md flex-grow">Create User</button>
+              <button id="admin-change-password" class="btn bg-yellow-600 text-white px-4 py-2 rounded-md flex-grow">Change Password</button>
+              <button id="admin-delete-user" class="btn btn-logout px-4 py-2 rounded-md flex-grow">Delete User</button>
             </div>
             <p id="admin-user-msg" class="text-sm text-center mt-2"></p>
           </div>
@@ -242,7 +407,7 @@
         <!-- Analytics View -->
         <div class="bg-gray-50 p-6 rounded-lg shadow-inner md:col-span-1 lg:col-span-2">
           <h3 class="text-xl font-semibold mb-4">System Analytics</h3>
-          <button id="admin-view-analytics" class="btn bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors mb-4">View All Users' Data</button>
+          <button id="admin-view-analytics" class="btn bg-purple-600 text-white px-4 py-2 rounded-md mb-4">View All Users' Data</button>
           <div id="analytics-output" class="bg-white p-4 rounded-md border border-gray-200 text-sm max-h-96 overflow-y-auto">
             <p class="text-gray-500">Click "View All Users' Data" to fetch and display analytics.</p>
           </div>
@@ -256,7 +421,7 @@
   </footer>
 
   <!-- Trade Modal -->
-  <dialog id="trade" class="modal bg-white p-6 rounded-lg shadow-lg backdrop:bg-black backdrop:opacity-50">
+  <dialog id="trade" class="modal bg-white p-6 rounded-lg shadow-lg">
     <h3 id="tradeTitle" class="text-xl font-semibold mb-2"></h3>
     <p id="tradePrice" class="text-lg text-gray-700 mb-4"></p>
     <div class="mb-4">
@@ -264,9 +429,9 @@
       <input type="number" id="qty" value="1" min="1" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
     </div>
     <div class="flex gap-4">
-      <button id="buy" class="btn bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors flex-grow">Buy</button>
-      <button id="sell" class="btn bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors flex-grow">Sell</button>
-      <button id="cancel" class="btn bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors flex-grow">Cancel</button>
+      <button id="buy" class="btn btn-accent px-4 py-2 rounded-md flex-grow">Buy</button>
+      <button id="sell" class="btn btn-logout px-4 py-2 rounded-md flex-grow">Sell</button>
+      <button id="cancel" class="btn btn-secondary px-4 py-2 rounded-md flex-grow">Cancel</button>
     </div>
     <p id="tradeMsg" class="text-sm text-center mt-4"></p>
   </dialog>

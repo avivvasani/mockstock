@@ -32,8 +32,6 @@
             --link-color: var(--primary-green);
             --portfolio-bg: #e6ffe6; /* Light green for portfolio in light mode */
             --portfolio-border: #90ee90;
-            --transaction-header-bg: #e0f0e0; /* Light background for transaction headers */
-            --transaction-border: #c0d0c0; /* Border for transaction history */
         }
 
         /* Dark Mode Colors */
@@ -58,8 +56,6 @@
             --link-color: var(--golden-yellow);
             --portfolio-bg: #1f3a4e; /* Darker blue-green for portfolio in dark mode */
             --portfolio-border: #3a6b8c;
-            --transaction-header-bg: #3f5e6b; /* Darker background for transaction headers */
-            --transaction-border: #5a8a9e; /* Border for transaction history */
         }
 
         body {
@@ -765,85 +761,6 @@
             box-shadow: 0 6px 20px rgba(40,167,69,0.3);
         }
 
-        /* Transaction History */
-        .transaction-history {
-            margin-top: 3rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--light-border);
-        }
-
-        .transaction-history h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-green);
-            border-bottom: 1px solid var(--light-border);
-            padding-bottom: 0.7rem;
-            margin-bottom: 1.8rem;
-            transition: color 0.5s ease, border-color 0.5s ease;
-        }
-
-        .transaction-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .transaction-item {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 1.2rem;
-            border: 1px solid var(--transaction-border);
-            border-radius: 8px;
-            margin-bottom: 0.7rem;
-            background-color: var(--white-card-background);
-            box-shadow: 0 1px 5px rgba(0,0,0,0.03);
-            transition: background-color 0.5s ease, border-color 0.5s ease;
-        }
-
-        .transaction-item.buy {
-            border-left: 5px solid var(--positive-color);
-        }
-
-        .transaction-item.sell {
-            border-left: 5px solid var(--negative-color);
-        }
-
-        .transaction-details {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .transaction-type {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .transaction-stock {
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--dark-text);
-        }
-
-        .transaction-qty-price {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 0.2rem;
-        }
-        body.dark-mode .transaction-qty-price {
-            color: #ccc;
-        }
-
-        .transaction-timestamp {
-            font-size: 0.85rem;
-            color: #888;
-            text-align: right;
-            min-width: 120px;
-        }
-        body.dark-mode .transaction-timestamp {
-            color: #999;
-        }
-
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -926,14 +843,6 @@
             .role-button {
                 font-size: 1rem;
                 padding: 12px 20px;
-            }
-            .transaction-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            .transaction-timestamp {
-                text-align: left;
             }
         }
     </style>
@@ -1049,13 +958,6 @@
                     <!-- Stock cards will be rendered here by JS -->
                 </ul>
             </main>
-
-            <section class="transaction-history">
-                <h2>Transaction History</h2>
-                <ul id="transaction-list" class="transaction-list">
-                    <!-- Transaction items will be rendered here by JS -->
-                </ul>
-            </section>
         </div>
 
         <!-- Stock Viewer (View Only) Section - Hidden by default, not used in this simplified version -->
@@ -1130,110 +1032,8 @@
         let currentFilter = "All"; // For stock categories
         let updatePricesIntervalId = null;
 
-        // Mock Stock Data from provided JSONs and existing data
-        // Data from mockstock_market_state(1).json
-        const marketStateStocksJSON = [
-            {"id": "HDFCBANK", "name": "HDFC Bank", "symbol": "HDFCBANK", "category": "Finance", "price": 1650.45, "prevClose": 1650.45},
-            {"id": "ICICIBANK", "name": "ICICI Bank", "symbol": "ICICIBANK", "category": "Finance", "price": 980.1, "prevClose": 980.1},
-            {"id": "SBIN", "name": "State Bank of India", "symbol": "SBIN", "category": "Finance", "price": 570.25, "prevClose": 570.25},
-            {"id": "KOTAKBANK", "name": "Kotak Mahindra Bank", "symbol": "KOTAKBANK", "category": "Finance", "price": 1925.3, "prevClose": 1925.3},
-            {"id": "TCS", "name": "Tata Consultancy Services", "symbol": "TCS", "category": "IT & Tech", "price": 3480.0, "prevClose": 3480.0},
-            {"id": "INFY", "name": "Infosys", "symbol": "INFY", "category": "IT & Tech", "price": 1425.0, "prevClose": 1425.0},
-            {"id": "WIPRO", "name": "Wipro", "symbol": "WIPRO", "category": "IT & Tech", "price": 415.75, "prevClose": 415.75},
-            {"id": "HCLTECH", "name": "HCL Technologies", "symbol": "HCLTECH", "category": "IT & Tech", "price": 1240.6, "prevClose": 1240.6},
-            {"id": "RELIANCE", "name": "Reliance Industries", "symbol": "RELIANCE", "category": "Manufacturing & Infra", "price": 2580.0, "prevClose": 2580.0},
-            {"id": "LT", "name": "Larsen & Toubro", "symbol": "LT", "category": "Manufacturing & Infra", "price": 3325.4, "prevClose": 3325.4},
-            {"id": "ADANIPORTS", "name": "Adani Ports", "symbol": "ADANIPORTS", "category": "Manufacturing & Infra", "price": 825.25, "prevClose": 825.25},
-            {"id": "ASIANPAINT", "name": "Asian Paints", "symbol": "ASIANPAINT", "category": "Manufacturing & Infra", "price": 3300.0, "prevClose": 3300.0},
-            {"id": "SUNPHARMA", "name": "Sun Pharma", "symbol": "SUNPHARMA", "category": "Pharma", "price": 1610.0, "prevClose": 1610.0},
-            {"id": "DRREDDY", "name": "Dr Reddy's Labs", "symbol": "DRREDDY", "category": "Pharma", "price": 5620.35, "prevClose": 5620.35},
-            {"id": "CIPLA", "name": "Cipla", "symbol": "CIPLA", "category": "Pharma", "price": 1235.1, "prevClose": 1235.1},
-            {"id": "DIVISLAB", "name": "Divi's Labs", "symbol": "DIVISLAB", "category": "Pharma", "price": 3545.0, "prevClose": 3545.0},
-            {"id": "MARUTI", "name": "Maruti Suzuki India", "symbol": "MARUTI", "category": "Automotive", "price": 10250.0, "prevClose": 10250.0},
-            {"id": "TATAMOTORS", "name": "Tata Motors", "symbol": "TATAMOTORS", "category": "Automotive", "price": 890.5, "prevClose": 890.5},
-            {"id": "M&M", "name": "Mahindra & Mahindra", "symbol": "M&M", "category": "Automotive", "price": 1765.2, "prevClose": 1765.2},
-            {"id": "EICHERMOT", "name": "Eicher Motors", "symbol": "EICHERMOT", "category": "Automotive", "price": 3650.75, "prevClose": 3650.75},
-            {"id": "NTPC", "name": "NTPC", "symbol": "NTPC", "category": "Energy", "price": 180.0, "prevClose": 180.0},
-            {"id": "POWERGRID", "name": "Power Grid Corp", "symbol": "POWERGRID", "category": "Energy", "price": 235.4, "prevClose": 235.4},
-            {"id": "ONGC", "name": "ONGC", "symbol": "ONGC", "category": "Energy", "price": 198.25, "prevClose": 198.25},
-            {"id": "ADANIGREEN", "name": "Adani Green Energy", "symbol": "ADANIGREEN", "category": "Energy", "price": 1125.0, "prevClose": 1125.0},
-            {"id": "ITC", "name": "ITC", "symbol": "ITC", "category": "FMCG", "price": 465.0, "prevClose": 465.0},
-            {"id": "HINDUNILVR", "name": "Hindustan Unilever", "symbol": "HINDUNILVR", "category": "FMCG", "price": 2500.25, "prevClose": 2500.25},
-            {"id": "NESTLEIND", "name": "Nestle India", "symbol": "NESTLEIND", "category": "FMCG", "price": 24550.0, "prevClose": 24550.0},
-            {"id": "BRITANNIA", "name": "Britannia Industries", "symbol": "BRITANNIA", "category": "FMCG", "price": 5130.5, "prevClose": 5130.5},
-            {"id": "JSWSTEEL", "name": "JSW Steel", "symbol": "JSWSTEEL", "category": "Metals", "price": 810.25, "prevClose": 810.25},
-            {"id": "TATASTEEL", "name": "Tata Steel", "symbol": "TATASTEEL", "category": "Metals", "price": 132.75, "prevClose": 132.75},
-            {"id": "HINDALCO", "name": "Hindalco Industries", "symbol": "HINDALCO", "category": "Metals", "price": 480.4, "prevClose": 480.4},
-            {"id": "NMDC", "name": "NMDC", "symbol": "NMDC", "category": "Metals", "price": 185.15, "prevClose": 185.15},
-            {"id": "AIRTEL", "name": "Bharti Airtel", "symbol": "AIRTEL", "category": "Telecom", "price": 910.2, "prevClose": 910.2},
-            {"id": "IDEA", "name": "Vodafone Idea", "symbol": "IDEA", "category": "Telecom", "price": 14.25, "prevClose": 14.25},
-            {"id": "INDUSTOWERS", "name": "Indus Towers", "symbol": "INDUSTOWERS", "category": "Telecom", "price": 185.3, "prevClose": 185.3},
-            {"id": "JIO", "name": "Reliance Jio", "symbol": "JIO", "category": "Telecom", "price": 800.0, "prevClose": 800.0},
-            {"id": "DMART", "name": "Avenue Supermarts", "symbol": "DMART", "category": "Retail", "price": 3850.0, "prevClose": 3850.0},
-            {"id": "TRENT", "name": "Trent Ltd", "symbol": "TRENT", "category": "Retail", "price": 3100.5, "prevClose": 3100.5},
-            {"id": "ABFRL", "name": "Aditya Birla Fashion", "symbol": "ABFRL", "category": "Retail", "price": 275.25, "prevClose": 275.25},
-            {"id": "SHOPERSTOP", "name": "Shoppers Stop", "symbol": "SHOPERSTOP", "category": "Retail", "price": 750.0, "prevClose": 750.0}
-        ];
-
-        // Data from mockstock_nifty50_state.json
-        const nifty50StocksJSON = [
-            {"id": "ADANIENT", "symbol": "ADANIENT", "name": "Adani Enterprises", "category": "Metals & Mining", "price": 3230.5, "prevClose": 3230.5},
-            {"id": "ADANIPORTS", "symbol": "ADANIPORTS", "name": "Adani Ports & SEZ", "category": "Services", "price": 1380.75, "prevClose": 1380.75},
-            {"id": "APOLLOHOSP", "symbol": "APOLLOHOSP", "name": "Apollo Hospitals", "category": "Healthcare", "price": 5200.2, "prevClose": 5200.2},
-            {"id": "ASIANPAINT", "symbol": "ASIANPAINT", "name": "Asian Paints", "category": "FMCG", "price": 3300.0, "prevClose": 3300.0},
-            {"id": "AXISBANK", "symbol": "AXISBANK", "name": "Axis Bank", "category": "Finance", "price": 1085.3, "prevClose": 1085.3},
-            {"id": "BAJAJ-AUTO", "symbol": "BAJAJ-AUTO", "name": "Bajaj Auto", "category": "Automotive", "price": 8900.5, "prevClose": 8900.5},
-            {"id": "BAJFINANCE", "symbol": "BAJFINANCE", "name": "Bajaj Finance", "category": "Finance", "price": 7650.1, "prevClose": 7650.1},
-            {"id": "BAJAJFINSV", "symbol": "BAJAJFINSV", "name": "Bajaj Finserv", "category": "Finance", "price": 1785.4, "prevClose": 1785.4},
-            {"id": "BPCL", "symbol": "BPCL", "name": "Bharat Petroleum", "category": "Energy", "price": 615.25, "prevClose": 615.25},
-            {"id": "BHARTIARTL", "symbol": "BHARTIARTL", "name": "Bharti Airtel", "category": "Telecom", "price": 910.2, "prevClose": 910.2},
-            {"id": "BRITANNIA", "symbol": "BRITANNIA", "name": "Britannia Industries", "category": "FMCG", "price": 5130.5, "prevClose": 5130.5},
-            {"id": "CIPLA", "symbol": "CIPLA", "name": "Cipla", "category": "Pharma", "price": 1235.1, "prevClose": 1235.1},
-            {"id": "COALINDIA", "symbol": "COALINDIA", "name": "Coal India", "category": "Metals & Mining", "price": 365.75, "prevClose": 365.75},
-            {"id": "DIVISLAB", "symbol": "DIVISLAB", "name": "Divi's Laboratories", "category": "Pharma", "price": 3545.0, "prevClose": 3545.0},
-            {"id": "DRREDDY", "symbol": "DRREDDY", "name": "Dr. Reddy's Laboratories", "category": "Pharma", "price": 5620.35, "prevClose": 5620.35},
-            {"id": "EICHERMOT", "symbol": "EICHERMOT", "name": "Eicher Motors", "category": "Automotive", "price": 3650.75, "prevClose": 3650.75},
-            {"id": "GRASIM", "symbol": "GRASIM", "name": "Grasim Industries", "category": "Manufacturing & Infra", "price": 2120.0, "prevClose": 2120.0},
-            {"id": "HCLTECH", "symbol": "HCLTECH", "name": "HCL Technologies", "category": "IT & Tech", "price": 1240.6, "prevClose": 1240.6},
-            {"id": "HDFCBANK", "symbol": "HDFCBANK", "name": "HDFC Bank", "category": "Finance", "price": 1650.45, "prevClose": 1650.45},
-            {"id": "HDFCLIFE", "symbol": "HDFCLIFE", "name": "HDFC Life Insurance", "category": "Finance", "price": 650.15, "prevClose": 650.15},
-            {"id": "HEROMOTOCO", "symbol": "HEROMOTOCO", "name": "Hero MotoCorp", "category": "Automotive", "price": 4100.25, "prevClose": 4100.25},
-            {"id": "HINDALCO", "symbol": "HINDALCO", "name": "Hindalco Industries", "category": "Metals & Mining", "price": 480.4, "prevClose": 480.4},
-            {"id": "HINDUNILVR", "symbol": "HINDUNILVR", "name": "Hindustan Unilever", "category": "FMCG", "price": 2500.25, "prevClose": 2500.25},
-            {"id": "ICICIBANK", "symbol": "ICICIBANK", "name": "ICICI Bank", "category": "Finance", "price": 980.1, "prevClose": 980.1},
-            {"id": "ITC", "symbol": "ITC", "name": "ITC Limited", "category": "FMCG", "price": 465.0, "prevClose": 465.0},
-            {"id": "INDUSINDBK", "symbol": "INDUSINDBK", "name": "IndusInd Bank", "category": "Finance", "price": 1480.6, "prevClose": 1480.6},
-            {"id": "INFY", "symbol": "INFY", "name": "Infosys", "category": "IT & Tech", "price": 1425.0, "prevClose": 1425.0},
-            {"id": "JSWSTEEL", "symbol": "JSWSTEEL", "name": "JSW Steel", "category": "Metals & Mining", "price": 810.25, "prevClose": 810.25},
-            {"id": "KOTAKBANK", "symbol": "KOTAKBANK", "name": "Kotak Mahindra Bank", "category": "Finance", "price": 1925.3, "prevClose": 1925.3},
-            {"id": "LT", "symbol": "LT", "name": "Larsen & Toubro", "category": "Manufacturing & Infra", "price": 3325.4, "prevClose": 3325.4},
-            {"id": "M&M", "symbol": "M&M", "name": "Mahindra & Mahindra", "category": "Automotive", "price": 1765.2, "prevClose": 1765.2},
-            {"id": "MARUTI", "symbol": "MARUTI", "name": "Maruti Suzuki India", "category": "Automotive", "price": 10250.0, "prevClose": 10250.0},
-            {"id": "NTPC", "symbol": "NTPC", "name": "NTPC Limited", "category": "Energy", "price": 180.0, "prevClose": 180.0},
-            {"id": "NESTLEIND", "symbol": "NESTLEIND", "name": "Nestle India", "category": "FMCG", "price": 24550.0, "prevClose": 24550.0},
-            {"id": "ONGC", "symbol": "ONGC", "name": "Oil & Natural Gas Corporation", "category": "Energy", "price": 198.25, "prevClose": 198.25},
-            {"id": "POWERGRID", "symbol": "POWERGRID", "name": "Power Grid Corporation", "category": "Energy", "price": 235.4, "prevClose": 235.4},
-            {"id": "RELIANCE", "symbol": "RELIANCE", "name": "Reliance Industries", "category": "Energy", "price": 2580.0, "prevClose": 2580.0},
-            {"id": "SBILIFE", "symbol": "SBILIFE", "name": "SBI Life Insurance", "category": "Finance", "price": 1410.0, "prevClose": 1410.0},
-            {"id": "SBIN", "symbol": "SBIN", "name": "State Bank of India", "category": "Finance", "price": 570.25, "prevClose": 570.25},
-            {"id": "SUNPHARMA", "symbol": "SUNPHARMA", "name": "Sun Pharma", "category": "Pharma", "price": 1610.0, "prevClose": 1610.0},
-            {"id": "TCS", "symbol": "TCS", "name": "Tata Consultancy Services", "category": "IT & Tech", "price": 3480.0, "prevClose": 3480.0},
-            {"id": "TATACONSUM", "symbol": "TATACONSUM", "name": "Tata Consumer Products", "category": "FMCG", "price": 975.0, "prevClose": 975.0},
-            {"id": "TATAMOTORS", "symbol": "TATAMOTORS", "name": "Tata Motors", "category": "Automotive", "price": 890.5, "prevClose": 890.5},
-            {"id": "TATASTEEL", "symbol": "TATASTEEL", "name": "Tata Steel", "category": "Metals & Mining", "price": 132.75, "prevClose": 132.75},
-            {"id": "TECHM", "symbol": "TECHM", "name": "Tech Mahindra", "category": "IT & Tech", "price": 1255.4, "prevClose": 1255.4},
-            {"id": "TITAN", "symbol": "TITAN", "name": "Titan Company", "category": "Retail", "price": 3350.15, "prevClose": 3350.15},
-            {"id": "ULTRACEMCO", "symbol": "ULTRACEMCO", "name": "UltraTech Cement", "category": "Manufacturing & Infra", "price": 9100.25, "prevClose": 9100.25},
-            {"id": "UPL", "symbol": "UPL", "name": "UPL Limited", "category": "Agrochemicals", "price": 605.4, "prevClose": 605.4},
-            {"id": "WIPRO", "symbol": "WIPRO", "name": "Wipro", "category": "IT & Tech", "price": 415.75, "prevClose": 415.75}
-        ];
-
-        // Combine all stocks into a single map for easy processing and deduplication
-        let combinedStocksMap = {};
-
-        // Add stocks from the existing HTML structure (if any unique ones, or for initialPrice/volatility)
-        // Note: The previous stockData in HTML was structured by category. I'm extracting them here.
-        [
+        // Mock Stock Data (Updated with missing names/symbols)
+        let stockData = [
             {
                 category: "Finance",
                 stocks: [
@@ -1263,7 +1063,7 @@
                 stocks: [
                     { id: "TCS", name: "Tata Consultancy Services", symbol: "TCS", price: 3480.00, initialPrice: 3480.00, volatility: 0.017 },
                     { id: "INFY", name: "Infosys", symbol: "INFY", price: 1425.00, initialPrice: 1425.00, volatility: 0.02 },
-                    { id: "WIPRO", name: "WIPRO", price: 410.50, initialPrice: 410.50, volatility: 0.025 },
+                    { id: "WIPRO", name: "WIPRO", symbol: "WIPRO", price: 410.50, initialPrice: 410.50, volatility: 0.025 },
                     { id: "TECHM", name: "Tech Mahindra", symbol: "TECHM", price: 1250.00, initialPrice: 1250.00, volatility: 0.023 },
                     { id: "HCLTECH", name: "HCLTech", symbol: "HCLTECH", price: 1350.25, initialPrice: 1350.25, volatility: 0.021 },
                     { id: "TATAELXSI", name: "Tata Elxsi", symbol: "TATAELXSI", price: 8150.00, initialPrice: 8150.00, volatility: 0.035 },
@@ -1463,61 +1263,7 @@
                     { id: "MAXHEALTH", name: "Max Healthcare", symbol: "MAXHEALTH", price: 830.00, initialPrice: 830.00, volatility: 0.025 }
                 ]
             }
-        ].flatMap(cat => cat.stocks).forEach(stock => {
-            combinedStocksMap[stock.id] = {
-                ...stock,
-                initialPrice: stock.initialPrice || stock.price,
-                volatility: stock.volatility || 0.02
-            };
-        });
-
-        // Add/update from mockstock_market_state(1).json
-        marketStateStocksJSON.forEach(stock => {
-            if (combinedStocksMap[stock.id]) {
-                combinedStocksMap[stock.id].price = stock.price;
-                combinedStocksMap[stock.id].prevClose = stock.prevClose;
-                // Keep existing initialPrice and volatility
-            } else {
-                combinedStocksMap[stock.id] = {
-                    ...stock,
-                    initialPrice: stock.price,
-                    volatility: 0.02 // Default volatility
-                };
-            }
-        });
-
-        // Add/update from mockstock_nifty50_state.json
-        nifty50StocksJSON.forEach(stock => {
-            if (combinedStocksMap[stock.id]) {
-                combinedStocksMap[stock.id].price = stock.price;
-                combinedStocksMap[stock.id].prevClose = stock.prevClose;
-                // Keep existing initialPrice and volatility
-            } else {
-                combinedStocksMap[stock.id] = {
-                    ...stock,
-                    initialPrice: stock.price,
-                    volatility: 0.02 // Default volatility
-                };
-            }
-        });
-
-        // Re-structure into categories for display
-        let stockData = [];
-        let allCategories = new Set(["All"]);
-
-        Object.values(combinedStocksMap).forEach(stock => {
-            allCategories.add(stock.category);
-            let categoryObj = stockData.find(cat => cat.category === stock.category);
-            if (!categoryObj) {
-                categoryObj = { category: stock.category, stocks: [] };
-                stockData.push(categoryObj);
-            }
-            categoryObj.stocks.push(stock);
-        });
-
-        // Sort categories and stocks within categories
-        stockData.sort((a, b) => a.category.localeCompare(b.category));
-        stockData.forEach(cat => cat.stocks.sort((a, b) => a.name.localeCompare(b.name)));
+        ];
 
         // Flattened list of all stocks for easier lookup and filtering
         const allStocksFlattened = stockData.flatMap(cat => cat.stocks);
@@ -1526,7 +1272,6 @@
             map[stock.id] = stock;
             return map;
         }, {});
-
 
         // Utility function to get DOM elements
         const getEl = (id) => document.getElementById(id);
@@ -1714,7 +1459,6 @@
                 marketShockEffect = (Math.random() - 0.5) * 0.08;
             }
 
-            // Update prices directly in the stockMap
             for (const stockId in stockMap) {
                 const stock = stockMap[stockId];
                 const oldPrice = stock.price; // Keep old price for change calculation
@@ -1728,7 +1472,7 @@
                     stock.price = 1; 
                 }
             }
-            // No return needed as stockMap is updated by reference
+            return Object.values(stockMap);
         }
 
         async function updatePrices() {
@@ -1834,8 +1578,8 @@
             getEl('modal-message').textContent = '';
             
             const sharesOwnedEl = getEl('modal-shares-owned');
-            const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
             if (type === 'sell') {
+                const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
                 sharesOwnedEl.textContent = holding ? `You own: ${holding.quantity} shares` : 'You own: 0 shares';
                 sharesOwnedEl.classList.remove('hidden');
             } else {
@@ -1954,7 +1698,6 @@
             if (transactionSuccess) {
                 saveUserData(currentUserId); // Save updated portfolio to localStorage
                 updatePortfolioDisplay();
-                renderTransactionHistory(); // Update transaction history after trade
                 // Re-render only the active view
                 const isTradingViewActive = !document.getElementById('trading-section').classList.contains('hidden');
                 renderStockCards(currentFilter, isTradingViewActive);
@@ -2055,21 +1798,6 @@
                         </span>
                     </div>
             `;
-            
-            if (hasHoldings) {
-                cardHtml += `
-                    <div class="text-sm text-gray-600 mt-1 mb-2">
-                        You own: ${holding.quantity} shares (Avg: ₹${holding.averagePrice.toFixed(2)})
-                    </div>
-                `;
-            } else if (isTradingView) { // Add a placeholder if it's trading view but no holdings
-                cardHtml += `
-                    <div class="text-sm text-gray-600 mt-1 mb-2" style="min-height: 1.25rem;">
-                        <!-- Placeholder for holding info -->
-                    </div>
-                `;
-            }
-
 
             if (isTradingView) {
                 cardHtml += `
@@ -2143,7 +1871,6 @@
                                     currentPortfolio.holdings = currentPortfolio.holdings.filter(h => h.stockId !== stock.id);
                                     saveUserData(currentUserId);
                                     updatePortfolioDisplay();
-                                    renderTransactionHistory(); // Update transaction history after trade
                                     renderStockCards(currentFilter, true); // Re-render to update UI
                                 }
                             });
@@ -2178,40 +1905,6 @@
                 filterContainerEl.appendChild(button);
             });
         }
-
-        function renderTransactionHistory() {
-            const transactionListEl = getEl('transaction-list');
-            transactionListEl.innerHTML = ''; // Clear existing list
-
-            if (currentPortfolio.transactions.length === 0) {
-                transactionListEl.innerHTML = `<p style="text-align: center; padding: 1rem; color: var(--dark-text);">No transactions yet.</p>`;
-                return;
-            }
-
-            // Sort transactions by timestamp, newest first
-            const sortedTransactions = [...currentPortfolio.transactions].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            sortedTransactions.forEach(transaction => {
-                const stock = stockMap[transaction.stockId];
-                if (!stock) return; // Skip if stock data is missing
-
-                const transactionDate = new Date(transaction.timestamp).toLocaleString();
-                const transactionTypeClass = transaction.type === 'buy' ? 'buy' : 'sell';
-
-                const transactionItemHtml = `
-                    <li class="transaction-item ${transactionTypeClass}">
-                        <div class="transaction-details">
-                            <div class="transaction-type">${transaction.type.toUpperCase()}</div>
-                            <div class="transaction-stock">${stock.name} (${stock.symbol})</div>
-                            <div class="transaction-qty-price">${transaction.quantity} shares @ ₹${transaction.price.toFixed(2)}</div>
-                        </div>
-                        <div class="transaction-timestamp">${transactionDate}</div>
-                    </li>
-                `;
-                transactionListEl.insertAdjacentHTML('beforeend', transactionItemHtml);
-            });
-        }
-
 
         function exportPortfolioToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
@@ -2250,19 +1943,14 @@
 
             // Check for existing logged-in user or show login page
             const storedUserId = localStorage.getItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
-            // If a storedUserId exists AND it's NOT a guest ID, then load that user's data
-            if (storedUserId && !storedUserId.startsWith('guest_')) {
+            if (storedUserId) {
                 currentUserId = storedUserId;
                 getEl('user-id-display-text').textContent = currentUserId;
                 loadUserData(currentUserId);
-                showPage('role-selection-page'); // Go to role selection if a registered user exists
+                showPage('role-selection-page'); // Go to role selection if user exists
             } else {
-                // If no user is logged in, or if it's a guest session, show the login page
+                // If no user is logged in, show the login page
                 showPage('login-page');
-                // Importantly, clear any old guest ID from local storage so it doesn't persist across sessions
-                if (storedUserId && storedUserId.startsWith('guest_')) {
-                    localStorage.removeItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
-                }
             }
             
             // Auth Page Navigation
@@ -2279,7 +1967,6 @@
                 renderFilterButtons(true); // Render for trader view
                 renderStockCards(currentFilter, true); // Render for trader view
                 updatePortfolioDisplay();
-                renderTransactionHistory(); // Render transactions on entering trader view
                 startPriceUpdates();
             };
             getEl('enter-as-viewer').onclick = () => {

@@ -1,4 +1,3 @@
-// supervisor.go
 package main
 
 import (
@@ -20,7 +19,7 @@ const (
 	shutdownTimeout = 8 * time.Second
 	logFile         = "worker.log"
 	jsonFile        = "prices.json"
-	healthTimeout   = 30 * time.Second // restart if JSON stale
+	healthTimeout   = 30 * time.Second // restart if JSON is stale
 )
 
 func fileExists(path string) bool {

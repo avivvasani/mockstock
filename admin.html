@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashoka Mock-Stock Admin Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Ashoka Universal School Theme Colors - Light Mode */
+        :root {
+            --primary-green: #006400; /* A deep, rich green */
+            --golden-yellow: #FFD700; /* Bright, golden yellow */
+            --light-background: #F8F8F0; /* Off-white, like paper */
+            --white-card-background: #ffffff; /* Pure white for main cards */
+            --dark-text: #333333; /* Dark gray for readability */
+            --light-border: #E0E0E0; /* Light gray border */
+            --positive-color: #28a745; /* Standard green for positive change */
+            --negative-color: #dc3545; /* Standard red for negative change */
+            --font-family: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--light-background);
+            color: var(--dark-text);
+        }
+        .admin-card {
+            background-color: var(--white-card-background);
+            border: 1px solid var(--light-border);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .admin-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .trend-up {
+            background-color: var(--positive-color);
+            color: white;
+        }
+        .trend-down {
+            background-color: var(--negative-color);
+            color: white;
+        }
+        .trend-none, .trend-manual {
+            background-color: #6c757d; /* Gray for neutral/manual */
+            color: white;
+        }
+        .trend-status {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .btn-up {
+            background-color: var(--positive-color);
+            color: white;
+            transition: background-color 0.15s, transform 0.1s;
+        }
+        .btn-down {
+            background-color: var(--negative-color);
+            color: white;
+            transition: background-color 0.15s, transform 0.1s;
+        }
+        .btn-up:hover, .btn-down:hover {
+            transform: scale(1.02);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-extrabold mb-3" style="color: var(--primary-green);">
+                Category Trend Override
+            </h1>
+            <p class="text-xl" style="color: var(--dark-text);">Control the category sentiment for 60 seconds.</p>
+        </header>
+
+        <!-- Message Area -->
+        <div id="message-area" class="hidden p-4 rounded-lg font-semibold text-center mb-8 transition duration-300" role="alert"></div>
+        
+        <!-- Loading Spinner -->
+        <div id="loading-message" class="text-center py-20">
+            <svg class="animate-spin h-8 w-8 mx-auto" style="color: var(--golden-yellow);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-3" style="color: var(--dark-text);">Connecting to server...</p>
+        </div>
+
+        <!-- Category Controls Grid -->
+        <div id="category-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards will be injected here by admin.js -->
+        </div>
+
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

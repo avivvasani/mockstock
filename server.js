@@ -4,15 +4,13 @@ import axios from "axios";
 import fs from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
-import { stockData } from "./stockData.js"; // Corrected import name
+import { stockData } from "./stockData.js"; // File import name
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = 5000;
-// NOTE: I've commented out the API key and Axios call for a mock environment.
-// const FINNHUB_API_KEY = "d3qgcvpr01quv7kao2kgd3qgcvpr01quv7kao2l0"; 
 
 app.use(cors());
 app.use(express.json());
@@ -33,9 +31,9 @@ let categoryTrends = {};
 let stockPressure = {}; 
 
 // --- Initial User Balance ---
-const INITIAL_BALANCE_INR = 1000000.00; // ₹1,000,000 as requested
+const INITIAL_BALANCE_INR = 1000000.00;
 
-// 🕒 Mock USD→INR rate update (remove if using actual API)
+// 🕒 Mock USD→INR rate update (remove if using using actual API)
 // async function updateUSDINR() {
 //   try {
 //     const res = await axios.get(

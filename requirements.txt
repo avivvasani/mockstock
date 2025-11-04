@@ -1,0 +1,3 @@
+yfinance
+Flask
+pandas

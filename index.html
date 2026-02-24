@@ -409,7 +409,7 @@
             transform: translateY(-2px);
         }
 
-        /* Login/Register Page Styles */
+        /* Login Page Styles */
         .auth-container {
             display: flex;
             flex-direction: column;
@@ -859,10 +859,6 @@
             <div class="right-group">
                 <button id="export-portfolio-button" class="export-btn">Export Portfolio</button>
                 <button id="logout-button" class="nav-button bg-red-500 text-white hover:bg-red-600">Logout</button>
-                <button id="theme-toggle" class="theme-toggle-button">
-                    <span id="theme-icon">☀</span>
-                    <span id="theme-text">Light Mode</span>
-                </button>
             </div>
         </div>
 
@@ -880,7 +876,6 @@
                 </div>
                 <button id="login-button" class="auth-button">Login</button>
                 <p id="login-error" class="error-message"></p>
-                <p class="auth-message">Don't have an account? <a href="#" id="go-to-register">Register here</a></p>
                 <p class="auth-message">Or <a href="#" id="anonymous-sign-in">Continue as Guest</a></p>
             </div>
         </div>
@@ -903,25 +898,13 @@
             </div>
         </div>
 
-        <!-- Role Selection Page -->
-        <div id="role-selection-page" class="role-selection-container hidden">
-            <div class="role-selection-card">
-                <h2>Select Your Role</h2>
-                <p class="intro-text">Choose how you want to participate in the Mock-Stock Competition.</p>
-                <div class="role-buttons-group">
-                    <button id="enter-as-trader" class="role-button trader">Enter as Trader</button>
-                    <button id="enter-as-viewer" class="role-button viewer">Enter as Viewer</button>
-                </div>
-            </div>
-        </div>
-
         <!-- Trading (Buying/Selling) Section - Default View -->
         <div id="trading-section" class="container hidden">
             <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
-                Ashoka Universal School <br/> Mock-Stock Competition (Trader)
+                Ashoka Universal School <br/> Mock-Stock Competition
             </h1>
             <p class="intro-text">
-                Welcome to the Live Mock-Stock Market Trader for the Ashoka Universal School Mock-Stock Competition!
+                Welcome to the Live Mock-Stock Market for the Ashoka Universal School Mock-Stock Competition!
                 Prices update every 3 seconds!
             </p>
 
@@ -1014,869 +997,404 @@
 
     <script>
         // --- Constants and Global State ---
-        const API_URL = '/api/prices'; // The API endpoint from your Flask server
+        const API_URL = '/api/prices'; 
         const LOCAL_STORAGE_CURRENT_USER_ID_KEY = 'mockStockCurrentUserId';
         const LOCAL_STORAGE_USERS_KEY = 'mockStockUsers';
         const LOCAL_STORAGE_WATCHLIST_PREFIX = 'mockStockWatchlist_';
         const LOCAL_STORAGE_PORTFOLIO_PREFIX = 'mockStockPortfolio_';
         const LOCAL_STORAGE_THEME_KEY = 'mockStockTheme';
-        
+
         let currentUserId = null;
         let currentWatchlist = [];
-        let currentPortfolio = { cashBalance: 100000, holdings: [], transactions: [] }; 
-        let currentFilter = "All"; // For stock categories
+        // Tracks balance, holdings, transaction history, and total realized profit/loss
+        let currentPortfolio = { cashBalance: 100000, holdings: [], transactions: [], realizedPL: 0 }; 
+        let currentFilter = "All"; 
         let updatePricesIntervalId = null;
-        
-        // --- Stock Data: We only need static metadata now, prices come from the API ---
-        // This structure maps category -> [ {id, name, symbol}, ... ]
-        // It should match the structure used in your fetcher.py's STOCKS_BY_CATEGORY
-        // 1. Define the raw structure from your Go backend
+
         const RAW_STOCKS_MAP = {
-           	"Auto Ancillaries":                    ["BHARATFORG", "CIEINDIA", "CRAFTSMAN", "ENDURANCE", "EXIDEIND", "FIEMIND", "GABRIEL", "JAMNAAUTO", "LUMAXIND", "RKFORGE", "SONACOMS", "SUBROS", "SUPRAJIT", "TALBROS", "UNOMINDA", "VARROC"],
-            "Automobiles - OEMs":                  ["SHOKLEY", "BAJAJ-AUTO", "EICHERMOT", "FORCEMOT", "HEROMOTOCO", "M&M", "MARUTI", "OLECTRA", "TVSMOTOR"],
-            "Banking":                             ["AXISBANK", "BANDHANBNK", "CSBBANK", "CUB", "DCBBANK", "DHANBANK", "ESAFSFB", "FEDERALBNK", "HDFCBANK", "ICICIBANK", "IDFCFIRSTB", "INDUSINDBK", "J&KBANK", "KARURVYSYA", "KOTAKBANK", "RBLBANK", "SOUTHBANK", "SURYODAY", "UTKARSHBNK", "YESBANK", "BANKBARODA", "BANKINDIA", "CANBK", "CENTRALBK", "IDBI", "INDIANB", "IOB", "MAHABANK", "PNB", "PSB", "SBIN", "UCOBANK", "UNIONBANK"],
-            "Beverages & Distilleries":            ["ASAL", "GLOBUSSPR", "RADICO", "SULA", "TI", "UBL", "VBL"],
-            "Capital Goods & Industrial":          ["ABB", "AIAENG", "BHEL", "CUMMINSIND", "DIXON", "ELGIEQUIP", "HAVELLS", "KEI", "KIRLOSENG", "LT", "POLYCAB", "SIEMENS", "SKFINDIA", "THERMAX", "TRITURBINE", "VOLTAS"],
-            "Cement & Building Materials":         ["ACC", "AMBUJACEM", "DALBHARAT", "HEIDELBERG", "INDIACEM", "JKCEMENT", "ORIENTCEM", "PRSMJOHNSN", "RAMCOCEM", "SAGCEM", "SHREECEM", "STARCEMENT", "ULTRACEMCO"],
-            "Chemicals":                           ["BAYERCROP", "CHAMBLFERT", "COROMANDEL", "FACT", "GNFC", "GSFC", "KAVERI", "MADRASFERT", "RCF", "SHARDACROP", "SPIC", "UPL", "AARTIIND", "ATUL", "CLEAN", "DEEPAKNTR", "FINEORG", "FLUOROCHEM", "GUJALKALI", "NAVINFLUOR", "NOCIL", "PIIND", "ROSSARI", "SRF", "SUDARSCHEM", "SUMICHEM", "TATACHEM", "VINATIORGA"],
-            "Construction & Infrastructure":       ["ASHOKA", "ENGINERSIN", "GPIL", "KNRCON", "NBCC", "NCC", "PATELENG", "PNCINFRA", "RKEC"],
-            "Consumer D&E":                        ["AMBER", "BAJAJELEC", "BLUESTARCO", "CROMPTON", "DIXON", "KAYNES", "ORIENTELEC", "SYRMA", "WHIRLPOOL"],
-            "Consumer R&S":                        ["ABFRL", "DELHIVERY", "DMART", "ETHOSLTD", "HONASA", "KALYANKJIL", "MAPMYINDIA", "NYKAA", "PAYTM", "POLICYBZR", "SENCO", "TITAN", "TRENT"],
-            "Defense & Shipbuilding":              ["ASTRAZEN", "BDL", "BEL", "BEML", "COCHINSHIP", "DCXINDIA", "GRSE", "HAL", "IDEAFORGE", "MAZDOCK", "MTARTECH", "PARAS"],
-            "Energy":                              ["BPCL", "CHENNPETRO", "CONFIPET", "GAIL", "GSPL", "GUJGASLTD", "GULFPETRO", "HINDPETRO", "IGL", "IOC", "MGL", "MRPL", "OIL", "ONGC", "PETRONET", "ADANIGREEN", "ADANIPOWER", "BORORENEW", "GENSOL", "GREENPANEL", "IREDA", "JPPOWER", "JSWENERGY", "NHPC", "NTPC", "POWERGRID", "SJVN", "SUZLON", "TATAPOWER", "TORNTPOWER"],
-            "FMCG":                                ["AWL", "BRITANNIA", "COLPAL", "DABUR", "DODLA", "GODREJCP", "HATSUN", "HERITGFOOD", "HINDUNILVR", "ITC", "JYOTHYLAB", "MARICO", "NESTLEIND", "PGHH", "TATACONSUM", "VIJAYA"],
-            "Finance":                             ["5PAISA", "AAVAS", "ANGELONE", "BAJAJFINSV", "BAJFINANCE", "CANFINHOME", "CHOLAFIN", "CREDITACC", "GEOJITFSL", "HOMEFIRST", "HUDCO", "IFCI", "IREDA", "LICHSGFIN", "M&MFIN", "MANAPPURAM", "MASFIN", "MUTHOOTFIN", "PFC", "POONAWALLA", "RECLTD", "SATIN", "SHRIRAMFIN", "UFLEX", "ABSLAMC", "BSE", "CAMS", "CDSL", "GICRE", "HDFCAMC", "HDFCLIFE", "ICICIGI", "ICICIPRULI", "IEX", "KFINTECH", "MCX", "NAM-INDIA", "NIACL", "SBILIFE", "UTIAMC"],
-            "Healthcare & Diagnostics":            ["APOLLOHOSP", "ASTERDM", "FORTIS", "GLOBAL", "KIMS", "LALPATHLAB", "MAXHEALTH", "MEDANTA", "METROPOLIS", "RAINBOW", "SHALBY", "THYROCARE", "VIJAYA"],
-            "Hospitality & Tourism":               ["CHALET", "EASEMYTRIP", "EIHOTEL", "INDHOTEL", "ITDC", "LEMONTREE", "SPECIALITY", "TAJGVK"],
-            "IT - SmallCap & Specialized":         ["63MOONS", "DATARELI", "DSSL", "HAPPSTMNDS", "INTELLECT", "KELLTONTEC", "NELCO", "NETWEB", "NEWGEN", "RAMCOSYS", "ROUTE", "SAKSOFT", "TANLA", "VALIANTORG"],
-            "IT - Tier 1 & 2":                     ["BSOFT", "COFORGE", "CYIENT", "HCLTECH", "INFY", "KPITTECH", "LTIM", "LTTS", "MASTEK", "MPHASIS", "OFSS", "PERSISTENT", "SONATSOFTW", "TATAELXSI", "TCS", "TECHM", "WIPRO", "ZENSARTECH"],
-            "Metals":                              ["APLAPOLLO", "ELECTCAST", "JINDALSTEL", "JSL", "JSWSTEEL", "RATNAMANI", "SAIL", "SUNFLAG", "TATASTEEL", "WELCORP", "COALINDIA", "GMDC", "HINDALCO", "HINDCOPPER", "HINDZINC", "KIOCL", "MIDHANI", "MOIL", "NATIONALUM", "NMDC", "VEDL"],
-            "Pharmaceuticals":                     ["ABBOTINDIA", "ALKEM", "AUROPHARMA", "BIOCON", "CIPLA", "DIVISLAB", "DRREDDY", "ERIS", "GLAND", "GLAXO", "GRANULES", "IPCALAB", "JBCHEPHARM", "LAURUSLABS", "LUPIN", "MANKIND", "MARKSANS", "NATCOPHARM", "SUNPHARMA", "TORNTPHARM", "ZYDUSLIFE"],
-            "Railways & Logistics":                ["ALLCARGO", "BLUEDART", "CONCOR", "DELHIVERY", "GATEWAY", "IRB", "IRCON", "IRFC", "JWL", "KEC", "RAILTEL", "RITES", "RVNL", "TCI", "TEXRAIL", "TITAGARH"],
-            "Real Estate":                         ["AJMERA", "BRIGADE", "DLF", "GODREJPROP", "IBREALEST", "LODHA", "MAHLIFE", "OBEROIRLTY", "PHOENIXLTD", "PRESTIGE", "PURVA", "SOBHA", "SUNTECK"],
-            "Sugar & Agriculture":                 ["AVADHSUGAR", "BALRAMCHIN", "BANARISUG", "DALMIASUG", "DHAMPURSUG", "EIDPARRY", "RENUKA", "TRIVENI"],
-            "Telecom & Media":                     ["BHARTIARTL", "GTLINFRA", "HFCL", "IDEA", "INDUSTOWER", "ITI", "NETWORK18", "PVRINOX", "SAREGAMA", "SUNTV", "TIPSMUSIC", "ZEEL"],
-            "Textiles & Apparels":                 ["ARVIND", "FILATEX", "GOKEX", "KPRMILL", "LUXIND", "NITINSPIN", "PAGEIND", "RAYMOND", "RUPA", "SANGAMIND", "TRIDENT"],
-            "Tyres & Rubber":                      ["APOLLOTYRE", "CEATLTD", "GOODYEAR", "JKTYRE", "MRF", "TVSSRICHAK"],
-    }
+            "Auto Ancillaries": ["BHARATFORG", "CIEINDIA", "CRAFTSMAN", "ENDURANCE", "EXIDEIND", "FIEMIND", "GABRIEL", "JAMNAAUTO", "LUMAXIND", "RKFORGE", "SONACOMS", "SUBROS", "SUPRAJIT", "TALBROS", "UNOMINDA", "VARROC"],
+            "Automobiles - OEMs": ["SHOKLEY", "BAJAJ-AUTO", "EICHERMOT", "FORCEMOT", "HEROMOTOCO", "M&M", "MARUTI", "OLECTRA", "TVSMOTOR"],
+            "Banking": ["AXISBANK", "BANDHANBNK", "CSBBANK", "CUB", "DCBBANK", "DHANBANK", "ESAFSFB", "FEDERALBNK", "HDFCBANK", "ICICIBANK", "IDFCFIRSTB", "INDUSINDBK", "J&KBANK", "KARURVYSYA", "KOTAKBANK", "RBLBANK", "SOUTHBANK", "SURYODAY", "UTKARSHBNK", "YESBANK", "BANKBARODA", "BANKINDIA", "CANBK", "CENTRALBK", "IDBI", "INDIANB", "IOB", "MAHABANK", "PNB", "PSB", "SBIN", "UCOBANK", "UNIONBANK"],
+            "Beverages & Distilleries": ["ASAL", "GLOBUSSPR", "RADICO", "SULA", "TI", "UBL", "VBL"],
+            "Capital Goods & Industrial": ["ABB", "AIAENG", "BHEL", "CUMMINSIND", "DIXON", "ELGIEQUIP", "HAVELLS", "KEI", "KIRLOSENG", "LT", "POLYCAB", "SIEMENS", "SKFINDIA", "THERMAX", "TRITURBINE", "VOLTAS"],
+            "Cement & Building Materials": ["ACC", "AMBUJACEM", "DALBHARAT", "HEIDELBERG", "INDIACEM", "JKCEMENT", "ORIENTCEM", "PRSMJOHNSN", "RAMCOCEM", "SAGCEM", "SHREECEM", "STARCEMENT", "ULTRACEMCO"],
+            "Chemicals": ["BAYERCROP", "CHAMBLFERT", "COROMANDEL", "FACT", "GNFC", "GSFC", "KAVERI", "MADRASFERT", "RCF", "SHARDACROP", "SPIC", "UPL", "AARTIIND", "ATUL", "CLEAN", "DEEPAKNTR", "FINEORG", "FLUOROCHEM", "GUJALKALI", "NAVINFLUOR", "NOCIL", "PIIND", "ROSSARI", "SRF", "SUDARSCHEM", "SUMICHEM", "TATACHEM", "VINATIORGA"],
+            "Construction & Infrastructure": ["ASHOKA", "ENGINERSIN", "GPIL", "KNRCON", "NBCC", "NCC", "PATELENG", "PNCINFRA", "RKEC"],
+            "Consumer D&E": ["AMBER", "BAJAJELEC", "BLUESTARCO", "CROMPTON", "DIXON", "KAYNES", "ORIENTELEC", "SYRMA", "WHIRLPOOL"],
+            "Consumer R&S": ["ABFRL", "DELHIVERY", "DMART", "ETHOSLTD", "HONASA", "KALYANKJIL", "MAPMYINDIA", "NYKAA", "PAYTM", "POLICYBZR", "SENCO", "TITAN", "TRENT"],
+            "Defense & Shipbuilding": ["ASTRAZEN", "BDL", "BEL", "BEML", "COCHINSHIP", "DCXINDIA", "GRSE", "HAL", "IDEAFORGE", "MAZDOCK", "MTARTECH", "PARAS"],
+            "Energy": ["BPCL", "CHENNPETRO", "CONFIPET", "GAIL", "GSPL", "GUJGASLTD", "GULFPETRO", "HINDPETRO", "IGL", "IOC", "MGL", "MRPL", "OIL", "ONGC", "PETRONET", "ADANIGREEN", "ADANIPOWER", "BORORENEW", "GENSOL", "GREENPANEL", "IREDA", "JPPOWER", "JSWENERGY", "NHPC", "NTPC", "POWERGRID", "SJVN", "SUZLON", "TATAPOWER", "TORNTPOWER"],
+            "FMCG": ["AWL", "BRITANNIA", "COLPAL", "DABUR", "DODLA", "GODREJCP", "HATSUN", "HERITGFOOD", "HINDUNILVR", "ITC", "JYOTHYLAB", "MARICO", "NESTLEIND", "PGHH", "TATACONSUM", "VIJAYA"],
+            "Finance": ["5PAISA", "AAVAS", "ANGELONE", "BAJAJFINSV", "BAJFINANCE", "CANFINHOME", "CHOLAFIN", "CREDITACC", "GEOJITFSL", "HOMEFIRST", "HUDCO", "IFCI", "IREDA", "LICHSGFIN", "M&MFIN", "MANAPPURAM", "MASFIN", "MUTHOOTFIN", "PFC", "POONAWALLA", "RECLTD", "SATIN", "SHRIRAMFIN", "UFLEX", "ABSLAMC", "BSE", "CAMS", "CDSL", "GICRE", "HDFCAMC", "HDFCLIFE", "ICICIGI", "ICICIPRULI", "IEX", "KFINTECH", "MCX", "NAM-INDIA", "NIACL", "SBILIFE", "UTIAMC"],
+            "Healthcare & Diagnostics": ["APOLLOHOSP", "ASTERDM", "FORTIS", "GLOBAL", "KIMS", "LALPATHLAB", "MAXHEALTH", "MEDANTA", "METROPOLIS", "RAINBOW", "SHALBY", "THYROCARE", "VIJAYA"],
+            "Hospitality & Tourism": ["CHALET", "EASEMYTRIP", "EIHOTEL", "INDHOTEL", "ITDC", "LEMONTREE", "SPECIALITY", "TAJGVK"],
+            "IT - SmallCap & Specialized": ["63MOONS", "DATARELI", "DSSL", "HAPPSTMNDS", "INTELLECT", "KELLTONTEC", "NELCO", "NETWEB", "NEWGEN", "RAMCOSYS", "ROUTE", "SAKSOFT", "TANLA", "VALIANTORG"],
+            "IT - Tier 1 & 2": ["BSOFT", "COFORGE", "CYIENT", "HCLTECH", "INFY", "KPITTECH", "LTIM", "LTTS", "MASTEK", "MPHASIS", "OFSS", "PERSISTENT", "SONATSOFTW", "TATAELXSI", "TCS", "TECHM", "WIPRO", "ZENSARTECH"],
+            "Metals": ["APLAPOLLO", "ELECTCAST", "JINDALSTEL", "JSL", "JSWSTEEL", "RATNAMANI", "SAIL", "SUNFLAG", "TATASTEEL", "WELCORP", "COALINDIA", "GMDC", "HINDALCO", "HINDCOPPER", "HINDZINC", "KIOCL", "MIDHANI", "MOIL", "NATIONALUM", "NMDC", "VEDL"],
+            "Pharmaceuticals": ["ABBOTINDIA", "ALKEM", "AUROPHARMA", "BIOCON", "CIPLA", "DIVISLAB", "DRREDDY", "ERIS", "GLAND", "GLAXO", "GRANULES", "IPCALAB", "JBCHEPHARM", "LAURUSLABS", "LUPIN", "MANKIND", "MARKSANS", "NATCOPHARM", "SUNPHARMA", "TORNTPHARM", "ZYDUSLIFE"],
+            "Railways & Logistics": ["ALLCARGO", "BLUEDART", "CONCOR", "DELHIVERY", "GATEWAY", "IRB", "IRCON", "IRFC", "JWL", "KEC", "RAILTEL", "RITES", "RVNL", "TCI", "TEXRAIL", "TITAGARH"],
+            "Real Estate": ["AJMERA", "BRIGADE", "DLF", "GODREJPROP", "IBREALEST", "LODHA", "MAHLIFE", "OBEROIRLTY", "PHOENIXLTD", "PRESTIGE", "PURVA", "SOBHA", "SUNTECK"],
+            "Sugar & Agriculture": ["AVADHSUGAR", "BALRAMCHIN", "BANARISUG", "DALMIASUG", "DHAMPURSUG", "EIDPARRY", "RENUKA", "TRIVENI"],
+            "Telecom & Media": ["BHARTIARTL", "GTLINFRA", "HFCL", "IDEA", "INDUSTOWER", "ITI", "NETWORK18", "PVRINOX", "SAREGAMA", "SUNTV", "TIPSMUSIC", "ZEEL"],
+            "Textiles & Apparels": ["ARVIND", "FILATEX", "GOKEX", "KPRMILL", "LUXIND", "NITINSPIN", "PAGEIND", "RAYMOND", "RUPA", "SANGAMIND", "TRIDENT"],
+            "Tyres & Rubber": ["APOLLOTYRE", "CEATLTD", "GOODYEAR", "JKTYRE", "MRF", "TVSSRICHAK"],
+        };
 
-        // 2. Programmatically generate the STOCK_METADATA_BY_CATEGORY
         const STOCK_METADATA_BY_CATEGORY = {};
-
-        Object.entries(RAW_STOCKS_MAP).forEach(([category, symbols]) => {
-            STOCK_METADATA_BY_CATEGORY[category] = symbols.map(sym => ({
-                id: sym,
-                symbol: sym,
-                // If you don't have the full name, the symbol is displayed as the name
-                name: sym.replace(/-(.)/g, ' $1') 
-            }));
-        });
-
-        // Flattened list and map initialized from static metadata
         let allStocksFlattened = [];
         let stockMap = {};
-        let firstLoad = true; // Flag to track the very first price fetch
+        let firstLoad = true;
 
-        // Initialize the stocks structure with static metadata
-        for (const category in STOCK_METADATA_BY_CATEGORY) {
-            STOCK_METADATA_BY_CATEGORY[category].forEach(stock => {
-                // Initialize dynamic properties for real-time tracking
-                stock.category = category;
-                stock.price = 0.00;
-                stock.initialPrice = 0.00;
-                
+        Object.entries(RAW_STOCKS_MAP).forEach(([category, symbols]) => {
+            STOCK_METADATA_BY_CATEGORY[category] = symbols.map(sym => {
+                const stock = {
+                    id: sym,
+                    symbol: sym,
+                    name: sym.replace(/-(.)/g, ' $1'),
+                    category: category,
+                    price: 0.00,
+                    initialPrice: 0.00
+                };
                 allStocksFlattened.push(stock);
-                stockMap[stock.id] = stock;
+                stockMap[sym] = stock;
+                return stock;
             });
-        }
-        
-        // Utility function to get DOM elements
+        });
+
         const getEl = (id) => document.getElementById(id);
 
-        // --- Local Storage Functions (No Change) ---
-        function loadUsers() {
-            try {
-                return JSON.parse(localStorage.getItem(LOCAL_STORAGE_USERS_KEY)) || {};
-            } catch (e) {
-                console.error("Error loading users from localStorage:", e);
-                return {};
-            }
-        }
-        
-        function saveUsers(users) {
-            try {
-                localStorage.setItem(LOCAL_STORAGE_USERS_KEY, JSON.stringify(users));
-            } catch (e) {
-                console.error("Error saving users to localStorage:", e);
-            }
-        }
+        // --- Local Storage & User Data ---
+        function loadUsers() { try { return JSON.parse(localStorage.getItem(LOCAL_STORAGE_USERS_KEY)) || {}; } catch (e) { return {}; } }
+        function saveUsers(users) { localStorage.setItem(LOCAL_STORAGE_USERS_KEY, JSON.stringify(users)); }
         
         function loadUserData(userId) {
             try {
-                const loadedWatchlist = JSON.parse(localStorage.getItem(LOCAL_STORAGE_WATCHLIST_PREFIX + userId));
-                if (loadedWatchlist) {
-                    currentWatchlist = loadedWatchlist;
+                const wl = JSON.parse(localStorage.getItem(LOCAL_STORAGE_WATCHLIST_PREFIX + userId));
+                if (wl) currentWatchlist = wl;
+                const pf = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + userId));
+                if (pf) {
+                    currentPortfolio = { ...currentPortfolio, ...pf };
+                    if (!currentPortfolio.realizedPL) currentPortfolio.realizedPL = 0;
                 }
-                
-                const loadedPortfolio = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + userId));
-                if (loadedPortfolio) {
-                    // Merge loaded data with defaults to ensure all keys exist
-                    currentPortfolio = { ...currentPortfolio, ...loadedPortfolio };
-                }
-            } catch (e) {
-                console.error(`Error loading data for user ${userId} from localStorage:`, e);
-            }
+            } catch (e) { console.error("Error loading data", e); }
         }
-        
+
         function saveUserData(userId) {
+            localStorage.setItem(LOCAL_STORAGE_WATCHLIST_PREFIX + userId, JSON.stringify(currentWatchlist));
+            localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + userId, JSON.stringify(currentPortfolio));
+        }
+
+        // --- Auth & Navigation (Direct to Trader) ---
+        async function handleLogin() {
+            const u = getEl('login-username').value;
+            const p = getEl('login-password').value;
+
             try {
-                localStorage.setItem(LOCAL_STORAGE_WATCHLIST_PREFIX + userId, JSON.stringify(currentWatchlist));
-                localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + userId, JSON.stringify(currentPortfolio));
-            } catch (e) {
-                console.error(`Error saving data for user ${userId} to localStorage:`, e);
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 1. CLEAR PREVIOUS DATA: Wipe localStorage and reset variables
+                    localStorage.clear(); 
+                    currentPortfolio = { cashBalance: 100000, holdings: [], transactions: [], realizedPL: 0 };
+                    currentWatchlist = [];
+
+                    // 2. SET NEW SESSION
+                    currentUserId = u;
+                    localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, u);
+                    
+                    // 3. LOAD DATA (Will start fresh if no previous data for this exact user)
+                    loadUserData(u); 
+                    showPage('trading-section');
+                    updateUI(); // Ensure UI reflects the fresh $100,000 balance
+                } else {
+                    getEl('login-error').textContent = result.message;
+                }
+            } catch (error) {
+                getEl('login-error').textContent = 'Cannot connect to server.';
             }
         }
 
-        // --- Auth Functions (No Change) ---
-        function handleLogin() {
-            const loginUsername = getEl('login-username').value;
-            const loginPassword = getEl('login-password').value;
-            const loginErrorEl = getEl('login-error');
-            loginErrorEl.textContent = '';
-            if (!loginUsername || !loginPassword) {
-                loginErrorEl.textContent = 'Please enter both username and password.';
-                return;
-            }
-            
-            const users = loadUsers();
-            if (users[loginUsername] && users[loginUsername].password === loginPassword) {
-                currentUserId = loginUsername; // Use username as ID for simplicity
-                localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
-                loadUserData(currentUserId);
-                showPage('role-selection-page'); // Go to role selection after login
-            } else {
-                loginErrorEl.textContent = 'Invalid username or password.';
-            }
-        }
-        
-        function handleRegister() {
-            const registerUsername = getEl('register-username').value;
-            const registerPassword = getEl('register-password').value;
-            const registerErrorEl = getEl('register-error');
-            registerErrorEl.textContent = '';
-            
-            if (!registerUsername || !registerPassword) {
-                registerErrorEl.textContent = 'Please fill in all fields.';
-                return;
-            }
-            if (registerPassword.length < 6) {
-                registerErrorEl.textContent = 'Password should be at least 6 characters.';
-                return;
-            }
-            
-            const users = loadUsers();
-            if (users[registerUsername]) {
-                registerErrorEl.textContent = 'This username is already taken. Please choose another.';
-                return;
-            }
-            
-            users[registerUsername] = { password: registerPassword }; // Store password directly (insecure for real apps)
-            saveUsers(users);
-            
-            // Automatically log in the newly registered user
-            currentUserId = registerUsername;
-            localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
-            
-            // Initialize empty watchlist and default portfolio for the new user, including transactions
-            localStorage.setItem(LOCAL_STORAGE_WATCHLIST_PREFIX + currentUserId, JSON.stringify([]));
-            localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + currentUserId, JSON.stringify({ cashBalance: 100000, holdings: [], transactions: [] }));
-            
-            showPage('role-selection-page');
-        }
-        
         function handleAnonymousSignIn() {
-            currentUserId = 'guest_user_' + Date.now();
+            currentUserId = 'guest_' + Date.now();
             localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY, currentUserId);
-            // Initialize guest user data
-            localStorage.setItem(LOCAL_STORAGE_WATCHLIST_PREFIX + currentUserId, JSON.stringify([]));
-            localStorage.setItem(LOCAL_STORAGE_PORTFOLIO_PREFIX + currentUserId, JSON.stringify({ cashBalance: 100000, holdings: [], transactions: [] }));
-            loadUserData(currentUserId);
-            // Guest users are auto-set as Traders
+            saveUserData(currentUserId);
             showPage('trading-section');
-            renderFilterButtons(true);
-            renderStockCards(currentFilter, true);
-            updatePortfolioDisplay();
-            startPriceUpdates();
-            getEl('user-id-display-text').textContent = 'Guest';
-            getEl('top-bar').classList.remove('hidden');
         }
 
         function handleLogout() {
             stopPriceUpdates();
+            
+            // 1. Wipe all traces of the current session
+            localStorage.clear();
             currentUserId = null;
-            localStorage.removeItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
+            currentPortfolio = { cashBalance: 100000, holdings: [], transactions: [], realizedPL: 0 };
             currentWatchlist = [];
-            currentPortfolio = { cashBalance: 100000, holdings: [], transactions: [] };
+
+            // 2. Clear input fields for security
+            getEl('login-username').value = '';
+            getEl('login-password').value = '';
+            
             showPage('login-page');
-            getEl('top-bar').classList.add('hidden');
         }
 
-        // --- Page Navigation and Rendering (Modified) ---
-
         function showPage(pageId) {
-            const pages = ['login-page', 'register-page', 'role-selection-page', 'trading-section', 'stock-viewer-section'];
+            const pages = ['login-page', 'trading-section', 'stock-viewer-section'];
             pages.forEach(id => {
                 const el = getEl(id);
-                if (el) {
-                    el.classList.add('hidden');
-                }
+                if(el) el.classList.add('hidden');
             });
+            getEl(pageId).classList.remove('hidden');
 
-            const targetPage = getEl(pageId);
-            if (targetPage) {
-                targetPage.classList.remove('hidden');
-            }
-            
-            // Manage price updates based on the page
-            if (pageId === 'trading-section' || pageId === 'stock-viewer-section') {
+            if (pageId === 'trading-section') {
                 startPriceUpdates();
-                // Set the correct user ID display
                 getEl('user-id-display-text').textContent = currentUserId;
                 getEl('top-bar').classList.remove('hidden');
+                renderFilterButtons(true);
+                renderStockCards(currentFilter, true);
             } else {
-                stopPriceUpdates();
                 getEl('top-bar').classList.add('hidden');
             }
         }
-        
-        // --- REAL-TIME DATA FETCHING (NEW LOGIC) ---
-        async function fetchPricesFromAPI() {
+
+        // --- Market Data ---
+        async function updatePrices() {
             try {
                 const response = await fetch(API_URL);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
                 const data = await response.json();
-                
-                // Check for error in JSON file reading (from Flask backend)
-                if (data.error) {
-                    throw new Error(data.error);
-                }
+                const fetchedStocks = data.stocks || {};
 
-                return data.stocks || {};
-            } catch (error) {
-                console.error("Failed to fetch real-time stock data from API:", error);
-                return null;
-            }
+                allStocksFlattened.forEach(stock => {
+                    for (const cat in fetchedStocks) {
+                        if (fetchedStocks[cat][stock.id] !== undefined) {
+                            const newPrice = fetchedStocks[cat][stock.id];
+                            if (firstLoad) stock.initialPrice = newPrice;
+                            stock.price = newPrice;
+                            break;
+                        }
+                    }
+                });
+
+                if (firstLoad) {
+                    renderFilterButtons(true);
+                    renderStockCards(currentFilter, true);
+                    firstLoad = false;
+                } else {
+                    updateLiveElements();
+                }
+                updatePortfolioDisplay();
+            } catch (e) { console.error("Update failed"); }
         }
 
-        async function updatePrices() {
-            const fetchedStocks = await fetchPricesFromAPI();
-            
-            if (!fetchedStocks) {
-                // If API fetch failed, skip this update cycle
-                return;
-            }
-
-            const isTradingViewActive = !getEl('trading-section').classList.contains('hidden');
-            
-            // Loop through all stocks defined in our metadata
+        function updateLiveElements() {
             allStocksFlattened.forEach(stock => {
-                // Check the API data structure: stocks -> Category -> TICKER -> price
-                let newPrice = null;
-
-                // Loop through fetched categories to find the stock's price
-                for (const category in fetchedStocks) {
-                    if (fetchedStocks[category][stock.id] !== undefined) {
-                        newPrice = fetchedStocks[category][stock.id];
-                        break;
-                    }
-                }
-                
-                if (newPrice !== null && newPrice !== undefined) {
-                    const oldPrice = stock.price;
-                    const priceChange = newPrice - oldPrice;
-                    
-                    // --- Crucial Update Logic ---
-                    stock.price = parseFloat(newPrice.toFixed(2));
-                    
-                    // On the very first load, set the initial price for P/L calculation
-                    if (firstLoad) {
-                        stock.initialPrice = stock.price;
-                    }
-                    
-                    // Update the price and change value in the DOM
-                    const stockItemElement = document.querySelector(`.stock-item[data-stock-id="${stock.id}"]`);
-                    if (stockItemElement) {
-                        // Find the price element and update its value
-                        const priceElement = stockItemElement.querySelector('.stock-price');
-                        if (priceElement) {
-                            priceElement.textContent = `₹${stock.price.toFixed(2)}`;
-                        }
-                        
-                        // Find the change value element and update its value, color, and icon
-                        const changeValueElement = stockItemElement.querySelector('.change-value');
-                        const iconElement = stockItemElement.querySelector('.price-change-icon');
-
-                        if (changeValueElement && iconElement) {
-                            const changeFromInitial = stock.price - stock.initialPrice;
-                            
-                            // 1. Update overall change from initial price
-                            changeValueElement.textContent = `₹${changeFromInitial.toFixed(2)}`;
-                            changeValueElement.classList.remove('positive', 'negative');
-                            iconElement.classList.remove('positive', 'negative');
-                            stockItemElement.classList.remove('price-up', 'price-down');
-
-                            if (changeFromInitial > 0) {
-                                changeValueElement.classList.add('positive');
-                                iconElement.classList.add('positive');
-                                iconElement.innerHTML = '&#x25B2;'; // Up arrow
-                            } else if (changeFromInitial < 0) {
-                                changeValueElement.classList.add('negative');
-                                iconElement.classList.add('negative');
-                                iconElement.innerHTML = '&#x25BC;'; // Down arrow
-                            } else {
-                                iconElement.innerHTML = '';
-                            }
-
-                            // 2. Trigger Flash Animation based on *last cycle* price change
-                            if (oldPrice > 0) { // Only flash if we have an old price (not the first run)
-                                if (priceChange > 0.01) { // Check for a meaningful change to avoid noise
-                                    stockItemElement.classList.add('price-up');
-                                    setTimeout(() => stockItemElement.classList.remove('price-up'), 500); // Remove class after flash
-                                } else if (priceChange < -0.01) {
-                                    stockItemElement.classList.add('price-down');
-                                    setTimeout(() => stockItemElement.classList.remove('price-down'), 500);
-                                }
-                            }
-                        }
+                const item = document.querySelector(`.stock-item[data-stock-id="${stock.id}"]`);
+                if (item) {
+                    const pEl = item.querySelector('.stock-price');
+                    const cEl = item.querySelector('.change-value');
+                    const diff = stock.price - stock.initialPrice;
+                    if (pEl) pEl.textContent = `₹${stock.price.toFixed(2)}`;
+                    if (cEl) {
+                        cEl.textContent = `₹${diff.toFixed(2)}`;
+                        cEl.className = `change-value ${diff > 0 ? 'positive' : diff < 0 ? 'negative' : ''}`;
                     }
                 }
             });
-
-            if (firstLoad) {
-                // Initial rendering is done only once when we have the first set of prices
-                renderFilterButtons(isTradingViewActive);
-                renderStockCards(currentFilter, isTradingViewActive);
-                firstLoad = false;
-            }
-            
-            // Always update the portfolio display after prices have changed
-            updatePortfolioDisplay();
-        } 
-
-        function startPriceUpdates() {
-            if (updatePricesIntervalId) {
-                clearInterval(updatePricesIntervalId);
-            }
-            // Start the initial fetch immediately
-            updatePrices(); 
-            // Then, set the interval to run every 3 seconds
-            updatePricesIntervalId = setInterval(updatePrices, 3000); 
         }
 
-        function stopPriceUpdates() {
-            if (updatePricesIntervalId) {
-                clearInterval(updatePricesIntervalId);
-                updatePricesIntervalId = null;
-            }
-        }
-        
-        // --- Remaining Functions (No logic change needed, just included for completeness) ---
+        function startPriceUpdates() { if (!updatePricesIntervalId) updatePricesIntervalId = setInterval(updatePrices, 3000); updatePrices(); }
+        function stopPriceUpdates() { clearInterval(updatePricesIntervalId); updatePricesIntervalId = null; }
 
-        // Portfolio Logic
-        function updatePortfolioDisplay() {
-            let totalInvestedForHoldings = 0;
-            let currentHoldingsValue = 0;
+        // --- UI Rendering ---
+        function renderStockCards(filter, isTrader) {
+            const container = getEl('stock-grid-trader');
+            if(!container) return;
             
-            currentPortfolio.holdings.forEach(holding => {
-                const stock = stockMap[holding.stockId];
-                if (stock && stock.price > 0) { // Only calculate if we have a valid price
-                    totalInvestedForHoldings += holding.quantity * holding.averagePrice;
-                    currentHoldingsValue += holding.quantity * stock.price;
-                }
+            let filtered = allStocksFlattened.filter(s => {
+                if (filter === "All") return true;
+                if (filter === "Watchlist") return currentWatchlist.includes(s.id);
+                return s.category === filter;
             });
 
-            // Cash Balance
-            getEl('portfolio-cash').textContent = `₹${currentPortfolio.cashBalance.toFixed(2)}`;
-
-            // Total Invested (Cost of current holdings)
-            getEl('portfolio-invested').textContent = `₹${totalInvestedForHoldings.toFixed(2)}`;
-
-            // Current Value (Market value of current holdings)
-            getEl('portfolio-current-value').textContent = `₹${currentHoldingsValue.toFixed(2)}`;
-
-            // Overall P/L (Unrealized P/L on current holdings)
-            const overallProfitLoss = currentHoldingsValue - totalInvestedForHoldings;
-            const portfolioOverallProfitLossEl = getEl('portfolio-overall-profit-loss');
-            portfolioOverallProfitLossEl.textContent = `₹${overallProfitLoss.toFixed(2)}`;
-            portfolioOverallProfitLossEl.classList.remove('positive', 'negative');
-            if (overallProfitLoss > 0) {
-                portfolioOverallProfitLossEl.classList.add('positive');
-            } else if (overallProfitLoss < 0) {
-                portfolioOverallProfitLossEl.classList.add('negative');
-            }
-            
-            // Total P/L (Net worth change from initial capital)
-            const initialCapital = 100000; // Assuming this is the starting capital
-            const totalProfitLoss = (currentPortfolio.cashBalance + currentHoldingsValue) - initialCapital;
-            const portfolioTotalProfitLossEl = getEl('portfolio-total-profit-loss');
-            portfolioTotalProfitLossEl.textContent = `₹${totalProfitLoss.toFixed(2)}`;
-            portfolioTotalProfitLossEl.classList.remove('positive', 'negative');
-            if (totalProfitLoss > 0) {
-                portfolioTotalProfitLossEl.classList.add('positive');
-            } else if (totalProfitLoss < 0) {
-                portfolioTotalProfitLossEl.classList.add('negative');
-            }
-        }
-        
-        function renderStockCard(stock, isTradingView) {
-            const priceChange = stock.price - stock.initialPrice;
-            const isAddedToWatchlist = currentWatchlist.includes(stock.id);
-            const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
-            const hasHoldings = holding && holding.quantity > 0;
-            
-            let cardHtml = `
-                <li class="stock-item" data-stock-id="${stock.id}">
-                    <div class="stock-info">
-                        <span class="stock-name">${stock.name}</span>
-                        <span class="stock-symbol">${stock.symbol}</span>
-                    </div>
-                    <div class="stock-price-container">
-                        <span class="stock-price">₹${stock.price.toFixed(2)}</span>
-                        <span class="change-value ${priceChange > 0 ? 'positive' : priceChange < 0 ? 'negative' : ''}">
-                            ₹${priceChange.toFixed(2)}
-                        </span>
-                        <span class="price-change-icon ${priceChange > 0 ? 'positive' : priceChange < 0 ? 'negative' : ''}">
-                            ${priceChange > 0 ? '▲' : priceChange < 0 ? '▼' : ''}
-                        </span>
-                    </div>
-            `;
-            
-            // Add holding info for traders
-            if (isTradingView && hasHoldings) {
-                cardHtml += `
-                    <div class="holding-info mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        <p class="font-semibold">Held: ${holding.quantity} shares</p>
-                        <p>Avg. Price: ₹${holding.averagePrice.toFixed(2)}</p>
-                    </div>
-                `;
-            }
-
-            // Add action buttons only if it's the trading view
-            if (isTradingView) {
-                cardHtml += `
-                    <div class="stock-actions">
-                        ${hasHoldings ? `<button class="sell-all-btn sell-btn" data-stock-id="${stock.id}">Sell All</button>` : ''}
-                        <button class="buy-btn" data-stock-id="${stock.id}">Buy</button>
-                        ${hasHoldings ? `<button class="sell-btn" data-stock-id="${stock.id}">Sell</button>` : ''}
-                        <button class="add-to-watchlist-btn ${isAddedToWatchlist ? 'added' : ''}" data-stock-id="${stock.id}">
-                            ${isAddedToWatchlist ? '&#10003; Watchlist' : '+ Watchlist'}
-                        </button>
-                    </div>
-                `;
-            }
-            
-            cardHtml += `</li>`;
-            return cardHtml;
-        }
-
-        function renderStockCards(filter, isTradingView) {
-            const stockGridId = isTradingView ? 'stock-grid-trader' : 'stock-grid-viewer';
-            const stockGridEl = getEl(stockGridId);
-            if (!stockGridEl) return;
-
-            // Filter stocks based on the current filter selection
-            let filteredStocks = allStocksFlattened.filter(stock => {
-                if (filter === "All") {
-                    return true;
-                }
-                if (filter === "Watchlist") {
-                    return currentWatchlist.includes(stock.id);
-                }
-                return stock.category === filter;
-            });
-            
-            // Sort by current profit/loss (optional, but good for mock trading)
-            filteredStocks.sort((a, b) => (b.price - b.initialPrice) - (a.price - a.initialPrice));
-
-            stockGridEl.innerHTML = filteredStocks.map(stock => renderStockCard(stock, isTradingView)).join('');
-
-            // --- Attach Event Listeners (Traders only) ---
-            if (isTradingView) {
-                // Using event delegation might be cleaner, but direct assignment is fine for this scale
-                stockGridEl.querySelectorAll('.buy-btn').forEach(button => {
-                    button.onclick = () => openTransactionModal('buy', button.dataset.stockId);
-                });
-
-                stockGridEl.querySelectorAll('.sell-btn').forEach(button => {
-                    button.onclick = () => openTransactionModal('sell', button.dataset.stockId);
-                });
-                
-                // Event listener for "Sell All" button
-                stockGridEl.querySelectorAll('.sell-all-btn').forEach(button => {
-                    button.onclick = () => {
-                        const stockId = button.dataset.stockId;
-                        const stock = stockMap[stockId];
-                        if (!stock) return;
-                        const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
-                        if (holding && holding.quantity > 0) {
-                            openCustomConfirmModal(`Are you sure you want to sell all ${holding.quantity} shares of ${stock.name}?`, (confirmed) => {
-                                if (confirmed) {
-                                    const revenue = holding.quantity * stock.price;
-                                    currentPortfolio.cashBalance += revenue;
-
-                                    // Record the sell transaction for all shares
-                                    currentPortfolio.transactions.push({ 
-                                        stockId: stock.id, 
-                                        type: 'sell', 
-                                        quantity: holding.quantity, 
-                                        price: stock.price, 
-                                        timestamp: new Date().toISOString() 
-                                    });
-                                    
-                                    currentPortfolio.holdings = currentPortfolio.holdings.filter(h => h.stockId !== stock.id);
-                                    saveUserData(currentUserId);
-                                    updatePortfolioDisplay();
-                                    renderStockCards(currentFilter, true); // Re-render to update UI
-                                }
-                            });
-                        } 
-                        // Note: The button is hidden if quantity is 0, so no 'else' is needed here.
-                    };
-                });
-
-                stockGridEl.querySelectorAll('.add-to-watchlist-btn').forEach(button => {
-                    button.onclick = () => toggleWatchlist(button.dataset.stockId);
-                });
-            }
-        }
-
-        function renderFilterButtons(isTradingView) {
-            const categories = ["All", ...Object.keys(STOCK_METADATA_BY_CATEGORY), "Watchlist"];
-            const filterContainerEl = isTradingView ? getEl('category-filter-trader') : getEl('category-filter-viewer');
-            if (!filterContainerEl) return;
-            
-            filterContainerEl.innerHTML = categories.map(cat => `
-                <button class="category-button ${cat === currentFilter ? 'active' : ''}" data-category="${cat}">
-                    ${cat}
-                </button>
-            `).join('');
-            
-            filterContainerEl.querySelectorAll('.category-button').forEach(button => {
-                button.onclick = () => {
-                    const newFilter = button.dataset.category;
-                    if (newFilter !== currentFilter) {
-                        currentFilter = newFilter;
-                        // Remove 'active' from all buttons
-                        filterContainerEl.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
-                        // Add 'active' to the clicked button
-                        button.classList.add('active');
-                        renderStockCards(currentFilter, isTradingView);
-                    }
-                };
-            });
-        }
-
-        function toggleWatchlist(stockId) {
-            const index = currentWatchlist.indexOf(stockId);
-            if (index > -1) {
-                currentWatchlist = currentWatchlist.filter(id => id !== stockId);
-            } else {
-                currentWatchlist = [...currentWatchlist, stockId];
-            }
-            saveUserData(currentUserId); // Save updated watchlist to localStorage
-            const isTradingViewActive = !getEl('trading-section').classList.contains('hidden');
-            renderStockCards(currentFilter, isTradingViewActive); // Re-render trading view to update watchlist button
-        }
-        
-        // --- Transaction Modal Logic (No Change) ---
-        let modalCurrentStock = null;
-        let modalCurrentType = '';
-        let confirmActionCallback = null; // For custom confirmation modal
-
-        function openTransactionModal(type, stockId) {
-            const stock = stockMap[stockId];
-            if (!stock || stock.price <= 0) {
-                 alert("Cannot trade. Stock price is not yet available or is invalid.");
-                 return;
-            }
-            modalCurrentStock = stock;
-            modalCurrentType = type;
-            
-            getEl('modal-title').textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} ${stock.name}`;
-            getEl('modal-stock-info').textContent = `Current Price: ₹${stock.price.toFixed(2)}`;
-            getEl('quantity-input').value = 1;
-            getEl('modal-message').textContent = '';
-            
-            const sharesOwnedEl = getEl('modal-shares-owned');
-            const confirmBtn = getEl('confirm-transaction-button');
-            confirmBtn.textContent = type.charAt(0).toUpperCase() + type.slice(1);
-            
-            // Set button color
-            if (type === 'buy') {
-                confirmBtn.className = 'confirm-btn';
-                confirmBtn.classList.add('buy-btn'); // Use CSS class for buy
-            } else {
-                confirmBtn.className = 'confirm-btn';
-                confirmBtn.classList.add('sell-btn'); // Use CSS class for sell
-            }
-
-            if (type === 'sell') {
+            container.innerHTML = filtered.map(stock => {
+                const diff = stock.price - stock.initialPrice;
+                const isAdded = currentWatchlist.includes(stock.id);
                 const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
-                const quantityOwned = holding ? holding.quantity : 0;
-                sharesOwnedEl.textContent = `You own: ${quantityOwned} shares`;
-                sharesOwnedEl.classList.remove('hidden');
                 
-                // Disable max button if 0 shares owned
-                getEl('max-quantity-button').disabled = (quantityOwned === 0);
-            } else {
-                sharesOwnedEl.classList.add('hidden');
-                getEl('max-quantity-button').disabled = false;
-            }
-
-            // Calculate and display initial cost/revenue
-            updateCalculatedCost(1);
-
-            getEl('transaction-modal').classList.add('active');
+                return `
+                    <li class="stock-item" data-stock-id="${stock.id}">
+                        <div class="stock-info">
+                            <span class="stock-name">${stock.name}</span>
+                            <span class="stock-symbol">${stock.symbol}</span>
+                        </div>
+                        <div class="stock-price-container">
+                            <span class="stock-price">₹${stock.price.toFixed(2)}</span>
+                            <span class="change-value ${diff > 0 ? 'positive' : diff < 0 ? 'negative' : ''}">₹${diff.toFixed(2)}</span>
+                        </div>
+                        <div class="stock-actions">
+                            <button class="buy-btn" onclick="openTransactionModal('buy', '${stock.id}')">Buy</button>
+                            ${holding ? `<button class="sell-btn" onclick="openTransactionModal('sell', '${stock.id}')">Sell</button>` : ''}
+                            <button class="add-to-watchlist-btn ${isAdded ? 'added' : ''}" onclick="toggleWatchlist('${stock.id}')">
+                                ${isAdded ? '✓' : '+ Watchlist'}
+                            </button>
+                        </div>
+                    </li>`;
+            }).join('');
         }
 
-        function closeTransactionModal() {
-            getEl('transaction-modal').classList.remove('active');
+        function renderFilterButtons(isTrader) {
+            const cats = ["All", ...Object.keys(STOCK_METADATA_BY_CATEGORY), "Watchlist"];
+            const container = getEl('category-filter-trader');
+            if(!container) return;
+            container.innerHTML = cats.map(c => `<button class="category-button ${c === currentFilter ? 'active' : ''}" onclick="setFilter('${c}', true)">${c}</button>`).join('');
         }
+
+        function setFilter(f, isTrader) { currentFilter = f; renderFilterButtons(isTrader); renderStockCards(f, isTrader); }
+
+        function toggleWatchlist(id) {
+            currentWatchlist = currentWatchlist.includes(id) ? currentWatchlist.filter(x => x !== id) : [...currentWatchlist, id];
+            saveUserData(currentUserId);
+            renderStockCards(currentFilter, true);
+        }
+
+        // --- Portfolio & Transaction Logic ---
+        function updatePortfolioDisplay() {
+            let invested = 0, current = 0;
+            currentPortfolio.holdings.forEach(h => {
+                const s = stockMap[h.stockId];
+                invested += h.quantity * h.averagePrice;
+                current += h.quantity * (s ? s.price : 0);
+            });
+            getEl('portfolio-cash').textContent = `₹${currentPortfolio.cashBalance.toFixed(2)}`;
+            getEl('portfolio-invested').textContent = `₹${invested.toFixed(2)}`;
+            getEl('portfolio-current-value').textContent = `₹${current.toFixed(2)}`;
+            
+            const unrealizedPL = current - invested;
+            const totalPL = unrealizedPL + currentPortfolio.realizedPL;
+            
+            getEl('portfolio-overall-profit-loss').textContent = `₹${unrealizedPL.toFixed(2)}`;
+            getEl('portfolio-overall-profit-loss').className = `portfolio-value ${unrealizedPL >= 0 ? 'positive' : 'negative'}`;
+            
+            getEl('portfolio-total-profit-loss').textContent = `₹${totalPL.toFixed(2)}`;
+            getEl('portfolio-total-profit-loss').className = `portfolio-value ${totalPL >= 0 ? 'positive' : 'negative'}`;
+        }
+
+        let modalStock = null, modalType = '';
+        function openTransactionModal(type, id) {
+            modalStock = stockMap[id]; modalType = type;
+            getEl('modal-title').textContent = `${type.toUpperCase()} ${modalStock.symbol}`;
+            getEl('modal-stock-info').textContent = `Price: ₹${modalStock.price.toFixed(2)}`;
+            getEl('quantity-input').value = 1;
+            getEl('confirm-transaction-button').textContent = type.toUpperCase();
+            getEl('transaction-modal-overlay').classList.add('active');
+        }
+
+        function closeTransactionModal() { getEl('transaction-modal-overlay').classList.remove('active'); }
 
         function setMaxQuantity() {
-            const stock = modalCurrentStock;
-            if (modalCurrentType === 'buy') {
-                // Calculate max shares based on cash balance
-                const maxShares = Math.floor(currentPortfolio.cashBalance / stock.price);
-                getEl('quantity-input').value = maxShares > 0 ? maxShares : 1;
-            } else if (modalCurrentType === 'sell') {
-                // Set max shares to total owned
-                const holding = currentPortfolio.holdings.find(h => h.stockId === stock.id);
-                getEl('quantity-input').value = holding ? holding.quantity : 1;
-            }
-            updateCalculatedCost(getEl('quantity-input').value);
-        }
-
-        function updateCalculatedCost(quantity) {
-            const costRevenueEl = getEl('modal-calculated-cost');
-            const total = (quantity * modalCurrentStock.price).toFixed(2);
-            if (modalCurrentType === 'buy') {
-                costRevenueEl.textContent = `Total Cost: ₹${total}`;
-                costRevenueEl.style.color = '#333';
-            } else {
-                costRevenueEl.textContent = `Total Revenue: ₹${total}`;
-                costRevenueEl.style.color = '#333';
+            if (modalType === 'buy') getEl('quantity-input').value = Math.floor(currentPortfolio.cashBalance / modalStock.price);
+            else {
+                const h = currentPortfolio.holdings.find(x => x.stockId === modalStock.id);
+                getEl('quantity-input').value = h ? h.quantity : 0;
             }
         }
 
         function confirmTransaction() {
-            const stock = modalCurrentStock;
-            const quantityInput = getEl('quantity-input');
-            const modalMessageEl = getEl('modal-message');
-            const quantity = parseInt(quantityInput.value, 10);
+            const q = parseInt(getEl('quantity-input').value);
+            if (isNaN(q) || q <= 0) return;
+            const cost = q * modalStock.price;
+            let pL = 0;
+
+            if (modalType === 'buy') {
+                if (currentPortfolio.cashBalance < cost) { alert("Insufficient funds"); return; }
+                currentPortfolio.cashBalance -= cost;
+                let h = currentPortfolio.holdings.find(x => x.stockId === modalStock.id);
+                if (h) {
+                    h.averagePrice = ((h.quantity * h.averagePrice) + cost) / (h.quantity + q);
+                    h.quantity += q;
+                } else currentPortfolio.holdings.push({ stockId: modalStock.id, quantity: q, averagePrice: modalStock.price });
+            } else {
+                let h = currentPortfolio.holdings.find(x => x.stockId === modalStock.id);
+                if (!h || h.quantity < q) { alert("Not enough shares"); return; }
+                
+                // Profit calculation: (Sell Price - Buy Price) * Quantity
+                pL = (modalStock.price - h.averagePrice) * q;
+                currentPortfolio.realizedPL += pL;
+                
+                currentPortfolio.cashBalance += cost;
+                h.quantity -= q;
+                if (h.quantity === 0) currentPortfolio.holdings = currentPortfolio.holdings.filter(x => x.stockId !== modalStock.id);
+            }
             
-            modalMessageEl.textContent = ''; // Clear previous messages
+            // Fixed Time Format HH:MM:SS
+            const now = new Date();
+            const timeString = now.toTimeString().split(' ')[0];
 
-            if (isNaN(quantity) || quantity < 1) {
-                modalMessageEl.textContent = 'Please enter a valid quantity.';
-                return;
-            }
-            
-            let transactionSuccess = false;
-
-            if (modalCurrentType === 'buy') {
-                const cost = quantity * stock.price;
-                if (currentPortfolio.cashBalance >= cost) {
-                    currentPortfolio.cashBalance -= cost;
-                    const existingHoldingIndex = currentPortfolio.holdings.findIndex(h => h.stockId === stock.id);
-                    
-                    if (existingHoldingIndex > -1) {
-                        const existingHolding = currentPortfolio.holdings[existingHoldingIndex];
-                        const newTotalQuantity = existingHolding.quantity + quantity;
-                        const newTotalCost = (existingHolding.quantity * existingHolding.averagePrice) + cost;
-                        existingHolding.quantity = newTotalQuantity;
-                        existingHolding.averagePrice = newTotalCost / newTotalQuantity;
-                    } else {
-                        currentPortfolio.holdings.push({ stockId: stock.id, quantity: quantity, averagePrice: stock.price });
-                    }
-                    
-                    // Record the buy transaction
-                    currentPortfolio.transactions.push({ 
-                        stockId: stock.id, 
-                        type: 'buy', 
-                        quantity: quantity, 
-                        price: stock.price, 
-                        timestamp: new Date().toISOString() 
-                    });
-                    
-                    modalMessageEl.textContent = `Successfully bought ${quantity} shares of ${stock.symbol}.`;
-                    transactionSuccess = true;
-                } else {
-                    modalMessageEl.textContent = 'Insufficient cash balance.';
-                }
-            } else if (modalCurrentType === 'sell') {
-                const existingHoldingIndex = currentPortfolio.holdings.findIndex(h => h.stockId === stock.id);
-                
-                if (existingHoldingIndex > -1) {
-                    const existingHolding = currentPortfolio.holdings[existingHoldingIndex];
-                    if (existingHolding.quantity >= quantity) {
-                        const revenue = quantity * stock.price;
-                        currentPortfolio.cashBalance += revenue;
-                        existingHolding.quantity -= quantity;
-
-                        if (existingHolding.quantity === 0) {
-                            currentPortfolio.holdings.splice(existingHoldingIndex, 1);
-                        }
-                        
-                        // Record the sell transaction
-                        currentPortfolio.transactions.push({ 
-                            stockId: stock.id, 
-                            type: 'sell', 
-                            quantity: quantity, 
-                            price: stock.price, 
-                            timestamp: new Date().toISOString() 
-                        });
-                        
-                        modalMessageEl.textContent = `Successfully sold ${quantity} shares of ${stock.symbol}.`;
-                        transactionSuccess = true;
-                    } else {
-                        modalMessageEl.textContent = `You only own ${existingHolding.quantity} shares.`;
-                    }
-                } else {
-                    modalMessageEl.textContent = 'You do not own this stock.';
-                }
-            }
-
-            if (transactionSuccess) {
-                // Clear the quantity input and update display immediately
-                quantityInput.value = ''; 
-                saveUserData(currentUserId); // Save updated portfolio to localStorage
-                updatePortfolioDisplay();
-                
-                const isTradingViewActive = !getEl('trading-section').classList.contains('hidden');
-                renderStockCards(currentFilter, isTradingViewActive); 
-                
-                // Auto-close modal after a short delay
-                setTimeout(closeTransactionModal, 1500); 
-            }
-        }
-
-        // Custom Confirmation Modal
-        function openCustomConfirmModal(message, callback) {
-            getEl('custom-confirm-message').textContent = message;
-            confirmActionCallback = callback;
-            getEl('custom-confirm-modal').classList.add('active');
-        }
-
-        function closeCustomConfirmModal() {
-            getEl('custom-confirm-modal').classList.remove('active');
-            confirmActionCallback = null;
-        }
-
-        function handleCustomConfirmYes() {
-            if (confirmActionCallback) {
-                confirmActionCallback(true);
-            }
-            closeCustomConfirmModal();
-        }
-
-        function handleCustomConfirmNo() {
-            if (confirmActionCallback) {
-                confirmActionCallback(false);
-            }
-            closeCustomConfirmModal();
-        }
-
-        // Export Function (No Change)
-        function exportPortfolioToCSV() {
-            let csv = "Timestamp,Type,Stock ID,Quantity,Price\n";
-            currentPortfolio.transactions.forEach(t => {
-                csv += `${t.timestamp},${t.type},${t.stockId},${t.quantity},${t.price.toFixed(2)}\n`;
+            currentPortfolio.transactions.push({ 
+                timestamp: timeString, 
+                type: modalType.toUpperCase(), 
+                stockId: modalStock.id, 
+                quantity: q, 
+                price: modalStock.price,
+                pl: modalType === 'sell' ? pL.toFixed(2) : "0.00"
             });
 
-            const link = document.createElement('a');
-            link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
-            link.setAttribute('download', `mock_stock_portfolio_${currentUserId}_${new Date().toISOString().slice(0, 10)}.csv`);
+            saveUserData(currentUserId);
+            updatePortfolioDisplay();
+            renderStockCards(currentFilter, true);
+            closeTransactionModal();
+        }
+
+        // --- FIXED EXPORT FUNCTION ---
+        function exportPortfolioToCSV() {
+            if (!currentPortfolio.transactions || currentPortfolio.transactions.length === 0) {
+                alert("Make transaction(s) to export your portfolio.");
+                return;
+            }
+
+            let csvContent = "Time,Type,Stock,Quantity,Price,Profit/Loss\n";
+            csvContent += currentPortfolio.transactions.map(t => 
+                `${t.timestamp},${t.type},${t.stockId},${t.quantity},${t.price.toFixed(2)},${t.pl}`
+            ).join("\n");
+
+            csvContent += `\n\nTotal Profit/Loss,,,,₹${currentPortfolio.realizedPL.toFixed(2)}`;
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `${currentUserId}.csv`);
+            link.style.visibility = 'hidden';
+            
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            alert("Portfolio transactions exported to CSV!");
         }
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Load and apply theme
-            const savedTheme = localStorage.getItem(LOCAL_STORAGE_THEME_KEY);
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                getEl('theme-icon').textContent = '🌙';
-                getEl('theme-text').textContent = 'Dark Mode';
-            } else {
-                document.body.classList.remove('dark-mode');
-                getEl('theme-icon').textContent = '☀';
-                getEl('theme-text').textContent = 'Light Mode';
-            }
-
-            // Check if user is already logged in
-            const savedUserId = localStorage.getItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
-            if (savedUserId) {
-                currentUserId = savedUserId;
-                loadUserData(currentUserId);
-                showPage('role-selection-page');
-            } else {
-                // If no user is logged in, show the login page
-                showPage('login-page');
-            }
-
-            // --- Event Listeners ---
-            
-            // Auth Page Navigation
-            getEl('go-to-register').onclick = () => showPage('register-page');
-            getEl('go-to-login').onclick = () => showPage('login-page');
             getEl('login-button').onclick = handleLogin;
-            getEl('register-button').onclick = handleRegister;
             getEl('anonymous-sign-in').onclick = handleAnonymousSignIn;
             getEl('logout-button').onclick = handleLogout;
-
-            // Role Selection Buttons
-            getEl('enter-as-trader').onclick = () => {
-                showPage('trading-section');
-                renderFilterButtons(true); // Render for trader view
-                renderStockCards(currentFilter, true); // Render for trader view
-                updatePortfolioDisplay();
-                startPriceUpdates();
-            };
-            
-            getEl('enter-as-viewer').onclick = () => {
-                showPage('stock-viewer-section');
-                renderFilterButtons(false); // Render for viewer view
-                renderStockCards(currentFilter, false); // Render for viewer view
-                startPriceUpdates();
-            };
-
-            // Modal Buttons
             getEl('confirm-transaction-button').onclick = confirmTransaction;
             getEl('cancel-transaction-button').onclick = closeTransactionModal;
-            getEl('max-quantity-button').onclick = setMaxQuantity; 
-            getEl('quantity-input').addEventListener('input', (e) => updateCalculatedCost(parseInt(e.target.value, 10) || 0));
-
-            // Custom Confirmation Modal Buttons
-            getEl('custom-confirm-yes').onclick = handleCustomConfirmYes;
-            getEl('custom-confirm-no').onclick = handleCustomConfirmNo;
-
-            // Export Portfolio Button
+            getEl('max-quantity-button').onclick = setMaxQuantity;
             getEl('export-portfolio-button').onclick = exportPortfolioToCSV;
-
-            // Theme Toggle
-            getEl('theme-toggle').onclick = () => {
-                document.body.classList.toggle('dark-mode');
-                const isDarkMode = document.body.classList.contains('dark-mode');
-                localStorage.setItem(LOCAL_STORAGE_THEME_KEY, isDarkMode ? 'dark' : 'light');
-                getEl('theme-icon').textContent = isDarkMode ? '🌙' : '☀';
-                getEl('theme-text').textContent = isDarkMode ? 'Dark Mode' : 'Light Mode';
-            };
+            
+            const saved = localStorage.getItem(LOCAL_STORAGE_CURRENT_USER_ID_KEY);
+            if (saved) { 
+                currentUserId = saved; 
+                loadUserData(saved); 
+                showPage('trading-section'); 
+            } else { 
+                showPage('login-page'); 
+            }
         });
     </script>
 </body>

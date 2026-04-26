@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashoka Mock-Stock Category History</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <style>
+        /* Ashoka Universal School Theme Colors - Light Mode */
+        :root {
+            --primary-green: #006400; 
+            --golden-yellow: #FFD700; 
+            --light-background: #F8F8F0; 
+            --white-card-background: #ffffff; 
+            --dark-text: #333333; 
+            --light-border: #E0E0E0;
+            --font-family: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--light-background);
+            color: var(--dark-text);
+        }
+        .graph-card {
+            background-color: var(--white-card-background);
+            border: 1px solid var(--light-border);
+            border-radius: 0.75rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+        .chart-container {
+            position: relative;
+            height: 65vh; 
+            width: 100%;
+            padding: 2rem 0 1rem 0; 
+        }
+        .tab-button {
+            transition: all 0.2s ease;
+            color: #6c757d;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-button:hover {
+            color: var(--primary-green);
+        }
+        .tab-button.active {
+            color: var(--primary-green);
+            border-color: var(--primary-green);
+            background-color: #f0f0f0; 
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-extrabold mb-2" style="color: var(--primary-green);">
+                Category Aggregate History
+            </h1>
+            <p class="text-xl" style="color: #6c757d;">Average Price in Indian Rupees (₹)</p>
+        </header>
+
+        <!-- Category Tabs -->
+        <div id="category-tabs" class="flex justify-center border-b mb-8 flex-wrap" style="border-color: var(--light-border);">
+            <!-- Tabs injected here by graphs.js -->
+        </div>
+
+        <!-- Chart Card -->
+        <div id="chart-card" class="graph-card p-6">
+            <h2 id="chart-title" class="text-2xl font-semibold text-center mb-4" style="color: var(--dark-text);">Select a Category Above</h2>
+            
+            <div id="chart-loading-message" class="text-center text-gray-500 py-10">
+                <p>Loading market data...</p>
+            </div>
+            
+            <div class="chart-container hidden" id="chart-display-area">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module" src="graphs.js"></script>
+</body>
+</html>

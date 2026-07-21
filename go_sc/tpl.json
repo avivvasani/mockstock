@@ -1,0 +1,45 @@
+[
+  {
+    "username": "Admin",
+    "starting_cash": 100000,
+    "remaining_cash": 103880.3,
+    "current_stock_holding_value": 0,
+    "realized_p_l": 77.35000000000002,
+    "unrealized_p_l": 0,
+    "total_net_worth": 103880.3,
+    "overall_total_p_l": 3880.300000000003,
+    "total_transactions": 13,
+    "total_unsold_shares": 0,
+    "rank": 1,
+    "active_holdings": {}
+  },
+  {
+    "username": "Animesh Garg",
+    "starting_cash": 100000,
+    "remaining_cash": 96431.76,
+    "current_stock_holding_value": 3626.46,
+    "realized_p_l": 0,
+    "unrealized_p_l": 58.22000000000003,
+    "total_net_worth": 100058.22,
+    "overall_total_p_l": 58.220000000001164,
+    "total_transactions": 2,
+    "total_unsold_shares": 2,
+    "rank": 2,
+    "active_holdings": {
+      "BANARISUG": {
+        "quantity": 1,
+        "average_buy_price": 3429.1,
+        "current_market_price": 3483.6,
+        "total_cost_basis": 3429.1,
+        "current_market_value": 3483.6
+      },
+      "DHAMPURSUG": {
+        "quantity": 1,
+        "average_buy_price": 139.14,
+        "current_market_price": 142.86,
+        "total_cost_basis": 139.14,
+        "current_market_value": 142.86
+      }
+    }
+  }
+]

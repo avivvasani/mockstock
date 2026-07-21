@@ -1,0 +1,245 @@
+{
+  "last_updated": "2026-07-11T22:39:53+05:30",
+  "stocks": {
+    "Agri \u0026 Sugar Cycles": {
+      "BALRAMCHIN": 566.9,
+      "BANARISUG": 3499,
+      "DALMIASUG": 357,
+      "DHAMPURSUG": 143.3,
+      "EIDPARRY": 758.65,
+      "RENUKA": 22.73,
+      "TRIVENI": 462.4
+    },
+    "Auto \u0026 EV": {
+      "FORCEMOT": 18170,
+      "OLECTRA": 1423.6,
+      "RKFORGE": 565.3,
+      "SONACOMS": 668.55,
+      "UNOMINDA": 1166.1
+    },
+    "Auto \u0026 EV Beta": {
+      "ASHOKLEY": 157.49,
+      "ENDURANCE": 2686.4,
+      "FIEMIND": 2249.9,
+      "JAMNAAUTO": 136.56,
+      "SUBROS": 821.65,
+      "SUPRAJIT": 509,
+      "TVSMOTOR": 3623.1,
+      "VARROC": 661.45
+    },
+    "Banking \u0026 Financials": {
+      "ANGELONE": 346.05,
+      "BANDHANBNK": 210,
+      "BANKBARODA": 250.95,
+      "BSE": 3811.6,
+      "CANBK": 128.78,
+      "CDSL": 1431.9,
+      "FEDERALBNK": 329.85,
+      "HUDCO": 206.96,
+      "IDFCFIRSTB": 80.83,
+      "IEX": 119.64,
+      "IFCI": 77.46,
+      "INDUSINDBK": 1015.8,
+      "IOB": 34.58,
+      "IREDA": 126.4,
+      "M\u0026MFIN": 340.85,
+      "MANAPPURAM": 341.3,
+      "MCX": 2770.7,
+      "PFC": 406.5,
+      "PNB": 105.41,
+      "POONAWALLA": 477,
+      "RBLBANK": 380.65,
+      "RECLTD": 351.95,
+      "UCOBANK": 26.7,
+      "YESBANK": 23.94
+    },
+    "Chemicals \u0026 Manufacturing": {
+      "DEEPAKNTR": 1644,
+      "FACT": 855.55,
+      "FLUOROCHEM": 3941.5,
+      "GNFC": 502.45,
+      "GSFC": 160.9,
+      "NAVINFLUOR": 7712,
+      "PIIND": 2607.4,
+      "SRF": 2774.6
+    },
+    "Commodities \u0026 Cyclicals": {
+      "APLAPOLLO": 1835.9,
+      "ELECTCAST": 77.27,
+      "KIOCL": 380.95,
+      "MIDHANI": 415.9,
+      "RATNAMANI": 2693.8,
+      "SUNFLAG": 342.7,
+      "WELCORP": 1612.6
+    },
+    "Consumer \u0026 Internet": {
+      "DELHIVERY": 520.3,
+      "ETHOSLTD": 2477.5,
+      "HONASA": 472.1,
+      "MAPMYINDIA": 1083.35,
+      "NYKAA": 330.1,
+      "PAYTM": 1341.8,
+      "POLICYBZR": 1580.4,
+      "TRENT": 2902.8
+    },
+    "Defense \u0026 PSU Momentum": {
+      "BDL": 1344.5,
+      "BEL": 414.85,
+      "COCHINSHIP": 1418,
+      "DCXINDIA": 200.17,
+      "GRSE": 2662,
+      "HAL": 4506.8,
+      "IDEAFORGE": 900.75,
+      "MAZDOCK": 2420.1,
+      "MTARTECH": 7101,
+      "PARAS": 1253.1
+    },
+    "Energy \u0026 Renewables": {
+      "ADANIGREEN": 1536.6,
+      "ADANIPOWER": 218.45,
+      "GENSOL": 20.32,
+      "IREDA": 126.4,
+      "JPPOWER": 17.02,
+      "JSWENERGY": 553.45,
+      "NHPC": 79.82,
+      "SJVN": 70.88,
+      "SUZLON": 53.92,
+      "TATAPOWER": 381.3
+    },
+    "Fast-Moving Industrials": {
+      "DIXON": 13421,
+      "ELGIEQUIP": 576.35,
+      "KAYNES": 3336.1,
+      "KEI": 5149.5,
+      "POLYCAB": 9210.5,
+      "SYRMA": 1451.9,
+      "TRITURBINE": 606.1,
+      "VOLTAS": 1286.7
+    },
+    "High-Move Consumer \u0026 Retail": {
+      "ABFRL": 60.02,
+      "DMART": 4081.1,
+      "ETHOSLTD": 2477.5,
+      "HONASA": 472.1,
+      "KALYANKJIL": 476.15,
+      "MAPMYINDIA": 1083.35,
+      "SENCO": 362.15,
+      "TRENT": 2902.8
+    },
+    "IT \u0026 Digital": {
+      "63MOONS": 678.6,
+      "COFORGE": 1503.8,
+      "HAPPSTMNDS": 386.3,
+      "KPITTECH": 561.75,
+      "NETWEB": 4305,
+      "NEWGEN": 517.2,
+      "PERSISTENT": 5053.9,
+      "TANLA": 550.2,
+      "TATAELXSI": 3690.3
+    },
+    "Metals \u0026 Commodities": {
+      "HINDCOPPER": 498.65,
+      "JINDALSTEL": 1051.3,
+      "MOIL": 274,
+      "NATIONALUM": 354.85,
+      "NMDC": 84.92,
+      "SAIL": 167.95,
+      "TATASTEEL": 191.19,
+      "VEDL": 272.55
+    },
+    "Midcap Tech Momentum": {
+      "CYIENT": 841.15,
+      "DSSL": 1325.1,
+      "INTELLECT": 758.75,
+      "KELLTONTEC": 15.36,
+      "NELCO": 890.35,
+      "RAMCOSYS": 805.6,
+      "ROUTE": 546.25,
+      "SAKSOFT": 171.06,
+      "ZENSARTECH": 508.25
+    },
+    "Momentum Chemicals": {
+      "ATUL": 6236,
+      "CLEAN": 770.05,
+      "NOCIL": 175.44,
+      "ROSSARI": 524.2,
+      "SHARDACROP": 914.75,
+      "SUDARSCHEM": 999.25,
+      "SUMICHEM": 513.7,
+      "TATACHEM": 721.05,
+      "UPL": 594.75,
+      "VINATIORGA": 1333.1
+    },
+    "Railway \u0026 Logistics Movers": {
+      "ALLCARGO": 7.98,
+      "BLUEDART": 4918.4,
+      "CONCOR": 463.75,
+      "GATEWAY": 58.71,
+      "JWL": 256.8,
+      "TCI": 935.25,
+      "TEXRAIL": 116.39
+    },
+    "Railways \u0026 Infra": {
+      "DELHIVERY": 520.3,
+      "IRCON": 131.36,
+      "IRFC": 89.9,
+      "KEC": 504.85,
+      "RAILTEL": 307.5,
+      "RVNL": 232.67,
+      "TITAGARH": 835.8
+    },
+    "Real Estate Momentum": {
+      "BRIGADE": 574.6,
+      "DLF": 685.75,
+      "GODREJPROP": 2133,
+      "LODHA": 1220.75,
+      "OBEROIRLTY": 1924.8,
+      "PHOENIXLTD": 2138.9,
+      "PRESTIGE": 1733.2,
+      "SOBHA": 1511.3,
+      "SUNTECK": 327.2
+    },
+    "Smallcap Financial Chaos": {
+      "CSBBANK": 360.4,
+      "DCBBANK": 188.67,
+      "DHANBANK": 34.75,
+      "ESAFSFB": 35.73,
+      "IDBI": 82.89,
+      "INDIANB": 870.7,
+      "J\u0026KBANK": 192.65,
+      "KARURVYSYA": 305.65,
+      "PSB": 24.99,
+      "SOUTHBANK": 45.81,
+      "SURYODAY": 184.31,
+      "UTKARSHBNK": 14.64
+    },
+    "Speculative Power \u0026 Infra": {
+      "ASHOKA": 131.59,
+      "BORORENEW": 640.55,
+      "ENGINERSIN": 239.64,
+      "GREENPANEL": 190.63,
+      "KNRCON": 129.05,
+      "NBCC": 99.98,
+      "NCC": 145.76,
+      "PATELENG": 31.75,
+      "RKEC": 28.05,
+      "TORNTPOWER": 1419.4
+    },
+    "Telecom \u0026 Entertainment": {
+      "INDUSTOWER": 406.15,
+      "ITI": 290.25,
+      "PVRINOX": 1002.05,
+      "SAREGAMA": 479.2,
+      "SUNTV": 499.7,
+      "TIPSMUSIC": 711.55,
+      "ZEEL": 97.47
+    },
+    "Telecom \u0026 Media": {
+      "GTLINFRA": 1.33,
+      "HFCL": 217.25,
+      "IDEA": 14.19,
+      "NETWORK18": 31.17,
+      "ZEEL": 97.47
+    }
+  }
+}

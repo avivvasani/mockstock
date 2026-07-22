@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ashoka Mock-Stock | Leaderboard</title>
+    
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file:; connect-src 'self' file: ipc: http://127.0.0.1:* http://localhost:*; ">
+    
+    <title>Ashoka Mock-Stock | Manual Ledger</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://*:5000 http://127.0.0.1:5000 http://localhost:5000;">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script>
         if (localStorage.getItem('theme') === 'dark') {
@@ -30,351 +31,726 @@
 
     <style>
         :root {
-            --primary-blue: #004275; 
-            --dark-blue: #3b82f6; 
-            --golden-yellow: #FFD700; 
-            --silver: #C0C0C0;
-            --bronze: #CD7F32;
-            --light-background: #F8F8F0; 
-            --font-family: 'Poppins', sans-serif;
+            --primary-blue: #004275;
+            --primary-blue-strong: #002d52;
+            --light-background: #edf4f9;
+            --light-border: #d2dee6;
+            --accent-glow: rgba(0, 66, 117, 0.18);
+            --input-border: #bfd0dc;
+            --white-card-background: rgba(255, 255, 255, 0.92);
+            --dark-text: #17211b;
+            --muted-text: #647067;
+            --positive-color: #148a4f;
+            --negative-color: #d64545;
         }
-        body { font-family: var(--font-family); }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, rgba(0, 66, 117, 0.12), transparent 30%), var(--light-background);
+            color: var(--dark-text);
+            min-height: 100vh;
         }
-        .dark .glass-card {
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+        .glass-panel {
+            background: var(--white-card-background);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            box-shadow: 0 24px 70px rgba(23, 33, 27, 0.08);
         }
-        .podium-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        @media (min-width: 768px) {
-            .podium-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-            }
+        .dark .glass-panel {
+            background: rgba(24, 24, 27, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
         }
-        .rank-badge {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-weight: bold;
-            color: white;
+        .strike-through {
+            opacity: 0.75;
+            background-color: rgba(220, 230, 240, 0.3);
         }
-        .gold { background: linear-gradient(45deg, #FFD700, #FFA500); box-shadow: 0 4px 15px rgba(255,215,0,0.4); }
-        .silver { background: linear-gradient(45deg, #C0C0C0, #A9A9A9); }
-        .bronze { background: linear-gradient(45deg, #CD7F32, #8B4513); }
-        .standard-rank { background: #e6edf2; color: var(--primary-blue); }
-        .dark .standard-rank { background: #262626; color: #a3a3a3; }
+        .dark .strike-through {
+            background-color: rgba(39, 39, 42, 0.3);
+        }
 
-        .price-chip {
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            display: inline-block;
-            white-space: nowrap;
-        }
-        .profit-chip { background-color: #d1fae5; color: #065f46; }
-        .loss-chip { background-color: #fee2e2; color: #991b1b; }
-        .dark .profit-chip { background-color: #064e3b; color: #34d399; }
-        .dark .loss-chip { background-color: #7f1d1d; color: #f87171; }
+        /* ==========================================================================
+           GLOBAL SCROLLBAR DELETION (SCROLLS SMOOTHLY BUT VISUALLY HIDDEN EVERYWHERE)
+           ========================================================================== */
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
+        input:focus, 
+        select:focus, 
+        button:focus, 
+        textarea:focus,
+        [contenteditable="true"]:focus {
+            outline: none !important;
+            box-shadow: none !important; /* Wipes out any native browser shadow highlights */
         }
-        .live-indicator {
-            width: 8px;
-            height: 8px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-            animation: pulse 2s infinite;
+        html, body, .custom-scrollbar, div, table, tbody, tr, td {
+            scrollbar-width: none !important; /* Firefox */
+            -ms-overflow-style: none !important; /* IE/Edge */
+        }
+        html::-webkit-scrollbar, 
+        body::-webkit-scrollbar, 
+        .custom-scrollbar::-webkit-scrollbar,
+        div::-webkit-scrollbar,
+        table::-webkit-scrollbar,
+        tbody::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+
+        /* ==========================================================================
+           FUNCTIONAL SYSTEM SPIN ARROWS (STRICTLY NO BACKGROUND PANEL BOXES)
+           ========================================================================== */
+        input[type="number"] {
+            appearance: auto !important;
+            -webkit-appearance: number-input !important;
+            -moz-appearance: number-input !important;
+        }
+
+        /* Wipes out background panels/boxes behind the clickable arrows */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: inner-spin-button !important;
+            appearance: inner-spin-button !important;
+            display: block !important;
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            cursor: pointer;
+        }
+
+        /* Turns the arrows white in dark mode without adding a container background */
+        .dark input[type="number"]::-webkit-inner-spin-button,
+        .dark input[type="number"]::-webkit-outer-spin-button {
+            filter: invert(1) brightness(2) !important;
         }
     </style>
 </head>
-<body class="min-h-screen p-4 sm:p-8 bg-[#F8F8F0] dark:bg-zinc-800 text-gray-800 dark:text-gray-100 transition-colors duration-200">
+<body class="p-10 bg-[#edf4f9] dark:bg-zinc-900 text-[#17211b] dark:text-zinc-100 transition-colors duration-200">
 
-    <div class="max-w-md md:max-w-5xl mx-auto">
-        <div class="flex justify-between items-center mb-2">
-            <span id="notif-status" class="text-xs font-semibold px-2 py-1 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
-                🔔 Notifications: Requesting Permission...
-            </span>
-            <button id="theme-toggle" class="px-3 py-1.5 rounded-xl bg-white/80 dark:bg-black text-xs font-semibold shadow-sm border border-gray-200 dark:border-zinc-700 text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors focus:outline-none">
-                🌓 Toggle Theme
+    <div id="login-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-md hidden items-center justify-center z-50 transition-opacity">
+        <div class="glass-panel rounded-2xl p-8 max-w-md w-full mx-4 border border-white/20 shadow-2xl">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-transparent">
+                    <img src="./assets/icon.png" alt="" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h2 class="text-lg font-extrabold text-[#002d52] dark:text-blue-400 tracking-tight">Ledger Authentication</h2>
+                    <p class="text-[10px] text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wider">Ashoka Mock-Stock</p>
+                </div>
+            </div>
+            <form onsubmit="handleAuthSubmit(event)" class="flex flex-col gap-4">
+                <div>
+                    <label for="username-input" class="block text-xs font-bold text-gray-400 dark:text-zinc-500 mb-2 uppercase tracking-wider">Team / Participant Name</label>
+                    <input type="text" id="username-input" required placeholder="Enter team name (e.g. Admin)" 
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:outline-none focus:border-[#004275] dark:focus:border-blue-500 font-semibold text-sm text-gray-800 dark:text-gray-100">
+                </div>
+                <button type="submit" class="w-full mt-2 bg-[#004275] dark:bg-blue-600 hover:bg-[#002d52] dark:hover:bg-blue-700 text-white font-extrabold py-3 rounded-xl shadow-md transition text-xs tracking-wider uppercase">
+                    Initialize Workspace
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <header class="glass-panel rounded-2xl p-6 mb-10 max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-transparent">
+                <img src="./assets/icon.png" alt="" class="w-full h-full object-contain">
+            </div>
+            <div>
+                <h1 class="text-xl font-extrabold text-[#002d52] dark:text-blue-400 tracking-tight">Ashoka Mock-Stock Ledger</h1>
+                <p id="workspace-title" class="text-[11px] text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wider">Loading Session Context...</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <button id="theme-toggle" class="px-3 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-xs font-bold border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700 transition">
+                Toggle Theme
+            </button>
+            <button onclick="logoutSession()" class="px-3 py-2 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800/50 rounded-xl transition">
+                Change Profile
+            </button>
+            <button onclick="clearAllData()" class="px-4 py-2 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition">
+                Reset Ledger
+            </button>
+            <button onclick="openExportModal()" class="bg-[#004275] dark:bg-blue-600 hover:bg-[#002d52] dark:hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-md flex items-center gap-2">
+                Export Portfolio (CSV)
             </button>
         </div>
+    </header>
 
-        <header class="mb-6 md:mb-12 text-center">
-            <div class="inline-block px-3 py-1 mb-3 rounded-full bg-slate-100 dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 text-xs font-semibold tracking-wider uppercase">
-                <span class="live-indicator"></span> Live Market Session
+    <div class="max-w-[1600px] mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+        <div class="glass-panel rounded-2xl p-6">
+            <p class="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Available Cash Balance</p>
+            <p id="metric-cash-balance" class="text-2xl font-extrabold text-[#004275] dark:text-blue-400 mt-2 tracking-tight">₹100,000.00</p>
+        </div>
+        <div class="glass-panel rounded-2xl p-6">
+            <p class="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Total Invested Outlay</p>
+            <p id="metric-total-cost" class="text-2xl font-extrabold text-[#002d52] dark:text-blue-300 mt-2 tracking-tight">₹0.00</p>
+        </div>
+        <div class="glass-panel rounded-2xl p-6">
+            <p class="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Total Net Portfolio P&amp;L</p>
+            <p id="metric-total-pl" class="text-2xl font-extrabold text-gray-400 dark:text-zinc-500 mt-2 tracking-tight">₹0.00</p>
+        </div>
+    </div>
+
+    <main class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            <div class="glass-panel rounded-2xl p-8">
+                <h2 class="text-sm font-extrabold text-[#002d52] dark:text-blue-400 mb-5 flex items-center gap-2 uppercase tracking-wide">
+                    <span class="w-2 h-4 bg-[#004275] dark:bg-blue-500 rounded-full inline-block"></span>
+                    Log Transaction Entry
+                </h2>
+                
+                <form id="transaction-form" onsubmit="handleTransaction(event)" class="flex flex-col gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 dark:text-zinc-500 mb-2 uppercase tracking-wider">Direction</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="border border-green-600 dark:border-green-500 rounded-xl p-2.5 flex items-center justify-center gap-2 cursor-pointer bg-green-50/20 text-green-700 dark:text-green-400 font-extrabold text-xs transition">
+                                <input type="radio" name="txType" value="BUY" checked class="w-3.5 h-3.5 accent-green-700 dark:accent-green-500"> BUY
+                            </label>
+                            <label class="border border-red-600 dark:border-red-500 rounded-xl p-2.5 flex items-center justify-center gap-2 cursor-pointer bg-red-50/20 text-red-700 dark:text-red-400 font-extrabold text-xs transition">
+                                <input type="radio" name="txType" value="SELL" class="w-3.5 h-3.5 accent-red-700 dark:accent-red-500"> SELL
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label for="stock-search" class="block text-xs font-bold text-gray-400 dark:text-zinc-500 mb-2 uppercase tracking-wider">Search Asset</label>
+                        <input type="text" id="stock-search" oninput="filterStockSuggestions()" placeholder="Type to search stocks..." 
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:outline-none focus:border-[#004275] dark:focus:border-blue-500 font-semibold text-sm text-gray-800 dark:text-gray-100">
+                        <div id="suggestions-box" class="absolute left-0 right-0 mt-1 max-h-48 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-lg overflow-y-auto hidden z-50 custom-scrollbar"></div>
+                    </div>
+
+                    <div>
+                        <label for="stockTicker" class="block text-xs font-bold text-gray-400 dark:text-zinc-500 mb-2 uppercase tracking-wider">Ticker Symbol</label>
+                        <input type="text" id="stockTicker" readonly required placeholder="Select stock from layout menu" 
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 bg-gray-50/80 dark:bg-zinc-900/50 font-bold text-xs tracking-wider text-gray-500 dark:text-zinc-400 uppercase">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="stockQty" class="block text-xs font-bold text-gray-400 dark:text-zinc-500 mb-2 uppercase tracking-wider">Volume</label>
+                            <input type="number" id="stockQty" min="1" required placeholder="0" 
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:outline-none font-bold text-[#002d52] dark:text-blue-400 text-sm">
+                        </div>
+                        <div>
+                            <label for="stockPrice" class="block text-xs font-bold text-gray-400 dark:text-zinc-500 mb-2 uppercase tracking-wider">Price (₹)</label>
+                            <input type="number" id="stockPrice" min="0.01" step="0.01" required placeholder="0.00" 
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:outline-none font-bold text-[#002d52] dark:text-blue-400 text-sm">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full mt-2 bg-[#004275] dark:bg-blue-600 hover:bg-[#002d52] dark:hover:bg-blue-700 text-white font-extrabold py-3 px-4 rounded-xl shadow-md transition text-xs tracking-wider uppercase">
+                        Commit Order
+                    </button>
+                </form>
             </div>
-            <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-1 tracking-tight text-[#004275] dark:text-blue-400">
-                Traders' Hall of Fortune
-            </h1>
-            <p class="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 font-medium italic">"Fortune favors the bold."</p>
-        </header>
+        </div>
 
-        <div id="podium-area" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-12"></div>
-
-        <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
-            <div class="p-4 md:p-6 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center bg-white/50 dark:bg-black/50">
-                <h2 class="text-base sm:text-lg md:text-xl font-bold text-[#004275] dark:text-blue-400">Full Rankings</h2>
-                <span class="text-[10px] sm:text-xs text-gray-400 dark:text-zinc-500 font-medium" id="last-update">Updating live...</span>
-            </div>
+        <div class="lg:col-span-8 glass-panel rounded-2xl p-8 flex flex-col">
+            <h2 class="text-sm font-extrabold text-[#002d52] dark:text-blue-400 mb-5 flex items-center gap-2 uppercase tracking-wide">
+                <span class="w-2 h-4 bg-[#148a4f] rounded-full inline-block"></span>
+                Position Overview Dashboard (Includes Closed Trades)
+            </h2>
             
-            <div class="overflow-x-auto w-full">
-                <table class="w-full text-left border-collapse">
+            <div class="overflow-x-auto overflow-y-auto max-h-[450px] custom-scrollbar flex-1">
+                <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 dark:text-zinc-500 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-                            <th class="px-4 md:px-8 py-3 font-semibold w-16 text-center">Rank</th>
-                            <th class="px-4 md:px-8 py-3 font-semibold">Trader</th>
-                            <th class="px-4 md:px-8 py-3 text-right font-semibold w-36">Performance</th>
+                        <tr class="border-b border-gray-100 dark:border-zinc-800 text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider">
+                            <th class="pb-3 pl-4">Asset Ticker</th>
+                            <th class="pb-3 text-right">Net Units Held</th>
+                            <th class="pb-3 text-right">Avg Cost</th>
+                            <th class="pb-3 text-right">Total Outlay</th>
+                            <th class="pb-3 text-right">Market Price</th>
+                            <th class="pb-3 text-right pr-4">Total P&amp;L</th>
                         </tr>
                     </thead>
-                    <tbody id="leaderboard-list" class="divide-y divide-gray-100 dark:divide-zinc-800"></tbody>
+                    <tbody id="holdings-table-body" class="font-bold text-[#002d52] dark:text-zinc-200 divide-y divide-gray-50 dark:divide-zinc-800/50"></tbody>
                 </table>
+                <div id="holdings-empty" class="text-center py-24 text-gray-400 dark:text-zinc-500 font-semibold">
+                    No portfolio metrics active. Log transactions via side entry board configuration framework.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="export-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 transition-opacity">
+        <div class="bg-white dark:bg-zinc-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-gray-100 dark:border-zinc-700 mx-4">
+            <h3 class="text-base font-extrabold text-[#002d52] dark:text-blue-400 mb-2">Trader Log Verification</h3>
+            <p class="text-xs text-gray-400 dark:text-zinc-500 mb-4">Confirm destination profile template formatting criteria alignment.</p>
+            <input type="text" id="trader-name-input" readonly class="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 text-sm font-bold mb-4 text-gray-500 dark:text-zinc-400 focus:outline-none">
+            <div class="flex justify-end gap-2 text-xs font-bold">
+                <button onclick="closeExportModal()" class="px-4 py-2 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-700">Cancel</button>
+                <button onclick="confirmAndExportCSV()" class="px-4 py-2 bg-[#004275] dark:bg-blue-600 text-white rounded-xl hover:bg-[#002d52] dark:hover:bg-blue-700">Download Archive</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ================= CONFIGURATION AREA =================
-        const API_HOST = '127.0.0.1'; 
-        const API_PORT = '5000';
-        const API_URL  = `http://${API_HOST}:${API_PORT}/api/leaderboard`;
-        const REFRESH_INTERVAL = 3000;
-        // ======================================================
+        const NSE_COMPANY_NAMES = {
+            // Auto Ancillaries
+            "BHARATFORG": "Bharat Forge Ltd.", "CIEINDIA": "CIE Automotive India Ltd.", "CRAFTSMAN": "Craftsman Automation Ltd.", "ENDURANCE": "Endurance Technologies Ltd.", "EXIDEIND": "Exide Industries Ltd.", "FIEMIND": "Fiem Industries Ltd.", "GABRIEL": "Gabriel India Ltd.", "JAMNAAUTO": "Jamna Auto Industries Ltd.", "LUMAXIND": "Lumax Industries Ltd.", "RKFORGE": "Ramkrishna Forgings Ltd.", "SONACOMS": "Sona BLW Precision Forgings", "SUBROS": "Subros Ltd.", "SUPRAJIT": "Suprajit Engineering Ltd.", "UNOMINDA": "Uno Minda Ltd.", "VARROC": "Varroc Engineering Ltd.",
+            // Automobiles - OEMs
+            "ASHOKLEY": "Ashok Leyland Ltd.", "BAJAJ-AUTO": "Bajaj Auto Ltd.", "EICHERMOT": "Eicher Motors Ltd.", "FORCEMOT": "Force Motors Ltd.", "HEROMOTOCO": "Hero MotoCorp Ltd.", "M&M": "Mahindra & Mahindra Ltd.", "MARUTI": "Maruti Suzuki India Ltd.", "OLECTRA": "OLECTRA Greentech Ltd.", "TVSMOTOR": "TVS Motor Company Ltd.",
+            // Banking
+            "AXISBANK": "Axis Bank Ltd.", "BANDHANBNK": "Bandhan Bank Ltd.", "BANKBARODA": "Bank of Baroda", "BANKINDIA": "Bank of India", "CANBK": "Canara Bank", "CENTRALBK": "Central Bank of India", "CSBBANK": "CSB Bank Ltd.", "CUB": "City Union Bank Ltd.", "DCBBANK": "DCB Bank Ltd.", "DHANBANK": "Dhanlaxmi Bank Ltd.", "ESAFSFB": "ESAF Small Finance Bank", "FEDERALBNK": "The Federal Bank Ltd.", "HDFCBANK": "HDFC Bank Ltd.", "ICICIBANK": "ICICI Bank Ltd.", "IDBI": "IDBI Bank Ltd.", "IDFCFIRSTB": "IDFC First Bank Ltd.", "INDIANB": "Indian Bank", "INDUSINDBK": "IndusInd Bank Ltd.", "IOB": "Indian Overseas Bank", "J&KBANK": "Jammu & Kashmir Bank Ltd.", "KARURVYSYA": "Karur Vysya Bank Ltd.", "KOTAKBANK": "Kotak Mahindra Bank Ltd.", "MAHABANK": "Bank of Maharashtra", "PNB": "Punjab National Bank", "PSB": "Punjab & Sind Bank", "RBLBANK": "RBL Bank Ltd.", "SBIN": "State Bank of India", "SOUTHBANK": "The South Indian Bank Ltd.", "SURYODAY": "Suryoday Small Finance Bank", "UCOBANK": "UCO Bank", "UNIONBANK": "Union Bank of India", "UTKARSHBNK": "Utkarsh Small Finance Bank", "YESBANK": "Yes Bank Ltd.",
+            // Beverages & Distilleries
+            "ASAL": "Associated Alcohols & Breweries", "GLOBUSSPR": "Globus Spirits Ltd.", "RADICO": "Radico Khaitan Ltd.", "SULA": "Sula Vineyards Ltd.", "TI": "Tilaknagar Industries Ltd.", "UBL": "United Breweries Ltd.", "VBL": "Varun Beverages Ltd.",
+            // Capital Goods & Industrial
+            "ABB": "ABB India Ltd.", "AIAENG": "AIA Engineering Ltd.", "BHEL": "Bharat Heavy Electricals Ltd.", "CUMMINSIND": "Cummins India Ltd.", "ELGIEQUIP": "Elgi Equipments Ltd.", "HAVELLS": "Havells India Ltd.", "KEI": "KEI Industries Ltd.", "KIRLOSENG": "Kirloskar Oil Engines Ltd.", "LT": "Larsen & Toubro Ltd.", "POLYCAB": "Polycab India Ltd.", "SIEMENS": "Siemens Ltd.", "SKFINDIA": "SKF India Ltd.", "THERMAX": "Thermax Ltd.", "TRITURBINE": "Triveni Turbine Ltd.", "VOLTAS": "Voltas Ltd.",
+            // Cement & Building Materials
+            "ACC": "ACC Ltd.", "AMBUJACEM": "Ambuja Cements Ltd.", "DALBHARAT": "Dalmia Bharat Ltd.", "HEIDELBERG": "HeidelbergCement India Ltd.", "INDIACEM": "The India Cements Ltd.", "JKCEMENT": "JK Cement Ltd.", "ORIENTCEM": "Orient Cement Ltd.", "PRSMJOHNSN": "Prism Johnson Ltd.", "RAMCOCEM": "The Ramco Cements Ltd.", "SAGCEM": "Sagar Cements Ltd.", "SHREECEM": "Shree Cement Ltd.", "STARCEMENT": "Star Cement Ltd.", "ULTRACEMCO": "UltraTech Cement Ltd.",
+            // Chemicals
+            "AARTIIND": "Aarti Industries Ltd.", "ATUL": "Atul Ltd.", "BAYERCROP": "Bayer CropScience Ltd.", "CHAMBLFERT": "Chambal Fertilisers & Chemicals", "CLEAN": "Clean Science & Technology", "COROMANDEL": "Coromandel International", "DEEPAKNTR": "Deepak Nitrite Ltd.", "FACT": "Fertilisers & Chemicals Travancore", "FINEORG": "Fine Organic Industries", "FLUOROCHEM": "Gujarat Fluorochemicals Ltd.", "GNFC": "Gujarat Narmada Valley Fertilizers", "GSFC": "Gujarat State Fertilizers & Chemicals", "GUJALKALI": "Gujarat Alkalies & Chemicals", "MADRASFERT": "Madras Fertilizers Ltd.", "NAVINFLUOR": "Navin Fluorine International", "NOCIL": "NOCIL Ltd.", "PIIND": "PI Industries Ltd.", "RCF": "Rashtriya Chemicals & Fertilizers", "ROSSARI": "Rossari Biotech Ltd.", "SHARDACROP": "Sharda Cropchem Ltd.", "SPIC": "Southern Petrochemical Industries", "SRF": "SRF Ltd.", "SUDARSCHEM": "Sudarshan Chemical Industries", "SUMICHEM": "Sumitomo Chemical India Ltd.", "TATACHEM": "Tata Chemicals Ltd.", "UPL": "UPL Ltd.", "VINATIORGA": "Vinati Organics Ltd.",
+            // Construction & Infrastructure
+            "ASHOKA": "Ashoka Buildcon Ltd.", "ENGINERSIN": "Engineers India Ltd.", "GPIL": "Godawari Power & Ispat Ltd.", "KNRCON": "KNR Constructions Ltd.", "NBCC": "NBCC (India) Ltd.", "NCC": "NCC Ltd.", "PATELENG": "Patel Engineering Ltd.", "PNCINFRA": "PNC Infratech Ltd.", "RKEC": "RKEC Projects Ltd.",
+            // Consumer D&E
+            "AMBER": "Amber Enterprises India Ltd.", "BAJAJELEC": "Bajaj Electricals Ltd.", "BLUESTARCO": "Blue Star Ltd.", "CROMPTON": "Crompton Greaves Consumer Electricals", "DIXON": "Dixon Technologies (India) Ltd.", "KAYNES": "Kaynes Technology India", "ORIENTELEC": "Orient Electric Ltd.", "SYRMA": "Syrma SGS Technology Ltd.", "WHIRLPOOL": "Whirlpool of India Ltd.",
+            // Consumer R&S
+            "ABFRL": "Aditya Birla Fashion and Retail Ltd.", "DELHIVERY": "Delhivery Ltd.", "DMART": "Avenue Supermarts Ltd. (DMart)", "ETHOSLTD": "Ethos Ltd.", "HONASA": "Honasa Consumer Ltd. (Mamaearth)", "KALYANKJIL": "Kalyan Jewellers India Ltd.", "MAPMYINDIA": "C.E. Info Systems Ltd. (MapmyIndia)", "NYKAA": "FSN E-Commerce Ventures Ltd. (Nykaa)", "PAYTM": "One 97 Communications Ltd. (Paytm)", "POLICYBZR": "PB Fintech Ltd. (Policybazaar)", "SENCO": "Senco Gold Ltd.", "TITAN": "Titan Company Ltd.", "TRENT": "Trent Ltd.",
+            // Defense & Shipbuilding
+            "ASTRAZEN": "AstraZeneca Pharma India Ltd.", "BDL": "Bharat Dynamics Ltd.", "BEL": "Bharat Electronics Ltd.", "BEML": "BEML Ltd.", "COCHINSHIP": "Cochin Shipyard Ltd.", "DCXINDIA": "DCX Systems Ltd.", "GRSE": "Garden Reach Shipbuilders & Engineers", "HAL": "Hindustan Aeronautics Ltd.", "IDEAFORGE": "ideaForge Technology Ltd.", "MAZDOCK": "Mazagon Dock Shipbuilders Ltd.", "MTARTECH": "MTAR Technologies Ltd.", "PARAS": "Paras Defence & Space Technologies",
+            // Energy
+            "ADANIGREEN": "Adani Green Energy Ltd.", "ADANIPOWER": "Adani Power Ltd.", "BORORENEW": "Borosil Renewables Ltd.", "BPCL": "Bharat Petroleum Corporation Ltd.", "CHENNPETRO": "Chennai Petroleum Corporation Ltd.", "CONFIPET": "Confidence Petroleum India Ltd.", "GAIL": "GAIL (India) Ltd.", "GENSOL": "Gensol Engineering Ltd.", "GREENPANEL": "Greenpanel Industries Ltd.", "GSPL": "Gujarat State Petronet Ltd.", "GUJGASLTD": "Gujarat Gas Ltd.", "GULFPETRO": "GP Petroleums Ltd.", "HINDPETRO": "Hindustan Petroleum Corporation Ltd.", "IGL": "Indraprastha Gas Ltd.", "IOC": "Indian Oil Corporation Ltd.", "IREDA": "Indian Renewable Energy Development Agency", "JPPOWER": "Jaiprakash Power Ventures Ltd.", "JSWENERGY": "JSW Energy Ltd.", "MGL": "Mahanagar Gas Ltd.", "MRPL": "Mangalore Refinery & Petrochemicals Ltd.", "NHPC": "NHPC Ltd.", "NTPC": "NTPC Ltd.", "OIL": "Oil India Ltd.", "ONGC": "Oil & Natural Gas Corporation Ltd.", "PETRONET": "Petronet LNG Ltd.", "POWERGRID": "Power Grid Corporation of India Ltd.", "SJVN": "SJVN Ltd.", "SUZLON": "Suzlon Energy Ltd.", "TATAPOWER": "Tata Power Company Ltd.", "TORNTPOWER": "Torrent Power Ltd.",
+            // FMCG
+            "AWL": "Adani Wilmar Ltd.", "BRITANNIA": "Britannia Industries Ltd.", "COLPAL": "Colgate-Palmolive (India) Ltd.", "DABUR": "Dabur India Ltd.", "DODLA": "Dodla Dairy Ltd.", "GODREJCP": "Godrej Consumer Products Ltd.", "HATSUN": "Hatsun Agro Product Ltd.", "HERITGFOOD": "Heritage Foods Ltd.", "HINDUNILVR": "Hindustan Unilever Ltd.", "ITC": "ITC Ltd.", "JYOTHYLAB": "Jyothy Labs Ltd.", "MARICO": "Marico Ltd.", "NESTLEIND": "Nestle India Ltd.", "PGHH": "Procter & Gamble Hygiene and Health Care", "TATACONSUM": "Tata Consumer Products Ltd.", "VIJAYA": "Vijaya Diagnostic Centre Ltd.",
+            // Finance
+            "5PAISA": "5paisa Capital Ltd.", "AAVAS": "Aavas Financiers Ltd.", "ABSLAMC": "Aditya Birla Sun Life AMC Ltd.", "ANGELONE": "Angel One Ltd.", "BAJAJFINSV": "Bajaj Finserv Ltd.", "BAJFINANCE": "Bajaj Finance Ltd.", "BSE": "BSE Ltd.", "CAMS": "Computer Age Management Services Ltd.", "CANFINHOME": "Can Fin Homes Ltd.", "CDSL": "Central Depository Services (India) Ltd.", "CHOLAFIN": "Cholamandalam Investment & Finance Co.", "CREDITACC": "CreditAccess Grameen Ltd.", "GEOJITFSL": "Geojit Financial Services Ltd.", "GICRE": "General Insurance Corporation of India", "HDFCAMC": "HDFC Asset Management Company Ltd.", "HDFCLIFE": "HDFC Life Insurance Company Ltd.", "HOMEFIRST": "Home First Finance Company India Ltd.", "HUDCO": "Housing & Urban Development Corporation", "ICICIGI": "ICICI Lombard General Insurance Co.", "ICICIPRULI": "ICICI Prudential Life Insurance Co.", "IEX": "Indian Energy Exchange Ltd.", "IFCI": "IFCI Ltd.", "KFINTECH": "KFin Technologies Ltd.", "LICHSGFIN": "LIC Housing Finance Ltd.", "M&MFIN": "Mahindra & Mahindra Financial Services", "MANAPPURAM": "Manappuram Finance Ltd.", "MASFIN": "MAS Financial Services Ltd.", "MCX": "Multi Commodity Exchange of India Ltd.", "MUTHOOTFIN": "Muthoot Finance Ltd.", "NAM-INDIA": "Nippon Life India Asset Management Ltd.", "NIACL": "The New India Assurance Company Ltd.", "PFC": "Power Finance Corporation Ltd.", "POONAWALLA": "Poonawalla Fincorp Ltd.", "RECLTD": "REC Ltd.", "SATIN": "Satin Creditcare Network Ltd.", "SBILIFE": "SBI Life Insurance Company Ltd.", "SHRIRAMFIN": "Shriram Finance Ltd.", "UFLEX": "Uflex Ltd.", "UTIAMC": "UTI Asset Management Company Ltd.",
+            // Healthcare & Diagnostics
+            "APOLLOHOSP": "Apollo Hospitals Enterprise Ltd.", "ASTERDM": "Aster DM Healthcare Ltd.", "FORTIS": "Fortis Healthcare Ltd.", "GLOBAL": "Global Health Ltd. (Medanta)", "KIMS": "Krishna Institute of Medical Sciences Ltd.", "LALPATHLAB": "Dr. Lal PathLabs Ltd.", "MAXHEALTH": "Max Healthcare Institute Ltd.", "MEDANTA": "Global Health Ltd. (Medanta)", "METROPOLIS": "Metropolis Healthcare Ltd.", "RAINBOW": "Rainbow Children's Medicare Ltd.", "SHALBY": "Shalby Ltd.", "THYROCARE": "Thyrocare Technologies Ltd.",
+            // Hospitality & Tourism
+            "CHALET": "Chalet Hotels Ltd.", "EASEMYTRIP": "Easy Trip Planners Ltd. (EaseMyTrip)", "EIHOTEL": "EIH Ltd. (Oberoi Hotels)", "INDHOTEL": "The Indian Hotels Company Ltd. (Taj)", "ITDC": "India Tourism Development Corporation Ltd.", "LEMONTREE": "Lemon Tree Hotels Ltd.", "SPECIALITY": "Speciality Restaurants Ltd.", "TAJGVK": "TAJGVK Hotels & Resorts Ltd.",
+            // IT - SmallCap & Specialized
+            "63MOONS": "63 Moons Technologies Ltd.", "DSSL": "Dynacons Systems & Solutions Ltd.", "HAPPSTMNDS": "Happiest Minds Technologies Ltd.", "INTELLECT": "Intellect Design Arena Ltd.", "KELLTONTEC": "Kellton Tech Solutions Ltd.", "NELCO": "Nelco Ltd.", "NETWEB": "Netweb Technologies India Ltd.", "NEWGEN": "Newgen Software Technologies Ltd.", "RAMCOSYS": "Ramco Systems Ltd.", "ROUTE": "Route Mobile Ltd.", "SAKSOFT": "Saksoft Ltd.", "TANLA": "Tanla Platforms Ltd.", "VALIANTORG": "Valiant Organics Ltd.",
+            // IT - Tier 1 & 2
+            "BSOFT": "Birlasoft Ltd.", "COFORGE": "Coforge Ltd.", "CYIENT": "Cyient Ltd.", "HCLTECH": "HCL Technologies Ltd.", "INFY": "Infosys Ltd.", "KPITTECH": "KPIT Technologies Ltd.", "LTTS": "L&T Technology Services Ltd.", "MASTEK": "Mastek Ltd.", "MPHASIS": "Mphasis Ltd.", "OFSS": "Oracle Financial Services Software Ltd.", "PERSISTENT": "Persistent Systems Ltd.", "SONATSOFTW": "Sonata Software Ltd.", "TATAELXSI": "Tata Elxsi Ltd.", "TCS": "Tata Consultancy Services Ltd.", "TECHM": "Tech Mahindra Ltd.", "WIPRO": "Wipro Ltd.", "ZENSARTECH": "Zensar Technologies Ltd.",
+            // Metals
+            "APLAPOLLO": "APL Apollo Tubes Ltd.", "COALINDIA": "Coal India Ltd.", "ELECTCAST": "Electrosteel Castings Ltd.", "HINDALCO": "Hindalco Industries Ltd.", "HINDCOPPER": "Hindustan Copper Ltd.", "HINDZINC": "Hindustan Zinc Ltd.", "JINDALSTEL": "Jindal Steel & Power Ltd.", "JSL": "Jindal Stainless Ltd.", "JSWSTEEL": "JSW Steel Ltd.", "KIOCL": "KIOCL Ltd.", "MIDHANI": "Mishra Dhatu Nigam Ltd.", "MOIL": "MOIL Ltd.", "NATIONALUM": "National Aluminium Company Ltd.", "NMDC": "NMDC Ltd.", "RATNAMANI": "Ratnamani Metals & Tubes Ltd.", "SAIL": "Steel Authority of India Ltd.", "SUNFLAG": "Sunflag Iron & Steel Company Ltd.", "TATASTEEL": "Tata Steel Ltd.", "VEDL": "Vedanta Ltd.", "WELCORP": "Welspun Corp Ltd.",
+            // Pharmaceuticals
+            "ABBOTINDIA": "Abbott India Ltd.", "ALKEM": "Alkem Laboratories Ltd.", "AUROPHARMA": "Aurobindo Pharma Ltd.", "BIOCON": "Biocon Ltd.", "CIPLA": "Cipla Ltd.", "DIVISLAB": "Divi's Laboratories Ltd.", "DRREDDY": "Dr. Reddy's Laboratories Ltd.", "ERIS": "Eris Lifesciences Ltd.", "GLAND": "Gland Pharma Ltd.", "GLAXO": "GlaxoSmithKline Pharmaceuticals Ltd.", "GRANULES": "Granules India Ltd.", "IPCALAB": "Ipca Laboratories Ltd.", "JBCHEPHARM": "J.B. Chemicals & Pharmaceuticals Ltd.", "LAURUSLABS": "Laurus Labs Ltd.", "LUPIN": "Lupin Ltd.", "MANKIND": "Mankind Pharma Ltd.", "MARKSANS": "Marksans Pharma Ltd.", "NATCOPHARM": "Natco Pharma Ltd.", "SUNPHARMA": "Sun Pharmaceutical Industries Ltd.", "TORNTPHARM": "Torrent Pharmaceuticals Ltd.", "ZYDUSLIFE": "Zydus Lifesciences Ltd.",
+            // Railways & Logistics
+            "ALLCARGO": "Allcargo Logistics Ltd.", "BLUEDART": "Blue Dart Express Ltd.", "CONCOR": "Container Corporation of India Ltd.", "GATEWAY": "Gateway Distriparks Ltd.", "IRB": "IRB Infrastructure Developers Ltd.", "IRCON": "IRCON International Ltd.", "IRFC": "Indian Railway Finance Corporation Ltd.", "JWL": "Jupiter Wagons Ltd.", "KEC": "KEC International Ltd.", "RAILTEL": "RailTel Corporation of India Ltd.", "RITES": "RITES Ltd.", "RVNL": "Rail Vikas Nigam Ltd.", "TCI": "Transport Corporation of India Ltd.", "TEXRAIL": "Texmaco Rail & Engineering Ltd.", "TITAGARH": "Titagarh Rail Systems Ltd.",
+            // Real Estate
+            "AJMERA": "Ajmera Realty & Infra India Ltd.", "BRIGADE": "Brigade Enterprises Ltd.", "DLF": "DLF Ltd.", "GODREJPROP": "Godrej Properties Ltd.", "IBREALEST": "Indiabulls Real Estate Ltd.", "LODHA": "Macrotech Developers Ltd. (Lodha)", "MAHLIFE": "Mahindra Lifespace Developers", "OBEROIRLTY": "Oberoi Realty Ltd.", "PHOENIXLTD": "The Phoenix Mills Ltd.", "PRESTIGE": "Prestige Estates Projects", "PURVA": "Puravankara Ltd.", "SOBHA": "Sobha Ltd.", "SUNTECK": "Sunteck Realty Ltd.",
+            // Sugar & Agriculture
+            "AVADHSUGAR": "Avadh Sugar & Energy Ltd.", "BALRAMCHIN": "Balrampur Chini Mills Ltd.", "BANARISUG": "Bannari Amman Sugars Ltd.", "DALMIASUG": "Dalmia Bharat Sugar & Industries", "DHAMPURSUG": "Dhampur Sugar Mills Ltd.", "EIDPARRY": "E.I.D. - Parry (India) Ltd.", "RENUKA": "Shree Renuka Sugars Ltd.", "TRIVENI": "Triveni Engineering & Industries Ltd.",
+            // Telecom & Media
+            "BHARTIARTL": "Bharti Airtel Ltd.", "GTLINFRA": "GTL Infrastructure Ltd.", "HFCL": "HFCL Ltd.", "IDEA": "Vodafone Idea Ltd.", "INDUSTOWER": "Indus Towers Ltd.", "ITI": "ITI Ltd.", "NETWORK18": "Network18 Media & Investments Ltd.", "PVRINOX": "PVR INOX Ltd.", "SAREGAMA": "Saregama India Ltd.", "SUNTV": "Sun TV Network Ltd.", "TIPSMUSIC": "Tips Industries Ltd. (Tips Music)", "ZEEL": "Zee Entertainment Enterprises Ltd.",
+            // Textiles & Apparels
+            "ARVIND": "Arvind Ltd.", "FILATEX": "Filatex India Ltd.", "GOKEX": "Gokaldas Exports Ltd.", "KPRMILL": "K.P.R. Mill Ltd.", "LUXIND": "Lux Industries Ltd.", "NITINSPIN": "Nitin Spinners Ltd.", "PAGEIND": "Page Industries Ltd.", "RAYMOND": "Raymond Ltd.", "RUPA": "Rupa & Company Ltd.", "SANGAMIND": "Sangam (India) Ltd.", "TRIDENT": "Trident Ltd.",
+            // Tyres & Rubber
+            "APOLLOTYRE": "Apollo Tyres Ltd.", "CEATLTD": "CEAT Ltd.", "GOODYEAR": "Goodyear India Ltd.", "JKTYRE": "JK Tyre & Industries Ltd.", "MRF": "MRF Ltd.", "TVSSRICHAK": "TVS Srichakra Ltd."
+        };
 
-        let localDataCached = [];
-        let previousTopThreeUsernames = []; 
+        const INITIAL_PRINCIPAL = 100000.00;
+        let currentTeam = "";
+        let transactions = [];
 
-        function roundToNearestFiveCents(value) {
-            return Math.round(value * 20) / 20;
-        }
+        let ipcRenderer = null;
 
-        function initNotifications() {
-            if (!("Notification" in window)) {
-                document.getElementById('notif-status').innerText = "❌ Notifications unsupported";
-                return;
-            }
-
-            if (Notification.permission === "granted") {
-                updateNotifBadge("active");
-            } else if (Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") updateNotifBadge("active");
-                    else updateNotifBadge("denied");
-                });
-            } else {
-                updateNotifBadge("denied");
-            }
-        }
-
-        function updateNotifBadge(status) {
-            const badge = document.getElementById('notif-status');
-            if (status === "active") {
-                badge.innerText = "Podiums Shift Alerts Active";
-                badge.className = "text-xs font-semibold px-2 py-1 rounded bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-            } else {
-                badge.innerText = "🔇 Alerts Blocked by Browser";
-                badge.className = "text-xs font-semibold px-2 py-1 rounded bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
-            }
-        }
-
-        async function updateLeaderboard() {
+        if (typeof window !== 'undefined' && window.electronAPI) {
+            // Architecture 1: Modern Context Isolation (preload.js)
+            ipcRenderer = {
+                invoke: async (channel, ...args) => {
+                    if (channel === 'read-portfolio' && window.electronAPI.readPortfolio) {
+                        return await window.electronAPI.readPortfolio(...args);
+                    }
+                    return { success: false, error: "Channel not mapped in preload." };
+                }
+            };
+        } else if (typeof window !== 'undefined' && window.require) {
+            // Architecture 2: Node Integration (Direct Electron require)
             try {
-                const response = await fetch(`${API_URL}?t=${Date.now()}`, { 
-                    method: 'GET',
-                    mode: 'cors' 
-                });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                let data = await response.json();
-                
-                if (Array.isArray(data)) {
-                    data.sort((a, b) => b.total_pl - a.total_pl);
-                    
-                    data = data.map((item, index) => ({
-                        ...item,
-                        rank: index + 1
-                    }));
-
-                    checkPodiumChanges(data.slice(0, 3));
-                    localDataCached = data;
-                    renderUI();
-                }
-            } catch (error) {
-                console.error("Leaderboard Sync Failed:", error);
-                if (localDataCached.length === 0) {
-                    document.getElementById('leaderboard-list').innerHTML = `<tr><td colspan="3" class="text-center py-8 text-red-500 font-bold text-sm">Error loading data. Verify host server settings.</td></tr>`;
-                }
+                ipcRenderer = window.require('electron').ipcRenderer;
+                console.log("[SYSTEM] Using native Node Integration for IPC.");
+            } catch (e) {
+                console.error("[SYSTEM] Failed to load native electron modules:", e);
             }
         }
 
-        function checkPodiumChanges(currentTopThree) {
-            const currentNames = currentTopThree.map(player => player ? player.username : '');
-
-            if (previousTopThreeUsernames.length === 0) {
-                previousTopThreeUsernames = currentNames;
-                return;
-            }
-
-            let dynamicShiftOccurred = false;
-            for (let i = 0; i < 3; i++) {
-                if (currentNames[i] !== previousTopThreeUsernames[i]) {
-                    dynamicShiftOccurred = true;
-                    break;
-                }
-            }
-
-            if (dynamicShiftOccurred) {
-                triggerSystemNotification(currentNames);
-                previousTopThreeUsernames = currentNames; 
-            }
-        }
-
-        function triggerSystemNotification(names) {
-            if (Notification.permission === "granted") {
-                const title = "Podium Shift Alert!";
-                const options = {
-                    body: `The Top 3 roster has changed!\n1st: ${names[0] || 'None'} | 2nd: ${names[1] || 'None'} | 3rd: ${names[2] || 'None'}`,
-                    requireInteraction: false
-                };
-                new Notification(title, options);
-            }
-        }
-
-        function renderUI() {
-            if (!localDataCached.length) {
-                document.getElementById('leaderboard-list').innerHTML = `<tr><td colspan="3" class="text-center py-8 text-gray-400 dark:text-zinc-500 font-semibold text-xs">No active trader sessions found.</td></tr>`;
-                return;
-            }
-            renderPodium(localDataCached.slice(0, 3));
-            renderList(localDataCached);
-            updateTimestamp();
-        }
-
-        function renderPodium(topThree) {
-            const container = document.getElementById('podium-area');
-            if (!container || !topThree.length) return;
-            
-            const colors = ['gold', 'silver', 'bronze'];
-            const borderColors = { 
-                gold: 'border-yellow-400 dark:border-yellow-400', 
-                silver: 'border-slate-300 dark:border-slate-400', 
-                bronze: 'border-amber-600 dark:border-amber-600' 
+        // Fallback: If running in a standard Chrome tab instead of the Electron app
+        if (!ipcRenderer) {
+            console.warn("[SYSTEM] No Electron environment detected. Forcing offline browser cache.");
+            ipcRenderer = {
+                invoke: async () => ({ success: false, data: null })
             };
-
-            const podiumElevations = {
-                1: 'md:-translate-y-8 md:scale-105 z-10 shadow-md', 
-                2: 'md:translate-y-0',                             
-                3: 'md:translate-y-8'                              
-            };
-
-            let targetOrder = [...topThree];
-            if (window.innerWidth >= 768 && topThree.length === 3) {
-                targetOrder = [topThree[1], topThree[0], topThree[2]]; 
-            }
-
-            container.innerHTML = targetOrder.map((user) => {
-                if (!user) return '';
-                
-                const rawPnL = parseFloat(user.total_pl) || 0;
-                const pnlValue = roundToNearestFiveCents(rawPnL);
-                
-                const isProfit = pnlValue > 0;
-                const isLoss = pnlValue < 0;
-                
-                const sign = isProfit ? '+' : (isLoss ? '-' : '');
-                const textColors = isLoss ? 'text-[#991b1b] dark:text-[#f87171]' : (isProfit ? 'text-[#065f46] dark:text-[#34d399]' : 'text-gray-600 dark:text-zinc-400');
-                
-                const rankIndex = user.rank - 1;
-                const colorClass = colors[rankIndex] || 'standard-rank';
-                const borderClass = borderColors[colorClass] || 'border-slate-200 dark:border-zinc-700';
-                const elevationClass = podiumElevations[user.rank] || '';
-
-                return `
-                    <div class="podium-card glass-card p-5 rounded-2xl border-t-4 ${borderClass} ${elevationClass} flex md:block items-center justify-between md:justify-center gap-4 transition-all duration-300">
-                        <div class="flex md:block items-center gap-3">
-                            <div class="rank-badge ${colorClass} md:mx-auto text-xs sm:text-sm shrink-0">${user.rank}</div>
-                            <h3 class="font-bold text-gray-800 dark:text-gray-100 text-sm sm:text-base md:text-lg truncate max-w-[120px] sm:max-w-none text-left md:text-center mt-2">${user.username}</h3>
-                        </div>
-                        <div class="text-right md:text-center md:mt-3">
-                            <p class="text-base sm:text-xl md:text-2xl font-extrabold ${textColors}">
-                                ${sign}₹${Math.abs(pnlValue).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                            </p>
-                            <p class="text-[9px] sm:text-[10px] md:text-xs text-gray-400 dark:text-zinc-400 uppercase tracking-wider font-semibold">Total P/L</p>
-                        </div>
-                    </div>
-                `;
-            }).join('');
         }
 
-        function renderList(users) {
-            const list = document.getElementById('leaderboard-list');
-            if (!list) return;
-            
-            list.innerHTML = users.map(user => {
-                const rawPnL = parseFloat(user.total_pl) || 0;
-                const pnlValue = roundToNearestFiveCents(rawPnL);
-
-                const isProfit = pnlValue > 0;
-                const isLoss = pnlValue < 0;
-                
-                const chipClass = isProfit ? 'profit-chip' : (isLoss ? 'loss-chip' : 'bg-gray-100 text-gray-600 dark:bg-zinc-700 dark:text-zinc-400');
-                const sign = isProfit ? '+' : (isLoss ? '-' : '');
-                const rankClass = user.rank === 1 ? 'gold' : user.rank === 2 ? 'silver' : user.rank === 3 ? 'bronze' : 'standard-rank';
-
-                return `
-                    <tr class="hover:bg-gray-50/50 dark:hover:bg-zinc-800/50 transition-colors border-b border-gray-100 dark:border-zinc-800 text-xs sm:text-sm">
-                        <td class="px-4 md:px-8 py-3 flex justify-center"><div class="rank-badge ${rankClass} text-xs">${user.rank}</div></td>
-                        <td class="px-4 md:px-8 py-3"><span class="font-bold text-gray-800 dark:text-gray-200">${user.username}</span></td>
-                        <td class="px-4 md:px-8 py-3 text-right">
-                            <span class="price-chip ${chipClass} text-xs">
-                                ${sign} ₹${Math.abs(pnlValue).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                            </span>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(renderUI, 100); 
-        });
-
-        function updateTimestamp() {
-            const el = document.getElementById('last-update');
-            if (el) el.innerText = `Last update: ${new Date().toLocaleTimeString()}`;
-        }
-
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Force screen frame presentation to load exactly after 2 Ctrl + zoom factors (120%)
+            if (window.require) {
+                try {
+                    const { webFrame } = window.require('electron');
+                    webFrame.setZoomFactor(1.2);
+                } catch (e) {
+                    console.error("Electron webFrame zoom could not be configured automatically:", e);
+                }
             } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
+                // Safe document container styling fallback rule for baseline standard browsers
+                document.body.style.zoom = "120%";
             }
+
+            // 2. Load core user sessions data structures
+            initializeWorkspaceSession();
+            
+            // 3. Document Click Suggestions box cleanup event
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#stock-search') && !e.target.closest('#suggestions-box')) {
+                    document.getElementById('suggestions-box').classList.add('hidden');
+                }
+            });
+
+            // 4. Global Dark/Light interface toggle execution context
+            document.getElementById('theme-toggle').addEventListener('click', () => {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
         });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            initNotifications();
-            updateLeaderboard();
-            setInterval(updateLeaderboard, REFRESH_INTERVAL);
-        });
+        function initializeWorkspaceSession() {
+            const savedUser = localStorage.getItem('mock_ledger_current_user');
+            if (!savedUser) {
+                showLoginModal();
+            } else {
+                currentTeam = savedUser.trim();
+                document.getElementById('workspace-title').innerText = `Active Profile: ${savedUser}`;
+                loadPortfolioData();
+            }
+        }
+
+        function showLoginModal() {
+            const overlay = document.getElementById('login-overlay');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const inputVal = document.getElementById('username-input').value.trim();
+            if(!inputVal) return;
+            
+            localStorage.setItem('mock_ledger_current_user', inputVal);
+            currentTeam = inputVal;
+            
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('login-overlay').classList.remove('flex');
+            document.getElementById('workspace-title').innerText = `Active Profile: ${inputVal}`;
+            
+            loadPortfolioData();
+        }
+
+        function logoutSession() {
+            localStorage.removeItem('mock_ledger_current_user');
+            location.reload();
+        }
+
+        async function loadPortfolioData() {
+            if (!ipcRenderer) return;
+            
+            try {
+                const response = await ipcRenderer.invoke('read-portfolio', currentTeam);
+                
+                if (response && response.success && response.data) {
+                    const rawTxList = response.data.transactions || [];
+                    
+                    // Map keys exactly matching Admin_portfolio.json structure
+                    transactions = rawTxList.map(tx => ({
+                        type: tx.type || 'BUY',
+                        stockId: (tx.stockId || '').toUpperCase(),
+                        quantity: parseInt(tx.quantity || 0, 10),
+                        price: parseFloat(tx.price || 0),
+                        timestamp: tx.timestamp || "00:00:00",
+                        pl: tx.pl || "0.00"
+                    }));
+                    
+                    console.log(`[READ SUCCESS] Synced ${transactions.length} items from source ledger.`);
+                } else {
+                    const storageKey = `offline_mock_ledger_txs_${currentTeam.toLowerCase()}`;
+                    const localData = localStorage.getItem(storageKey);
+                    transactions = localData ? JSON.parse(localData) : [];
+                }
+            } catch (err) {
+                console.error("Critical error mapping asset logs:", err);
+                transactions = [];
+            }
+            
+            renderDashboard();
+        }
+
+        function saveLocalStorageFallback() {
+            const storageKey = `offline_mock_ledger_txs_${currentTeam.toLowerCase()}`;
+            localStorage.setItem(storageKey, JSON.stringify(transactions));
+            console.log("[READ-ONLY] State saved to browser cache. JSON file remains pristine.");
+        }
+
+        function filterStockSuggestions() {
+            const query = document.getElementById('stock-search').value.toUpperCase().trim();
+            const box = document.getElementById('suggestions-box');
+            box.innerHTML = '';
+
+            if (!query) { box.classList.add('hidden'); return; }
+
+            const matched = Object.keys(NSE_COMPANY_NAMES).filter(ticker => 
+                ticker.includes(query) || NSE_COMPANY_NAMES[ticker].toUpperCase().includes(query)
+            );
+
+            if (matched.length === 0) { box.classList.add('hidden'); return; }
+
+            box.classList.remove('hidden');
+            matched.forEach(ticker => {
+                const item = document.createElement('div');
+                item.className = 'px-4 py-2 hover:bg-gray-50 dark:hover:bg-zinc-700/50 cursor-pointer text-xs font-bold text-[#002d52] dark:text-zinc-200 flex justify-between border-b border-gray-100 dark:border-zinc-700 last:border-0';
+                item.innerHTML = `<span class="text-[#004275] dark:text-blue-400">${ticker}</span> <span class="text-gray-400 dark:text-zinc-500 font-medium truncate max-w-[180px]">${NSE_COMPANY_NAMES[ticker]}</span>`;
+                item.onclick = () => {
+                    document.getElementById('stockTicker').value = ticker;
+                    document.getElementById('stock-search').value = `${ticker} - ${NSE_COMPANY_NAMES[ticker]}`;
+                    box.classList.add('hidden');
+                };
+                box.appendChild(item);
+            });
+        }
+
+        function handleTransaction(e) {
+            e.preventDefault();
+            const type = document.querySelector('input[name="txType"]:checked').value;
+            const ticker = document.getElementById('stockTicker').value.trim().toUpperCase();
+            const qty = parseInt(document.getElementById('stockQty').value, 10);
+            const price = parseFloat(document.getElementById('stockPrice').value);
+
+            if (!ticker || isNaN(qty) || isNaN(price)) return;
+
+            const currentCash = calculateWalletMetrics().availableCash;
+            if (type === 'BUY' && (qty * price) > currentCash) {
+                alert("Action Denied: Insufficient cash balance.");
+                return;
+            }
+
+            if (type === 'SELL') {
+                const holdingsMap = calculateHoldings();
+                const activeUnits = holdingsMap[ticker]?.qty || 0;
+                if (qty > activeUnits) {
+                    alert("Action Denied: Insufficient units available.");
+                    return;
+                }
+            }
+
+            transactions.push({
+                type,
+                stockId: ticker,
+                quantity: qty,
+                price,
+                timestamp: new Date().toLocaleString()
+            });
+
+            saveLocalStorageFallback();
+            renderDashboard();
+            
+            document.getElementById('stock-search').value = '';
+            document.getElementById('stockTicker').value = '';
+            document.getElementById('stockQty').value = '';
+            document.getElementById('stockPrice').value = '';
+        }
+
+        function calculateHoldings() {
+            const holdings = {};
+            
+            transactions.forEach(tx => {
+                const ticker = tx.stockId;
+                if (!ticker) return;
+                
+                if (!holdings[ticker]) {
+                    holdings[ticker] = { 
+                        qty: 0, 
+                        totalCost: 0,       
+                        realizedPL: 0, 
+                        lastPrice: tx.price,
+                        firstBuyPrice: tx.price
+                    };
+                }
+                holdings[ticker].lastPrice = tx.price;
+
+                if (tx.type === 'BUY') {
+                    if (holdings[ticker].qty === 0) {
+                        holdings[ticker].firstBuyPrice = tx.price;
+                    }
+                    holdings[ticker].qty += tx.quantity;
+                    holdings[ticker].totalCost += (tx.quantity * tx.price);
+                } else if (tx.type === 'SELL') {
+                    const currentUnits = holdings[ticker].qty;
+                    const avgCostBeforeSell = currentUnits > 0 ? (holdings[ticker].totalCost / currentUnits) : holdings[ticker].firstBuyPrice;
+                    
+                    holdings[ticker].realizedPL += (tx.quantity * tx.price) - (tx.quantity * avgCostBeforeSell);
+                    holdings[ticker].qty -= tx.quantity;
+                    holdings[ticker].totalCost -= (tx.quantity * avgCostBeforeSell);
+                    
+                    if (holdings[ticker].qty <= 0) {
+                        holdings[ticker].qty = 0;
+                        holdings[ticker].totalCost = 0;
+                    }
+                }
+            });
+            return holdings;
+        }
+
+        function calculateWalletMetrics() {
+            let availableCash = INITIAL_PRINCIPAL;
+            transactions.forEach(tx => {
+                if (tx.type === 'BUY') {
+                    availableCash -= (tx.quantity * tx.price);
+                } else if (tx.type === 'SELL') {
+                    availableCash += (tx.quantity * tx.price);
+                }
+            });
+            return { availableCash };
+        }
+
+        function renderDashboard() {
+            const holdingsMap = calculateHoldings();
+            const wallet = calculateWalletMetrics();
+            const body = document.getElementById('holdings-table-body');
+            const emptyNotify = document.getElementById('holdings-empty');
+            
+            body.innerHTML = '';
+            const keys = Object.keys(holdingsMap);
+
+            if (keys.length === 0) {
+                emptyNotify.classList.remove('hidden');
+            } else {
+                emptyNotify.classList.add('hidden');
+            }
+
+            let grandTotalCost = 0;
+            let grandTotalRealizedPL = 0;
+
+            keys.forEach(ticker => {
+                const position = holdingsMap[ticker];
+                const isClosed = position.qty === 0;
+                
+                // If closed, reflect original baseline buy price so it doesn't print messy math
+                const avgCost = !isClosed ? (position.totalCost / position.qty) : position.firstBuyPrice;
+                const currentValue = !isClosed ? (position.qty * position.lastPrice) : 0;
+                const unrealizedPL = !isClosed ? (currentValue - position.totalCost) : 0;
+                
+                // Absolute total profit/loss for this asset ticker
+                const totalPositionPL = unrealizedPL + position.realizedPL;
+
+                grandTotalCost += (!isClosed ? position.totalCost : 0);
+                grandTotalRealizedPL += totalPositionPL;
+
+                const row = document.createElement('tr');
+                row.className = `hover:bg-gray-50/60 dark:hover:bg-zinc-800/40 border-b border-gray-100 dark:border-zinc-800/80 last:border-0 ${isClosed ? 'strike-through' : ''}`;
+                
+                // Clean formatting to prevent fractional decimal rounding errors near zero (-0.00)
+                const absolutePL = Math.abs(totalPositionPL) < 0.01 ? 0.00 : totalPositionPL;
+                const plStyleClass = absolutePL > 0 ? 'text-[#148a4f] dark:text-green-400' : absolutePL < 0 ? 'text-[#d64545] dark:text-red-400' : 'text-gray-400 dark:text-zinc-500';
+                
+                row.innerHTML = `
+                    <td class="py-4 pl-4 font-extrabold text-[#004275] dark:text-blue-400">
+                        ${ticker} ${isClosed ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-zinc-700 text-gray-600 dark:text-zinc-400 font-bold uppercase tracking-wider">CLOSED</span>' : ''}
+                        <span class="block text-[10px] text-gray-400 normal-case font-medium">${NSE_COMPANY_NAMES[ticker] || 'Custom Asset'}</span>
+                    </td>
+                    <td class="py-4 text-right">${position.qty.toLocaleString()}</td>
+                    <td class="py-4 text-right text-gray-400">₹${avgCost.toFixed(2)}</td>
+                    <td class="py-4 text-right text-gray-400">₹${Math.max(0, position.totalCost).toFixed(2)}</td>
+                    <td class="py-4 text-right text-blue-900 dark:text-blue-300">₹${position.lastPrice.toFixed(2)}</td>
+                    <td class="py-4 text-right pr-4 ${plStyleClass}">₹${absolutePL.toFixed(2)}</td>
+                `;
+                body.appendChild(row);
+            });
+
+            // Fix rounding variance issues on your cash metrics card layouts
+            const finalCash = Math.abs(wallet.availableCash - INITIAL_PRINCIPAL) < 0.01 ? INITIAL_PRINCIPAL : wallet.availableCash;
+            const finalGrandPL = Math.abs(grandTotalRealizedPL) < 0.01 ? 0.00 : grandTotalRealizedPL;
+
+            document.getElementById('metric-cash-balance').innerText = `₹${finalCash.toFixed(2)}`;
+            document.getElementById('metric-total-cost').innerText = `₹${grandTotalCost.toFixed(2)}`;
+
+            const plNode = document.getElementById('metric-total-pl');
+            plNode.innerText = `₹${finalGrandPL.toFixed(2)}`;
+            plNode.className = finalGrandPL > 0 ? "text-2xl font-extrabold text-[#148a4f] mt-2 tracking-tight" : finalGrandPL < 0 ? "text-2xl font-extrabold text-[#d64545] mt-2 tracking-tight" : "text-2xl font-extrabold text-gray-400 mt-2 tracking-tight";
+        }
+
+        function openExportModal() {
+            if (transactions.length === 0) { alert("The ledger history is completely empty."); return; }
+            document.getElementById('trader-name-input').value = localStorage.getItem('mock_ledger_current_user') || "Anonymous";
+            document.getElementById('export-modal').classList.remove('hidden');
+            document.getElementById('export-modal').classList.add('flex');
+        }
+
+        function closeExportModal() {
+            document.getElementById('export-modal').classList.add('hidden');
+            document.getElementById('export-modal').classList.remove('flex');
+        }
+
+        function confirmAndExportCSV() {
+            const traderName = localStorage.getItem('mock_ledger_current_user') || "Anonymous";
+            const holdingsMap = calculateHoldings();
+            const wallet = calculateWalletMetrics();
+            
+            let csvRows = [
+                ["ASHOKA MOCK-STOCK COMPETITION PORTFOLIO REPORT"],
+                ["Trader Profile Name", `"${traderName}"`],
+                ["Available Cash Balance", wallet.availableCash.toFixed(2)],
+                [],
+                ["Asset Ticker", "Net Units Held", "Avg. Cost", "Total Outlay", "Market Price", "Net P&L"]
+            ];
+            
+            let totalPortfolioPL = 0;
+
+            Object.keys(holdingsMap).forEach(ticker => {
+                const pos = holdingsMap[ticker];
+                const isClosed = pos.qty === 0;
+                
+                const avgCost = !isClosed ? (pos.totalCost / pos.qty) : (pos.firstBuyPrice || 0);
+                const currentValue = !isClosed ? (pos.qty * pos.lastPrice) : 0;
+                const unrealizedPL = !isClosed ? (currentValue - pos.totalCost) : 0;
+                const netPositionPL = unrealizedPL + pos.realizedPL;
+                
+                totalPortfolioPL += netPositionPL;
+                const absolutePL = Math.abs(netPositionPL) < 0.01 ? 0.00 : netPositionPL;
+
+                // FIXED: Removed the filter that omitted zero-P&L holdings
+                csvRows.push([
+                    ticker, 
+                    pos.qty, 
+                    avgCost.toFixed(2), 
+                    pos.totalCost.toFixed(2), 
+                    pos.lastPrice.toFixed(2), 
+                    absolutePL.toFixed(2)
+                ]);
+            });
+
+            csvRows.push([]);
+            csvRows.push(["TOTAL PORTFOLIO PROFIT / LOSS", "", "", "", "", totalPortfolioPL.toFixed(2)]);
+
+            const csvContent = "data:text/csv;charset=utf-8," + csvRows.map(row => row.join(",")).join("\n");
+            const downloadAnchor = document.createElement("a");
+            downloadAnchor.setAttribute("href", encodeURI(csvContent));
+            downloadAnchor.setAttribute("download", `${traderName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.csv`);
+            
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            document.body.removeChild(downloadAnchor);
+            
+            closeExportModal();
+        }
+
+        function clearAllData() {
+            if (confirm("Reset current layout preview container?")) {
+                transactions = [];
+                saveLocalStorageFallback();
+                renderDashboard();
+            }
+        }
     </script>
 </body>
 </html>
